@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reverse Linked List — Pointer Lab</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  :root {
+    /* Ultra-Playful Gamified Palette */
+    --bg-color: #F0E6FF; 
+    --card: #FFFFFF; 
+    
+    /* Text */
+    --ink: #2D3436; 
+    --ink-2: #636E72; 
+    --ink-3: #B2BEC3;
+    
+    /* Borders & Shadows */
+    --line: #DFE6E9; 
+    --line-heavy: #D1D8DB;
+    --shadow-color: rgba(45, 52, 54, 0.1);
+    
+    /* Brand & Accents */
+    --primary: #FF9F43; 
+    --primary-shadow: #E1700F;
+    --secondary: #A55EEA; 
+    --secondary-shadow: #7B3BB5;
+    
+    /* Visualizer & States */
+    --prev: #FF5252; --prev-bg: #FFDADA;
+    --curr: #00D2D3; --curr-bg: #C7F6F6;
+    --next: #FECA57; --next-bg: #FFF3D1;
+    
+    --ok: #10AC84; --ok-shadow: #0A7A5D; --ok-bg: #1DD1A1;
+    --bad: #FF6B6B; --bad-shadow: #C0392B; --bad-bg: #FFEAA7;
+    
+    /* Typography */
+    --mono: "Nunito", ui-monospace, "Cascadia Code", "JetBrains Mono", monospace;
+    --sans: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg-color); min-height: 100vh; }
+  
+  body { 
+    font-family: var(--sans); color: var(--ink); line-height: 1.6; 
+    -webkit-font-smoothing: antialiased; 
+    background-image: radial-gradient(#D5C0F9 2px, transparent 2px);
+    background-size: 30px 30px;
+    padding-bottom: 40px;
+  }
+  
+  a { color: var(--secondary); font-weight: 800; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---- Floating Gamified Topbar ---- */
+  .topbar {
+    display: flex; align-items: center; gap: 16px; padding: 16px 28px; 
+    background: var(--card); border-radius: 100px;
+    margin: 20px auto 30px auto; max-width: 1550px; width: calc(100% - 48px);
+    border: 4px solid var(--card); box-shadow: 0 8px 0 var(--shadow-color);
+    z-index: 20;
+  }
+  .logo {
+    font-size: 22px; font-weight: 900; letter-spacing: .02em; 
+    display: flex; align-items: center; gap: 12px;
+    color: var(--secondary); text-transform: uppercase;
+  }
+  .logo .dots { display: inline-flex; gap: 6px; }
+  .logo .dots i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
+  .logo .dots i:nth-child(1) { background: var(--prev); }
+  .logo .dots i:nth-child(2) { background: var(--curr); }
+  .logo .dots i:nth-child(3) { background: var(--next); }
+  .topbar .spacer { flex: 1; }
+  
+  .pill {
+    font-family: var(--sans); font-size: 14px; font-weight: 900; padding: 8px 18px; 
+    border-radius: 100px; background: #F1F2F6; color: var(--ink-2);
+    border: 2px solid transparent; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .pill.easy { color: #FFFFFF; background: var(--ok-bg); box-shadow: 0 4px 0 var(--ok-shadow); transform: translateY(-2px);}
+
+  /* ---- Tabs Container ---- */
+  .tab-group {
+    display: flex; gap: 16px; justify-content: center; margin-bottom: 32px;
+    max-width: 1600px; margin-left: auto; margin-right: auto; flex-wrap: wrap;
+  }
+  .tab {
+    font-family: var(--sans); font-size: 18px; font-weight: 900;
+    padding: 14px 32px; border-radius: 100px; background: var(--card);
+    border: 4px solid var(--line); color: var(--ink-3); cursor: pointer;
+    box-shadow: 0 6px 0 var(--line-heavy); transition: all 0.1s;
+    text-transform: uppercase; letter-spacing: 1px; outline: none;
+  }
+  .tab:active { transform: translateY(6px); box-shadow: 0 0px 0 transparent; }
+  .tab.active {
+    border-color: var(--secondary); color: var(--secondary);
+    box-shadow: 0 6px 0 var(--secondary-shadow); background: #F8F0FF;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.3s ease-out forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---- Layout ---- */
+  .wrap {
+    display: grid; padding: 0 24px; margin: 0 auto;
+  }
+  
+  /* ---- Floating Cards ---- */
+  .col {
+    background: var(--card); padding: 40px; border-radius: 40px;
+    border: 4px solid #FFFFFF; box-shadow: 0 12px 0 var(--shadow-color);
+  }
+
+  /* ---- Problem Statement ---- */
+  h1 { font-size: 36px; font-weight: 900; letter-spacing: -0.02em; margin: 0 0 8px; color: var(--primary); }
+  .sub { font-size: 16px; font-weight: 800; color: var(--ink-3); margin-bottom: 28px; text-transform: uppercase; letter-spacing: 1px;}
+  .prose p { margin: 0 0 18px; font-size: 18px; font-weight: 700; color: var(--ink); }
+  .prose code { 
+    font-family: var(--mono); font-size: 16px; font-weight: 800; 
+    background: #F1F2F6; color: var(--secondary); padding: 4px 10px; border-radius: 10px; 
+  }
+  
+  .eg {
+    background: #F8F9FA; border-radius: 24px; padding: 20px 24px; margin: 0 0 20px;
+    border: 3px solid var(--line); box-shadow: 0 6px 0 var(--line); transition: transform 0.2s;
+  }
+  .eg:hover { transform: translateY(-4px); box-shadow: 0 10px 0 var(--line); }
+  .eg .lbl { font-size: 15px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;}
+  .eg .kv { font-family: var(--sans); font-size: 17px; margin: 6px 0; font-weight: 800; color: var(--ink);}
+  .eg .kv b { color: var(--ink-3); font-weight: 900; display: inline-block; width: 80px; text-transform: uppercase; font-size: 14px;}
+  
+  .hint-bar { display: flex; gap: 20px; font-size: 15px; color: var(--ink-2); margin: 32px 0 16px; flex-wrap: wrap; font-weight: 800;}
+  .hint-bar span { background: #F1F2F6; padding: 8px 16px; border-radius: 12px; }
+  .hint-bar span b { color: var(--ink); font-weight: 900; text-transform: uppercase; }
+  
+  details.hint {
+    margin-top: 16px; border-radius: 24px; background: var(--next-bg); overflow: hidden; 
+    border: 3px solid #FDE49B; box-shadow: 0 6px 0 #FDE49B;
+  }
+  details.hint > summary {
+    cursor: pointer; padding: 18px 24px; font-size: 17px; font-weight: 900; 
+    list-style: none; user-select: none; color: #D49B1C; display: flex; align-items: center;
+  }
+  details.hint > summary::-webkit-details-marker { display: none; }
+  details.hint > summary::before { content: "🎁  Unlock Hint "; margin-right: 8px; }
+  details.hint[open] > summary::before { content: "✨  Hint Revealed: "; }
+  details.hint .body { padding: 0 24px 20px; font-size: 16px; color: #B38215; font-weight: 700;}
+
+  /* ---- Code Editor ---- */
+  .editor-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .editor-head .ttl { font-size: 20px; font-weight: 900; color: var(--ink); display: flex; align-items: center; gap: 8px;}
+  
+  select#langSelect {
+    font-family: var(--sans); font-size: 16px; font-weight: 900; padding: 10px 20px; 
+    border-radius: 100px; border: 3px solid var(--line); background: var(--card); 
+    color: var(--secondary); cursor: pointer; outline: none; box-shadow: 0 4px 0 var(--line-heavy);
+  }
+  select#langSelect:focus { border-color: var(--secondary); box-shadow: 0 4px 0 var(--secondary-shadow); }
+
+  .ed-shell {
+    position: relative; border-radius: 28px; background: #1E272E; 
+    overflow: hidden; border: 4px solid var(--line); box-shadow: 0 8px 0 var(--shadow-color);
+    transition: all 0.2s;
+  }
+  .ed-shell.focus { border-color: var(--secondary); box-shadow: 0 8px 0 var(--secondary-shadow), 0 0 0 6px #E0C3FC; }
+  
+  textarea#code {
+    width: 100%; min-height: 380px; resize: vertical; border: none; outline: none; background: transparent;
+    font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 16px; font-weight: 600;
+    line-height: 1.7; padding: 24px; color: #F8EFBA; tab-size: 2; white-space: pre;
+  }
+  
+  .ed-foot {
+    display: flex; gap: 16px; align-items: center; padding: 16px 24px; 
+    background: #2D3436; border-top: 2px solid #4B6584; flex-wrap: wrap;
+  }
+  
+  /* ---- Squishy 3D Buttons ---- */
+  .btn {
+    font-family: var(--sans); font-size: 16px; font-weight: 900; padding: 12px 28px; 
+    border-radius: 100px; border: none; background: #F1F2F6; 
+    color: var(--ink); cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 0 var(--line-heavy); position: relative; top: 0;
+  }
+  .btn:active { top: 6px; box-shadow: 0 0px 0 transparent; }
+  .btn.run { background: var(--ok-bg); color: #fff; box-shadow: 0 6px 0 var(--ok-shadow); }
+  .btn.primary { background: var(--primary); color: #fff; box-shadow: 0 6px 0 var(--primary-shadow); }
+  
+  .btn.ghost { background: transparent; color: #B2BEC3; box-shadow: none; padding: 12px 16px; }
+  .btn.ghost:hover { color: #FFF; background: rgba(255,255,255,0.1); }
+  .btn.ghost:active { top: 2px; }
+  .ed-foot .spacer { flex: 1; }
+
+  /* ---- Results Section ---- */
+  .results { margin-top: 32px; }
+  .res-head { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 900; color: var(--ink-2); margin-bottom: 16px; text-transform: uppercase;}
+  
+  .verdict { font-weight: 900; font-size: 18px; padding: 8px 20px; border-radius: 100px; text-transform: uppercase; letter-spacing: 1px;}
+  .verdict.ok { color: #FFF; background: var(--ok-bg); box-shadow: 0 4px 0 var(--ok-shadow); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .verdict.bad { color: #fff; background: var(--bad); box-shadow: 0 4px 0 var(--bad-shadow); }
+  .verdict.idle { color: var(--ink-3); background: var(--line); box-shadow: 0 4px 0 var(--line-heavy);}
+  
+  @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  
+  .case {
+    border-radius: 20px; padding: 16px 20px; margin-bottom: 12px; 
+    background: #F8F9FA; font-family: var(--sans); font-size: 16px; font-weight: 800;
+    display: flex; gap: 16px; align-items: center; border: 3px solid var(--line); box-shadow: 0 4px 0 var(--line);
+  }
+  .case.pass { border-color: #55E6C1; background: #E8FDF5; box-shadow: 0 4px 0 #55E6C1; color: #0A7A5D;}
+  .case.fail { border-color: #FD79A8; background: #FFF0F5; box-shadow: 0 4px 0 #FD79A8; color: #D63031;}
+  
+  .case .mark { flex-shrink: 0; font-size: 24px; line-height: 1;}
+  .case .detail { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
+  .case .detail .arrow { color: var(--ink-3); font-weight: 900; }
+  .case .badge { background: #FFF; padding: 4px 12px; border-radius: 12px; border: 2px solid rgba(0,0,0,0.1); }
+  .err { font-family: var(--mono); font-size: 15px; font-weight: 700; color: #D63031; background: #FFEAA7; border: 3px solid #FDCB6E; border-radius: 20px; padding: 18px; white-space: pre-wrap; box-shadow: 0 4px 0 #FDCB6E;}
+
+  /* ---- Visualizer ---- */
+  .viz-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;}
+  .viz-head .t { font-size: 28px; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 10px;}
+  .viz-head .legend { display: flex; gap: 16px; font-size: 15px; font-weight: 900; text-transform: uppercase; background: #F1F2F6; padding: 10px 20px; border-radius: 100px;}
+  .viz-head .legend i { display: inline-block; width: 16px; height: 16px; border-radius: 5px; margin-right: 8px; vertical-align: -3px; box-shadow: 0 2px 0 rgba(0,0,0,0.2);}
+  
+  #vsvg {
+    display: block; background: #F8F9FA; border: 4px solid var(--line); 
+    border-radius: 32px; box-shadow: inset 0 8px 0 rgba(0,0,0,0.03); margin-bottom: 24px; width: 100%;
+  }
+  
+  .viz-stage { 
+    font-size: 18px; font-weight: 800; color: #7B3BB5; min-height: 24px; 
+    background: #E0C3FC; padding: 20px 28px; border-radius: 20px; 
+    border: 3px solid #D1A3FF; text-align: center; box-shadow: 0 6px 0 #D1A3FF;
+    display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+  }
+  
+  .viz-ctrl { 
+    display: flex; gap: 16px; align-items: center; margin-top: 28px; 
+    background: var(--card); padding: 20px; border-radius: 28px; 
+    border: 4px solid var(--line); box-shadow: 0 8px 0 var(--shadow-color); flex-wrap: wrap;
+  }
+  
+  .viz-ctrl .input-group {
+    display: flex; align-items: center; gap: 10px; background: #F1F2F6; padding: 6px 6px 6px 20px; border-radius: 100px; border: 3px solid var(--line-heavy);
+  }
+  .viz-ctrl .lbl { font-size: 15px; font-weight: 900; color: var(--ink-2); text-transform: uppercase;}
+  .viz-ctrl input[type=text] { 
+    font-family: var(--sans); font-size: 18px; font-weight: 900; padding: 8px; border: none; background: transparent; width: 150px; color: var(--secondary); outline: none; text-align: center;
+  }
+  
+  .sbtn { 
+    font-family: var(--sans); font-size: 16px; font-weight: 900; padding: 14px 24px; 
+    border-radius: 100px; border: none; background: #DFE6E9; cursor: pointer; 
+    color: var(--ink); box-shadow: 0 5px 0 #B2BEC3; text-transform: uppercase; 
+    transition: all 0.1s; position: relative; top: 0; outline: none;
+  }
+  .sbtn:hover:not(:disabled) { background: #FFEAA7; color: #D49B1C; box-shadow: 0 5px 0 #FDCB6E; }
+  .sbtn:active:not(:disabled) { top: 5px; box-shadow: 0 0px 0 transparent; }
+  .sbtn:disabled { opacity: 0.4; cursor: default; box-shadow: none; top: 5px; background: #F1F2F6;}
+  
+  .codeline { 
+    font-family: var(--mono); font-size: 18px; font-weight: 800; color: var(--ink-2); 
+    margin-top: 24px; min-height: 24px; padding: 16px 24px; background: #F8F9FA;
+    border-radius: 20px; border: 3px solid var(--line);
+  }
+  .codeline b { color: var(--primary); font-family: var(--sans); font-size: 20px; font-weight: 900; margin-right: 12px; background: #FFEAA7; padding: 4px 10px; border-radius: 8px;}
+  
+  footer { padding: 32px; font-size: 16px; font-weight: 800; color: var(--ink-3); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="logo"><span class="dots"><i></i><i></i><i></i></span> Pointer Lab 🧩</span>
+  <span class="spacer"></span>
+  <span class="pill easy">🌟 Easy</span>
+  <span class="pill">Linked List</span>
+  <span class="pill">Two Pointers</span>
+</div>
+
+<div class="tab-group">
+  <button class="tab active" onclick="showTab('tab1', this)">📋 Problem</button>
+  <button class="tab" onclick="showTab('tab2', this)">🔍 Pointer Trace</button>
+  <button class="tab" onclick="showTab('tab3', this)">💻 Code Solutions</button>
+</div>
+
+<!-- ============ TAB 1: Problem ============ -->
+<div id="tab1" class="panel active">
+  <div class="wrap" style="grid-template-columns: 1fr; max-width: 800px;">
+    <section class="col">
+      <h1>Reverse Linked List</h1>
+      <div class="sub">Level 206 · Recursion & Pointers</div>
+
+      <div class="prose">
+        <p>Given the <code>head</code> of a singly linked list, reverse the list and return the new head! 🔄</p>
+
+        <div class="eg">
+          <div class="lbl">📋 Example 1</div>
+          <div class="kv"><b>Input:</b> head = [1, 2, 3, 4, 5]</div>
+          <div class="kv"><b>Output:</b> [5, 4, 3, 2, 1]</div>
+        </div>
+        <div class="eg">
+          <div class="lbl">📋 Example 2</div>
+          <div class="kv"><b>Input:</b> head = [1, 2]</div>
+          <div class="kv"><b>Output:</b> [2, 1]</div>
+        </div>
+
+        <div class="hint-bar">
+          <span><b>Constraints:</b></span>
+          <span>Nodes: <code>0 to 5000</code></span>
+          <span>Value: <code>-5000 to 5000</code></span>
+        </div>
+
+        <details class="hint">
+          <summary>Hint 1 — The Three Pointers</summary>
+          <div class="body">
+            <p>Walk the list with two live pointers, <code>prev</code> and <code>curr</code>. From <code>curr</code>'s point of view, its <code>next</code> arrow should point <em>backward</em> at <code>prev</code> instead of forward.</p>
+            <p>You also need a third, temporary pointer to remember the node ahead before you overwrite the link — otherwise the rest of the list is lost in space! 🚀</p>
+          </div>
+        </details>
+        <details class="hint">
+          <summary>Hint 2 — The Loop Action Plan</summary>
+          <div class="body">
+            <p>1. <code>next = curr.next</code> — Save what comes after.</p>
+            <p>2. <code>curr.next = prev</code> — Flip the arrow around! ↩️</p>
+            <p>3. <code>prev = curr</code> — Slide prev forward.</p>
+            <p>4. <code>curr = next</code> — Slide curr forward.</p>
+            <p>When <code>curr</code> falls off the end, <code>prev</code> is your shiny new head.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ============ TAB 2: Pointer Trace ============ -->
+<div id="tab2" class="panel">
+  <div class="wrap" style="grid-template-columns: 1fr; max-width: 1100px;">
+    <section class="col">
+      <div class="viz-head">
+        <span class="t">🔍 Pointer Trace</span>
+        <span class="legend">
+          <span style="color:var(--prev)"><i style="background:var(--prev)"></i>prev</span>
+          <span style="color:var(--curr)"><i style="background:var(--curr)"></i>curr</span>
+          <span style="color:var(--next)"><i style="background:var(--next)"></i>next</span>
+        </span>
+      </div>
+
+      <svg viewBox="0 0 560 180" id="vsvg">
+        <defs>
+          <marker id="va" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <g id="vscene"></g>
+      </svg>
+
+      <div class="codeline" id="vcode"></div>
+      <div class="viz-stage" id="vstage"></div>
+
+      <div class="viz-ctrl">
+        <div class="input-group">
+          <span class="lbl">List:</span>
+          <input type="text" id="vinput" value="1, 2, 3, 4" spellcheck="false">
+          <button class="sbtn" style="padding: 10px 20px; margin-left: 4px;" onclick="vBuild()">Load</button>
+        </div>
+        <span style="flex:1"></span>
+        <button class="sbtn" id="vvoice" onclick="toggleVoice()" style="background: #A55EEA; color: #FFF; box-shadow: 0 5px 0 #7B3BB5;">🔊 Voice: On</button>
+        <button class="sbtn" id="vback" onclick="vStep(-1)">◀ Back</button>
+        <button class="sbtn" id="vfwd" onclick="vStep(1)">Step ▶</button>
+        <button class="sbtn" id="vplay" onclick="vToggle()" style="background: #FFEAA7; color: #D49B1C; box-shadow: 0 5px 0 #FDCB6E;">Auto ⏯</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ============ TAB 3: Solutions ============ -->
+<div id="tab3" class="panel">
+  <div class="wrap" style="grid-template-columns: 1fr; max-width: 1000px;">
+    <section class="col">
+      <div class="editor-head" style="justify-content: space-between;">
+        <span class="ttl">💻 Code Solutions</span>
+        <select id="langSelect" onchange="updateCode()">
+          <option value="js">JavaScript (Interactive)</option>
+          <option value="py">Python</option>
+          <option value="java">Java</option>
+        </select>
+      </div>
+
+      <div class="ed-shell focus" id="edshell">
+        <textarea id="code" spellcheck="false"></textarea>
+        <div class="ed-foot" id="test-controls">
+          <button class="btn ghost" onclick="updateCode()">↺ Reset Code</button>
+          <span class="spacer"></span>
+          <button class="btn run" onclick="runTests(false)">▶ Run Tests</button>
+          <button class="btn primary" onclick="runTests(true)">🚀 Submit</button>
+        </div>
+      </div>
+
+      <div class="results" id="results-area">
+        <div class="res-head">
+          <span>🎯 Test Results</span>
+          <span class="verdict idle" id="verdict">Ready to Play!</span>
+          <span style="flex:1"></span>
+          <span id="timing" style="font-family:var(--sans);font-weight:900;font-size:15px;color:var(--ink-3)"></span>
+        </div>
+        <div id="cases"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<footer>O(n) time · O(1) space — Three pointers, zero extra structure. Play around to see how it works! 🎮</footer>
+
+<script>
+// ---------- Multi-Language Solutions Data ----------
+const codeSolutions = {
+  js: `/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ * this.val = (val === undefined ? 0 : val);
+ * this.next = (next === undefined ? null : next);
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+function reverseList(head) {
+  let prev = null;
+  let curr = head;
+  while (curr !== null) {
+    let next = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = next;
+  }
+  return prev;
+}`,
+  py: `# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = None
+        curr = head
+        while curr:
+            next_node = curr.next
+            curr.next = prev
+            prev = curr
+            curr = next_node
+        return prev`,
+  java: `/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ * int val;
+ * ListNode next;
+ * ListNode() {}
+ * ListNode(int val) { this.val = val; }
+ * ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        while (curr != null) {
+            ListNode nextNode = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextNode;
+        }
+        return prev;
+    }
+}`
+};
+
+// ---------- UI Management ----------
+function showTab(tabId, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  el.classList.add('active');
+}
+
+const ta = document.getElementById('code');
+const shell = document.getElementById('edshell');
+const testControls = document.getElementById('test-controls');
+const resultsArea = document.getElementById('results-area');
+
+ta.addEventListener('focus', () => shell.classList.add('focus'));
+ta.addEventListener('blur', () => shell.classList.remove('focus'));
+ta.addEventListener('keydown', e => {
+  if (e.key === 'Tab') { 
+    e.preventDefault(); const s = ta.selectionStart, en = ta.selectionEnd;
+    ta.value = ta.value.slice(0,s) + '  ' + ta.value.slice(en); ta.selectionStart = ta.selectionEnd = s + 2; 
+  }
+});
+
+function updateCode() {
+  const lang = document.getElementById('langSelect').value;
+  ta.value = codeSolutions[lang];
+  // Only allow running code for JS in the browser client
+  if (lang === 'js') {
+    testControls.style.display = 'flex';
+    resultsArea.style.display = 'block';
+    ta.removeAttribute('readonly');
+  } else {
+    testControls.style.display = 'none';
+    resultsArea.style.display = 'none';
+    ta.setAttribute('readonly', true);
+  }
+}
+updateCode(); // Initialize code area
+
+// ---------- linked list helpers (For JS Test Runner) ----------
+function ListNode(val, next){ this.val = (val===undefined?0:val); this.next = (next===undefined?null:next); }
+function fromArray(a){ let dummy=new ListNode(0), t=dummy; for(const v of a){ t.next=new ListNode(v); t=t.next; } return dummy.next; }
+function toArray(h){ const out=[]; let g=0; while(h){ out.push(h.val); if(++g>10000) break; h=h.next; } return out; }
+function eqArr(a,b){ if(a.length!==b.length) return false; for(let i=0;i<a.length;i++) if(a[i]!==b[i]) return false; return true; }
+
+const TESTS = [
+  { in:[1,2,3,4,5], out:[5,4,3,2,1] },
+  { in:[1,2],       out:[2,1] },
+  { in:[],          out:[] },
+  { in:[7],         out:[7] },
+  { in:[-3,0,9,-1], out:[-1,9,0,-3] }
+];
+
+function runTests(isSubmit){
+  const casesEl = document.getElementById('cases');
+  const verdict = document.getElementById('verdict');
+  const timing = document.getElementById('timing');
+  casesEl.innerHTML = ''; timing.textContent = '';
+
+  let fn;
+  try{
+    const src = ta.value + '\n;return reverseList;';
+    fn = new Function('ListNode', src)(ListNode);
+    if(typeof fn !== 'function') throw new Error('reverseList is not defined as a function');
+  }catch(err){
+    verdict.className = 'verdict bad'; verdict.textContent = 'Oops! Compile Error 🐛';
+    casesEl.innerHTML = '<div class="err">' + esc(String(err)) + '</div>';
+    return;
+  }
+
+  const cases = isSubmit ? TESTS : TESTS.slice(0,3);
+  let allPass = true; const t0 = performance.now();
+
+  for(let i=0; i<cases.length; i++){
+    const tc = cases[i];
+    let got, threw = null;
+    try{ got = toArray(fn(fromArray(tc.in.slice()))); }
+    catch(err){ threw = err; got = null; allPass = false; }
+
+    const pass = !threw && eqArr(got, tc.out);
+    if(!pass) allPass = false;
+
+    const div = document.createElement('div');
+    div.className = 'case ' + (pass ? 'pass' : 'fail');
+    if(threw){
+      div.innerHTML = '<span class="mark">💥</span><span class="detail">Case '+(i+1)+
+        ' — runtime error: <span class="badge" style="color:red">'+esc(String(threw.message||threw))+'</span></span>';
+    }else{
+      div.innerHTML = '<span class="mark">'+(pass?'⭐':'❌')+'</span>'+
+        '<span class="detail"><span class="badge">['+tc.in.join(', ')+']</span> '+
+        '<span class="arrow">➔</span> <span class="badge">['+(got.join(', '))+']</span>'+
+        (pass ? '' : ' <span class="arrow">expected</span> <span class="badge" style="border-color:#FD79A8">['+tc.out.join(', ')+']</span>')+
+        '</span>';
+    }
+    casesEl.appendChild(div);
+  }
+
+  const dt = (performance.now() - t0);
+  timing.textContent = dt.toFixed(2) + ' ms';
+  
+  verdict.style.animation = 'none';
+  verdict.offsetHeight;
+  verdict.style.animation = null; 
+
+  if(allPass){
+    verdict.className = 'verdict ok'; verdict.textContent = isSubmit ? '🎉 YOU WIN! All Passed 🎉' : 'Level Cleared! ✨';
+  }else{
+    verdict.className = 'verdict bad'; verdict.textContent = 'Try Again! 💪';
+  }
+}
+function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+// ================= VISUALIZER & VOICE =================
+const COLORS = {prev:'#FF5252', curr:'#00D2D3', next:'#FECA57'};
+const RAMP = ['#FF9F43','#A55EEA','#1DD1A1','#FF6B6B','#00D2D3','#FECA57','#54A0FF']; 
+const RAMP_SHADOW = ['#E1700F','#7B3BB5','#0A7A5D','#C0392B','#00B894','#F39C12','#2E86DE'];
+const RBG  = ['#FFF0E1','#F3EEFF','#E3F8EB','#FFE4E4','#E0F7F5','#FFF5E0','#E3F2FD'];
+
+function ncol(i){ return RAMP[i%RAMP.length]; }
+function nshadow(i){ return RAMP_SHADOW[i%RAMP_SHADOW.length]; }
+function nbg(i){ return RBG[i%RBG.length]; }
+
+let vSteps=[], vIdx=0, vVals=[], vTimer=null;
+let voiceEnabled = true;
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+  const btn = document.getElementById('vvoice');
+  if (voiceEnabled) {
+    btn.innerHTML = '🔊 Voice: On';
+    btn.style.background = '#A55EEA';
+    btn.style.boxShadow = '0 5px 0 #7B3BB5';
+    btn.style.color = '#FFF';
+  } else {
+    btn.innerHTML = '🔇 Voice: Off';
+    btn.style.background = '#DFE6E9';
+    btn.style.boxShadow = '0 5px 0 #B2BEC3';
+    btn.style.color = '#2D3436';
+    window.speechSynthesis.cancel();
+  }
+}
+
+function speakCurrentStep() {
+  if (!voiceEnabled) return;
+  const step = vSteps[vIdx];
+  if (!step) return;
+  
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(step.desc);
+  utterance.rate = 1.05;
+  utterance.pitch = 1.1;
+  window.speechSynthesis.speak(utterance);
+}
+
+function buildTrace(vals){
+  const n = vals.length;
+  const steps = [];
+  const links = {}; for(let i=0; i<n; i++) links[i] = (i < n-1 ? i+1 : null);
+  const snap = (line, prev, curr, next, desc, code) => steps.push({
+    line, prev, curr, next, desc, code, links: Object.assign({}, links)
+  });
+
+  let prev = null, curr = (n>0 ? 0 : null), next = undefined;
+  snap('init', prev, curr, undefined, 'prev starts null, curr starts at the head.', 'prev = null; curr = head;');
+  while(curr !== null){
+    snap('while', prev, curr, next, 'curr is not null, enter the loop.', 'while (curr !== null)');
+    next = (links[curr] !== undefined ? links[curr] : null);
+    snap('1', prev, curr, next, 'Save the next node before the link is broken.', 'next = curr.next;');
+    links[curr] = prev; 
+    snap('2', prev, curr, next, 'Flip curr.next to point back at prev.', 'curr.next = prev;');
+    prev = curr;
+    snap('3', prev, curr, next, 'Slide prev forward onto curr.', 'prev = curr;');
+    curr = next;
+    snap('4', prev, curr, next, 'Slide curr forward to the saved node.', 'curr = next;');
+  }
+  snap('while', prev, curr, next, 'curr is null, the while condition is false.', 'while (curr !== null) // false');
+  snap('return', prev, curr, next, 'Return prev — the new head of the reversed list!', 'return prev;');
+  return steps;
+}
+
+function vBuild(){
+  const raw = document.getElementById('vinput').value.trim();
+  let vals = raw === '' ? [] : raw.split(',').map(s => parseInt(s.trim(),10)).filter(v => !Number.isNaN(v)).slice(0,7);
+  document.getElementById('vinput').value = vals.join(', ');
+  vVals = vals; vSteps = buildTrace(vals); vIdx = 0; vStop(); vRender();
+}
+
+function vStep(d){ 
+  vIdx = Math.max(0, Math.min(vSteps.length-1, vIdx+d)); 
+  vRender(); 
+  speakCurrentStep(); 
+}
+
+function vToggle(){ vTimer ? vStop() : vPlay(); }
+
+function vPlay(){
+  document.getElementById('vplay').innerHTML = 'Pause ⏸';
+  speakCurrentStep(); // speak current before waiting
+  vTimer = setInterval(() => { 
+    if(vIdx >= vSteps.length - 1){ vStop(); return; } 
+    vIdx++; 
+    vRender(); 
+    speakCurrentStep(); 
+  }, 2500); // 2.5 seconds allows most sentences to finish
+}
+
+function vStop(){ 
+  if(vTimer) { clearInterval(vTimer); vTimer = null; } 
+  document.getElementById('vplay').innerHTML = 'Auto ⏯'; 
+}
+
+function vRender(){
+  const s = vSteps[vIdx]; if(!s) return;
+  const n = vVals.length;
+  const scene = document.getElementById('vscene');
+  const W = 560;
+  const NW = 52, NH = 52, GAP = (n > 0 ? Math.min(84, (W-90) / Math.max(n,1)) : 0);
+  const startX = 46, y = 90;
+  const X = i => startX + i * GAP;
+  const cx = i => X(i) + NW / 2;
+  let h = '';
+
+  h += `<text x="20" y="${y+NH/2}" text-anchor="middle" dominant-baseline="central" font-family="Nunito" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>`;
+  if(n > 0) h += `<text x="${X(n-1)+NW+34}" y="${y+NH/2}" text-anchor="middle" dominant-baseline="central" font-family="Nunito" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>`;
+
+  for(let i=0; i<n; i++){
+    const tgt = s.links[i], yy = y+NH/2;
+    if(tgt === null || tgt === undefined){
+      if(i > 0 && s.links[i] === null && (i === 0 || vIdx > 0) && tgt === null && isReversedTail(s,i,n)){
+        h += `<path d="M${X(i)} ${yy} L32 ${yy}" fill="none" stroke="${ncol(i)}" stroke-width="3" marker-end="url(#va)"/>`;
+      } else if(tgt === null){
+        if(i === n-1 && !isReversedTail(s,i,n)){
+          h += `<path d="M${X(i)+NW} ${yy} L${X(n-1)+NW+22} ${yy}" fill="none" stroke="${ncol(i)}" stroke-width="3" marker-end="url(#va)"/>`;
+        } else {
+          h += `<path d="M${X(i)} ${yy} L32 ${yy}" fill="none" stroke="${ncol(i)}" stroke-width="3" marker-end="url(#va)"/>`;
+        }
+      }
+      continue;
+    }
+    const fc = cx(i), tc = cx(tgt), yy2 = y+NH/2;
+    if(tc > fc){
+      h += `<line x1="${X(i)+NW}" y1="${yy2}" x2="${X(tgt)}" y2="${yy2}" stroke="${ncol(i)}" stroke-width="3" marker-end="url(#va)"/>`;
+    }else{
+      const sx = X(i), ex = X(tgt)+NW, my = yy2+38;
+      h += `<path d="M${sx} ${yy2+12} C ${sx-24} ${my}, ${ex+24} ${my}, ${ex} ${yy2+12}" fill="none" stroke="${ncol(i)}" stroke-width="3" marker-end="url(#va)"/>`;
+    }
+  }
+
+  for(let i=0; i<n; i++){
+    const isCurr = s.curr === i;
+    h += `<rect x="${X(i)}" y="${y+6}" width="${NW}" height="${NH}" rx="18" fill="${nshadow(i)}" />`;
+    h += `<rect x="${X(i)}" y="${y}" width="${NW}" height="${NH}" rx="18" fill="${nbg(i)}" stroke="${ncol(i)}" stroke-width="${isCurr?4:3}"/>`;
+    h += `<text x="${X(i)+NW/2}" y="${y+NH/2+2}" text-anchor="middle" dominant-baseline="central" font-family="Nunito" font-size="22" font-weight="900" fill="${ncol(i)}">${vVals[i]}</text>`;
+  }
+  
+  function flag(id, label, color, dy){
+    if(id === null || id === undefined) return '';
+    const x = cx(id), fy = y - 24 - dy;
+    return `<rect x="${x-24}" y="${fy-14}" width="48" height="22" rx="8" fill="${color}" />
+            <text x="${x}" y="${fy+1}" text-anchor="middle" font-family="Nunito" font-size="13" font-weight="900" fill="#FFF">${label}</text>
+            <line x1="${x}" y1="${fy+8}" x2="${x}" y2="${y-4}" stroke="${color}" stroke-width="3" marker-end="url(#va)"/>`;
+  }
+  
+  const samePC = (s.prev === s.curr && s.prev != null);
+  h += flag(s.prev, 'prev', COLORS.prev, samePC ? 28 : 0);
+  h += flag(s.curr, 'curr', COLORS.curr, 0);
+  if(s.next != null) h += flag(s.next, 'next', COLORS.next, 56);
+  if(s.curr === null && s.line !== 'init'){
+    h += `<rect x="${W-110}" y="${y-30}" width="80" height="26" rx="10" fill="${COLORS.curr}" />
+        <text x="${W-70}" y="${y-12}" text-anchor="middle" font-family="Nunito" font-size="14" font-weight="900" fill="#FFF">curr = ∅</text>`;
+  }
+
+  scene.innerHTML = h;
+  document.getElementById('vcode').innerHTML = stepBadge(s.line) + ' <span style="color:var(--ink)">' + esc(s.code) + '</span>';
+  document.getElementById('vstage').innerHTML = '<span>🎬 Step '+(vIdx+1)+' of '+vSteps.length+'</span> <span>'+s.desc+'</span>';
+  document.getElementById('vback').disabled = (vIdx === 0);
+  document.getElementById('vfwd').disabled = (vIdx === vSteps.length - 1);
+}
+
+function stepBadge(line){
+  if(['1','2','3','4'].includes(line)) return '<b>'+line+'.</b>';
+  if(line === 'while') return '<span style="color:var(--secondary);font-weight:900">while</span>';
+  if(line === 'return') return '<span style="color:var(--secondary);font-weight:900">return</span>';
+  return '<span style="color:var(--ink-3);font-weight:900">init</span>';
+}
+
+function isReversedTail(s, i, n){
+  return i === 0 && s.links[0] === null && s.prev !== null && s.prev !== undefined;
+}
+
+vBuild();
+runTests(false); // Initial Run
+</script>
+</body>
+</html>

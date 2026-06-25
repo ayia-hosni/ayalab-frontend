@@ -1,0 +1,144 @@
+<div class="topbar">
+  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
+  <span class="spacer"></span>
+  <a class="pill" routerLink="/">← Problem Set</a>
+</div>
+
+<div class="wrap">
+
+  <!-- Header + period selector -->
+  <div class="page-head">
+    <h1>💳 Payment Dashboard</h1>
+    <div class="period-btns">
+      @for (p of periods; track p.value) {
+        <button class="period-btn" [class.active]="period() === p.value" (click)="setPeriod(p.value)">
+          {{ p.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton-row">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  } @else if (stats(); as s) {
+
+    <!-- KPI cards -->
+    <div class="kpi-row">
+      <div class="kpi-card kpi-total">
+        <span class="kpi-icon">📊</span>
+        <div>
+          <div class="kpi-value">{{ s.total }}</div>
+          <div class="kpi-label">Total Initiated</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-success">
+        <span class="kpi-icon">✅</span>
+        <div>
+          <div class="kpi-value">{{ s.succeeded }}</div>
+          <div class="kpi-label">Completed</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-failed">
+        <span class="kpi-icon">❌</span>
+        <div>
+          <div class="kpi-value">{{ s.failed }}</div>
+          <div class="kpi-label">Failed</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-revenue">
+        <span class="kpi-icon">💰</span>
+        <div>
+          <div class="kpi-value">{{ egp(s.totalRevenueCents) }}</div>
+          <div class="kpi-label">Revenue</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-rate">
+        <span class="kpi-icon">📈</span>
+        <div>
+          <div class="kpi-value">{{ s.successRate.toFixed(1) }}%</div>
+          <div class="kpi-label">Success Rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card chart-wide">
+        <div class="chart-title">Payments over time</div>
+        <div class="chart-body">
+          <canvas #lineCanvas></canvas>
+        </div>
+      </div>
+      <div class="chart-card chart-narrow">
+        <div class="chart-title">By method</div>
+        <div class="chart-body">
+          <canvas #doughnutCanvas></canvas>
+        </div>
+      </div>
+    </div>
+
+  }
+
+  <!-- Audit log table -->
+  <div class="log-card">
+    <div class="log-header">
+      <div class="log-title">🗂 Audit Log</div>
+      <div class="log-filters">
+        <select class="log-select" [(ngModel)]="eventTypeFilter" (ngModelChange)="applyFilter()">
+          <option value="">All events</option>
+          @for (t of EVENT_TYPES; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (logsLoading()) {
+      <div class="log-empty">Loading… ⏳</div>
+    } @else if (logs().length === 0) {
+      <div class="log-empty">No events yet. Make a payment to see logs here.</div>
+    } @else {
+      <div class="log-table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Ref</th>
+              <th>Method</th>
+              <th>Amount</th>
+              <th>Error</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of logs(); track log.id) {
+              <tr>
+                <td><span class="badge" [class]="eventBadgeClass(log.eventType)">{{ log.eventType }}</span></td>
+                <td class="mono">{{ log.internalRef ?? '—' }}</td>
+                <td>{{ log.method ?? '—' }}</td>
+                <td>{{ log.amountCents != null ? egp(log.amountCents) : '—' }}</td>
+                <td class="error-cell" [title]="log.errorMessage ?? ''">
+                  {{ log.errorMessage ? log.errorMessage.slice(0, 40) + (log.errorMessage.length > 40 ? '…' : '') : '—' }}
+                </td>
+                <td class="time-cell">{{ log.createdAt | date:'dd/MM HH:mm:ss' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button class="page-btn" [disabled]="logPage() === 0" (click)="loadLogs(logPage() - 1)">←</button>
+        <span class="page-info">Page {{ logPage() + 1 }} / {{ logTotalPages() }}</span>
+        <button class="page-btn" [disabled]="logPage() >= logTotalPages() - 1" (click)="loadLogs(logPage() + 1)">→</button>
+      </div>
+    }
+  </div>
+
+</div>

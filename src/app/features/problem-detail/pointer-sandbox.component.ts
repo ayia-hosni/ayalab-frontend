@@ -1,0 +1,25 @@
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+
+@Component({
+  selector: 'app-pointer-sandbox',
+  standalone: true,
+  template: `<div #mount style="width:100%;min-height:100vh;"></div>`,
+})
+export class PointerSandboxComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('mount') mountRef!: ElementRef<HTMLDivElement>;
+  private root: any;
+
+  async ngAfterViewInit(): Promise<void> {
+    const [React, ReactDOM, { default: App }] = await Promise.all([
+      import('react'),
+      import('react-dom/client'),
+      import('./pointer-sandbox-react'),
+    ]);
+    this.root = ReactDOM.createRoot(this.mountRef.nativeElement);
+    this.root.render(React.createElement(App));
+  }
+
+  ngOnDestroy(): void {
+    this.root?.unmount();
+  }
+}

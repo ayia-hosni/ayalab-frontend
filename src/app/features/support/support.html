@@ -1,0 +1,84 @@
+<div class="topbar">
+  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
+  <span class="spacer"></span>
+  <a class="pill" routerLink="/">← Problem Set</a>
+</div>
+
+<div class="wrap">
+  <div class="support-card">
+
+    <div class="hero">
+      <span class="big-cup">☕</span>
+      <h1>Buy me a coffee!</h1>
+      <p class="tagline">If AyaLab helped you crack an interview or learn something new, a coffee keeps the problems coming ❤️</p>
+    </div>
+
+    <!-- Tier picker -->
+    <div class="section-label">How many coffees?</div>
+    <div class="tiers">
+      @for (tier of tiers; track tier.cups) {
+        <button
+          class="tier-btn"
+          [class.active]="selectedTier().cups === tier.cups"
+          (click)="selectTier(tier)"
+          type="button">
+          <span class="tier-cups">{{ tier.label }}</span>
+          <span class="tier-price">{{ tier.price }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Payment method -->
+    <div class="section-label">Pay with</div>
+    <div class="methods">
+      @for (m of methods; track m.value) {
+        <button
+          class="method-btn"
+          [class.active]="method() === m.value"
+          (click)="selectMethod(m.value)"
+          type="button">
+          <span>{{ m.icon }}</span>
+          <span>{{ m.label }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Billing fields -->
+    <div class="fields">
+      <div class="field-row">
+        <div class="field">
+          <label>First name *</label>
+          <input [(ngModel)]="firstName" placeholder="Ahmed" />
+        </div>
+        <div class="field">
+          <label>Last name *</label>
+          <input [(ngModel)]="lastName" placeholder="Hassan" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Email *</label>
+        <input [(ngModel)]="email" type="email" placeholder="ahmed@example.com" />
+      </div>
+      @if (showPhone) {
+        <div class="field">
+          <label>Mobile number *</label>
+          <input [(ngModel)]="phoneNumber" placeholder="01012345678" />
+        </div>
+      }
+    </div>
+
+    @if (error()) {
+      <div class="error-box">{{ error() }}</div>
+    }
+
+    <button class="pay-btn" (click)="pay()" [disabled]="loading()">
+      @if (loading()) {
+        <span class="spinner"></span> Processing…
+      } @else {
+        Send {{ selectedTier().cups }} coffee{{ selectedTier().cups > 1 ? 's' : '' }} · {{ selectedTier().price }}
+      }
+    </button>
+
+    <p class="secure-note">🔒 Secured by Paymob · PCI-DSS compliant</p>
+  </div>
+</div>

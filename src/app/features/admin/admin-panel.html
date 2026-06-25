@@ -1,0 +1,274 @@
+<div class="topbar">
+  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
+  <span class="spacer"></span>
+  <a class="pill" routerLink="/">← Problem Set</a>
+</div>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="page-head">
+    <div>
+      <h1>🎮 Problem Admin</h1>
+      <p class="sub">Manage the problem catalogue — create, edit, and publish problems.</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">＋ New Problem</button>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <span class="kpi-icon">📋</span>
+      <div><div class="kpi-value">{{ total() }}</div><div class="kpi-label">Total Problems</div></div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <span class="kpi-icon">✅</span>
+      <div><div class="kpi-value">{{ available() }}</div><div class="kpi-label">Published</div></div>
+    </div>
+    <div class="kpi-card kpi-yellow">
+      <span class="kpi-icon">🔒</span>
+      <div><div class="kpi-value">{{ total() - available() }}</div><div class="kpi-label">Hidden</div></div>
+    </div>
+    <div class="kpi-card kpi-purple">
+      <span class="kpi-icon">🧩</span>
+      <div><div class="kpi-value">{{ problems().filter(p=>!!p.visualizerType).length }}</div><div class="kpi-label">With Sandbox</div></div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert-error">⚠️ {{ error() }} <button (click)="load()">Retry</button></div>
+  }
+
+  @if (loading()) {
+    <div class="table-card skeleton-table">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="skeleton-row-line"></div>
+      }
+    </div>
+  } @else {
+
+    <!-- Problem table -->
+    <div class="table-card">
+      <table class="prob-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Slug</th>
+            <th>Difficulty</th>
+            <th>Tags</th>
+            <th>Sandbox</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of problems(); track p.id) {
+            <tr [class.row-hidden]="!p.available">
+              <td class="cell-id">{{ p.id }}</td>
+              <td class="cell-title">
+                <span class="title-text">{{ p.title }}</span>
+              </td>
+              <td class="cell-slug"><code>{{ p.slug }}</code></td>
+              <td class="cell-diff">
+                <span class="diff-badge" [style.background]="diffColor(p.difficulty) + '22'" [style.color]="diffColor(p.difficulty)">
+                  {{ p.difficulty }}
+                </span>
+              </td>
+              <td class="cell-tags">
+                @for (t of p.tags.slice(0,3); track t) {
+                  <span class="tag-chip">{{ t }}</span>
+                }
+                @if (p.tags.length > 3) {
+                  <span class="tag-more">+{{ p.tags.length - 3 }}</span>
+                }
+              </td>
+              <td class="cell-viz">
+                @if (p.visualizerType) {
+                  <span class="viz-badge">🧩 {{ p.visualizerType }}</span>
+                } @else {
+                  <span class="none-text">—</span>
+                }
+              </td>
+              <td class="cell-avail">
+                <span class="avail-pill" [class.avail-on]="p.available">
+                  {{ p.available ? '● Live' : '○ Hidden' }}
+                </span>
+              </td>
+              <td class="cell-actions">
+                <button class="btn-edit" (click)="openEdit(p)">✏️ Edit</button>
+                @if (deleteConfirm() === p.id) {
+                  <span class="confirm-row">
+                    <button class="btn-del-confirm" (click)="doDelete(p.id)">Delete</button>
+                    <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+                  </span>
+                } @else {
+                  <button class="btn-del" (click)="confirmDelete(p.id)">🗑️</button>
+                }
+              </td>
+            </tr>
+          }
+          @empty {
+            <tr><td colspan="8" class="empty-row">No problems yet — click "New Problem" to add one.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</div>
+
+<!-- ── Side panel overlay ──────────────────────────────────────────────── -->
+@if (panelOpen()) {
+  <div class="overlay" (click)="closePanel()"></div>
+  <div class="side-panel">
+
+    <div class="panel-header">
+      <h2>{{ isEdit() ? '✏️ Edit Problem' : '＋ New Problem' }}</h2>
+      <button class="close-btn" (click)="closePanel()">✕</button>
+    </div>
+
+    <div class="panel-body">
+
+      @if (saveError()) {
+        <div class="alert-error small">⚠️ {{ saveError() }}</div>
+      }
+
+      <!-- ── Basic Info ── -->
+      <section class="form-section">
+        <h3>Basic Info</h3>
+        <div class="form-row two-col">
+          <label class="form-field">
+            <span>Problem ID *</span>
+            <input type="number" [value]="form().id ?? ''" (input)="updateField('id', +$any($event.target).value || null)"
+                   [disabled]="isEdit()" placeholder="e.g. 206" />
+          </label>
+          <label class="form-field">
+            <span>Difficulty *</span>
+            <select [value]="form().difficulty" (change)="updateField('difficulty', $any($event.target).value)">
+              @for (d of DIFFICULTIES; track d) { <option [value]="d">{{ d }}</option> }
+            </select>
+          </label>
+        </div>
+
+        <label class="form-field">
+          <span>Title *</span>
+          <input type="text" [value]="form().title" (input)="onTitleChange($any($event.target).value)" placeholder="e.g. Reverse Linked List" />
+        </label>
+
+        <label class="form-field">
+          <span>Slug *</span>
+          <input type="text" [value]="form().slug" (input)="updateField('slug', $any($event.target).value)" placeholder="e.g. reverse-linked-list" />
+        </label>
+
+        <div class="form-row two-col">
+          <label class="form-field">
+            <span>Acceptance (%)</span>
+            <input type="number" min="0" max="100" step="0.1" [value]="form().acceptance"
+                   (input)="updateField('acceptance', +$any($event.target).value)" />
+          </label>
+          <label class="form-field">
+            <span>Visualizer</span>
+            <select [value]="form().visualizerType ?? ''" (change)="updateField('visualizerType', $any($event.target).value || null)">
+              <option value="">None</option>
+              @for (v of VISUALIZERS.slice(1); track v) { <option [value]="v">{{ v }}</option> }
+            </select>
+          </label>
+        </div>
+
+        <div class="form-row available-row">
+          <label class="toggle-label">
+            <input type="checkbox" [checked]="form().available" (change)="updateField('available', $any($event.target).checked)" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">Published (visible to users)</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- ── Tags ── -->
+      <section class="form-section">
+        <h3>Tags</h3>
+        <div class="tag-editor">
+          @for (t of form().tags; track t) {
+            <span class="tag-chip editable">{{ t }}<button (click)="removeTag(t)">×</button></span>
+          }
+          <input class="tag-input" type="text" [value]="tagInput()" placeholder="Add tag, press Enter"
+                 (input)="tagInput.set($any($event.target).value)"
+                 (keydown)="onTagKeydown($event)" />
+        </div>
+      </section>
+
+      <!-- ── Description ── -->
+      <section class="form-section">
+        <h3>Description <span class="hint">(Markdown)</span></h3>
+        <textarea class="desc-area" rows="8" [value]="form().description"
+                  (input)="updateField('description', $any($event.target).value)"
+                  placeholder="Problem statement in Markdown…"></textarea>
+      </section>
+
+      <!-- ── Starter Code ── -->
+      <section class="form-section">
+        <h3>Starter Code</h3>
+        <div class="lang-tabs">
+          @for (lang of LANGS; track lang) {
+            <button class="lang-tab" [class.active]="activeCodeLang() === lang" (click)="activeCodeLang.set(lang)">
+              {{ lang }}
+            </button>
+          }
+        </div>
+        @for (lang of LANGS; track lang) {
+          @if (activeCodeLang() === lang) {
+            <textarea class="code-area" rows="10" [value]="form().starterCode[lang] || ''"
+                      (input)="setCode(lang, $any($event.target).value)"
+                      placeholder="Starter code for {{ lang }}…" spellcheck="false"></textarea>
+          }
+        }
+      </section>
+
+      <!-- ── Test Cases ── -->
+      <section class="form-section">
+        <div class="section-head-row">
+          <h3>Test Cases</h3>
+          <button class="btn-add-case" (click)="addTestCase()">＋ Add</button>
+        </div>
+        @if (form().testCases.length === 0) {
+          <p class="empty-hint">No test cases yet.</p>
+        }
+        @for (tc of form().testCases; track tc.ordinal; let idx = $index) {
+          <div class="test-case-card">
+            <div class="tc-header">
+              <span class="tc-num">Case {{ tc.ordinal }}</span>
+              <label class="sample-toggle">
+                <input type="checkbox" [checked]="tc.sample"
+                       (change)="updateTestCase(idx, 'sample', $any($event.target).checked)" />
+                <span>Sample</span>
+              </label>
+              <button class="btn-rm-case" (click)="removeTestCase(idx)">✕</button>
+            </div>
+            <div class="tc-row">
+              <label class="form-field">
+                <span>Input JSON</span>
+                <input type="text" [value]="tc.inputJson" placeholder="e.g. [1,2,3,4,5]"
+                       (input)="updateTestCase(idx, 'inputJson', $any($event.target).value)" />
+              </label>
+              <label class="form-field">
+                <span>Expected Output JSON</span>
+                <input type="text" [value]="tc.outputJson" placeholder="e.g. [5,4,3,2,1]"
+                       (input)="updateTestCase(idx, 'outputJson', $any($event.target).value)" />
+              </label>
+            </div>
+          </div>
+        }
+      </section>
+
+    </div><!-- /panel-body -->
+
+    <div class="panel-footer">
+      <button class="btn-ghost" (click)="closePanel()">Cancel</button>
+      <button class="btn-primary" [disabled]="saving()" (click)="save()">
+        {{ saving() ? 'Saving…' : (isEdit() ? 'Save Changes' : 'Create Problem') }}
+      </button>
+    </div>
+
+  </div>
+}
