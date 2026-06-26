@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pointerlab-ingress
-  namespace: pointerlab
+  name: ayalab-ingress
+  namespace: ayalab
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
@@ -14,13 +14,13 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: pointer-lab-backend
+                name: ayalab-backend
                 port:
                   number: 8080
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: pointer-lab-frontend
+                name: ayalab-frontend
                 port:
                   number: 80

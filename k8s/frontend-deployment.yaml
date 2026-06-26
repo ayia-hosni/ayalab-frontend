@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pointer-lab-frontend
-  namespace: pointerlab
+  name: ayalab-frontend
+  namespace: ayalab
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pointer-lab-frontend
+      app: ayalab-frontend
   template:
     metadata:
       labels:
-        app: pointer-lab-frontend
+        app: ayalab-frontend
     spec:
       containers:
-        - name: pointer-lab-frontend
-          image: pointer-lab-frontend:latest
-          imagePullPolicy: IfNotPresent
+        - name: ayalab-frontend
+          image: ayahosny/ayalab-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           readinessProbe:

@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: pointer-lab-frontend
-  namespace: pointerlab
+  name: ayalab-frontend
+  namespace: ayalab
 spec:
   selector:
-    app: pointer-lab-frontend
+    app: ayalab-frontend
   ports:
     - port: 80
       targetPort: 80
