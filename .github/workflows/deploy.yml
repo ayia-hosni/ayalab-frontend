@@ -49,7 +49,7 @@ jobs:
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
-            cd /opt/ayalab
+            cd /var/www/aya-lab/ayalab-frontend
             docker compose pull
             docker compose up -d
             docker image prune -f
