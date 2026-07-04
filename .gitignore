@@ -3,6 +3,7 @@ node_modules/
 dist/
 .angular/
 out-tsc/
+newdesigns/*.html
 
 # IDE
 .idea/

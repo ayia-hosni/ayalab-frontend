@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aya Coding Lab - Reverse Linked List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#8B5CF6',
+                            light: '#F5F3FF',
+                            dark: '#6D28D9'
+                        },
+                        appbg: '#F8F9FA' 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        body { background-color: #F8F9FA; color: #334155; }
+        
+        /* Node Styling for the visualizer */
+        .ll-node {
+            box-shadow: 0 4px 0px 0px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        .ll-node:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px 0px rgba(0,0,0,0.1);
+        }
+        
+        /* Custom styles for the dark code editor mock */
+        .code-bg { background-color: #1E1E2E; }
+        .code-line-active { background-color: rgba(139, 92, 246, 0.2); border-left: 3px solid #8B5CF6; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                    <div class="flex gap-1">
+                        <div class="w-3 h-3 rounded-full bg-teal-400 shadow-sm"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm"></div>
+                        <div class="w-3 h-3 rounded-full bg-brand-purple shadow-sm"></div>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight text-gray-800 uppercase flex items-center gap-2">
+                        Aya Coding Lab <span class="text-xl">🧩</span>
+                    </span>
+                </div>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center gap-4">
+                    <button class="flex items-center gap-2 text-gray-600 hover:text-brand-purple hover:bg-brand-light px-3 py-2 rounded-lg text-sm font-semibold transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Dashboard
+                    </button>
+                    
+                    <button class="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-4 py-2 rounded-full text-sm font-bold shadow-sm transition-colors">
+                        ☕ Buy Me A Coffee
+                    </button>
+
+                    <button class="flex items-center gap-2 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg text-sm font-semibold transition-colors border border-gray-200 bg-white shadow-sm ml-2">
+                        ← Problem Set
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+        
+        <!-- Problem Header Card -->
+        <section class="bg-white rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-gray-100 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative overflow-hidden">
+            <!-- Subtle background accent -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-brand-light rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2"></div>
+            
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm border border-orange-200">
+                    #206
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Reverse Linked List</h1>
+                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                        <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">EASY</span>
+                        <span class="text-xs font-medium text-gray-500 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            79.1% accepted
+                        </span>
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600">Recursion</span>
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600">Linked List</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="relative z-10 flex items-center gap-2 bg-brand-light text-brand-dark px-4 py-2.5 rounded-xl font-bold text-sm border border-brand-purple/20 hover:bg-brand-purple hover:text-white transition-colors group">
+                ✨ VISUALIZER
+            </button>
+        </section>
+
+        <!-- View Mode Tabs -->
+        <nav class="flex overflow-x-auto gap-3 pb-2 scrollbar-hide">
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
+                📄 Question
+            </button>
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
+                🔍 Pointer Trace
+            </button>
+            <!-- Active Tab -->
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold bg-brand-purple text-white shadow-md shadow-brand-purple/20 whitespace-nowrap ring-2 ring-brand-purple ring-offset-2 ring-offset-[#F8F9FA]">
+                🎮 Trace Game & Solution
+            </button>
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
+                🧩 Pointer Sandbox
+            </button>
+        </nav>
+
+        <!-- Main Content Split -->
+        <div class="flex flex-col lg:flex-row gap-6 items-start">
+            
+            <!-- LEFT COLUMN: Trace Game -->
+            <div class="w-full lg:w-7/12 flex flex-col gap-4">
+                
+                <!-- Game Header -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">🎮</span>
+                        <div>
+                            <h2 class="font-bold text-gray-900">Trace Game</h2>
+                            <p class="text-xs text-gray-500 font-medium">Predict what the algorithm does — one step at a time</p>
+                        </div>
+                    </div>
+                    <div class="bg-brand-light border border-brand-purple/20 px-4 py-1.5 rounded-full flex items-center gap-2">
+                        <span class="text-brand-dark font-bold text-lg">0 / 10</span>
+                        <span class="text-brand-purple text-[10px] font-bold uppercase tracking-wider">Correct</span>
+                    </div>
+                </div>
+
+                <div class="text-xs font-bold text-brand-purple tracking-wider uppercase">Question 1 of 10</div>
+
+                <!-- Active Question Prompt -->
+                <div class="bg-white border-2 border-orange-200 rounded-xl p-4 shadow-sm flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xl flex-shrink-0">?</div>
+                    <div class="pt-1">
+                        <p class="font-bold text-gray-800 text-lg">Where does <code class="bg-gray-100 px-1 py-0.5 rounded text-brand-dark text-sm">curr</code> start? Click the head node.</p>
+                    </div>
+                </div>
+
+                <!-- Code Execution State Mock -->
+                <div class="bg-[#1E1E2E] rounded-xl overflow-hidden shadow-lg border border-gray-800 p-2 font-mono text-sm">
+                    <div class="px-4 py-1 text-gray-500">function reverse(head) {</div>
+                    <div class="px-4 py-1.5 code-line-active flex justify-between items-center relative text-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)]"></div>
+                            <span>let prev = null, curr = head;</span>
+                        </div>
+                        <span class="text-[10px] text-teal-400 bg-teal-400/10 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">← you are here</span>
+                    </div>
+                    <div class="px-4 py-1 text-gray-500 ml-6">while (curr !== null) {</div>
+                    <div class="px-4 py-1 text-gray-600 ml-12">let next = curr.next;</div>
+                    <div class="px-4 py-1 text-gray-600 ml-12">curr.next = prev;</div>
+                    <div class="px-4 py-1 text-gray-600 ml-12">prev = curr; curr = next;</div>
+                    <div class="px-4 py-1 text-gray-500 ml-6">}</div>
+                    <div class="px-4 py-1 text-gray-500 ml-6">return prev;</div>
+                    <div class="px-4 py-1 text-gray-500">}</div>
+                </div>
+
+                <!-- Step Description -->
+                <div class="bg-white border-2 border-teal-200 rounded-xl p-4 shadow-sm flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-500 flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            Initialize Pointers 
+                            <span class="text-[10px] bg-brand-light text-brand-purple px-1.5 py-0.5 rounded uppercase tracking-wider">Init</span>
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Place <code class="bg-gray-100 px-1 py-0.5 rounded">prev</code> at null and <code class="bg-gray-100 px-1 py-0.5 rounded">curr</code> at the head — the three-pointer setup before the loop starts.</p>
+                    </div>
+                </div>
+
+                <!-- Visualizer Interactive Area -->
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                    
+                    <!-- Visualizer Header Toolbar -->
+                    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-xs font-bold text-gray-500 tracking-wider uppercase">
+                            <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            Current State
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="flex items-center gap-1.5 text-xs font-bold text-gray-600"><div class="w-3 h-3 rounded bg-rose-400"></div> PREV</span>
+                            <span class="flex items-center gap-1.5 text-xs font-bold text-gray-600"><div class="w-3 h-3 rounded bg-teal-400"></div> CURR</span>
+                            <span class="flex items-center gap-1.5 text-xs font-bold text-gray-600"><div class="w-3 h-3 rounded bg-yellow-400"></div> NEXT</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Drag Area Mock -->
+                    <div class="p-6 bg-[#FDFDFE] relative flex flex-col items-center justify-center min-h-[250px] gap-8">
+                        
+                        <!-- Instruction Banner inside canvas -->
+                        <div class="bg-white border-2 border-yellow-300 border-dashed rounded-xl px-4 py-2 shadow-sm flex items-center justify-between w-full max-w-md">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-teal-400 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-sm">curr</div>
+                                <span class="text-sm font-bold text-gray-700">Drag onto a node · or click a node directly</span>
+                            </div>
+                            <button class="text-yellow-600 bg-yellow-50 hover:bg-yellow-100 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 transition-colors">
+                                💡 Hint
+                            </button>
+                        </div>
+
+                        <!-- Nodes Graphic -->
+                        <div class="flex items-center justify-center w-full">
+                            
+                            <!-- Null indicator -->
+                            <div class="flex items-center mr-2">
+                                <div class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs font-bold bg-gray-50">∅</div>
+                                <div class="w-8 h-0 border-t-2 border-dashed border-gray-300"></div>
+                            </div>
+
+                            <!-- Nodes -->
+                            <div class="flex items-center">
+                                <!-- Node 1 -->
+                                <div class="w-14 h-14 rounded-xl border-[3px] border-orange-400 bg-orange-50 flex items-center justify-center font-bold text-2xl text-orange-600 ll-node cursor-pointer relative">
+                                    1
+                                    <!-- Hover state pulse ring simulation -->
+                                    <div class="absolute -inset-1 rounded-xl border-2 border-teal-400 opacity-0 hover:opacity-100 transition-opacity animate-pulse"></div>
+                                </div>
+                                <div class="w-10 h-0.5 bg-orange-400 relative">
+                                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-orange-400"></div>
+                                </div>
+
+                                <!-- Node 2 -->
+                                <div class="w-14 h-14 rounded-xl border-[3px] border-brand-purple bg-brand-light flex items-center justify-center font-bold text-2xl text-brand-dark ll-node cursor-pointer">
+                                    2
+                                </div>
+                                <div class="w-10 h-0.5 bg-brand-purple relative">
+                                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-brand-purple"></div>
+                                </div>
+
+                                <!-- Node 3 -->
+                                <div class="w-14 h-14 rounded-xl border-[3px] border-teal-400 bg-teal-50 flex items-center justify-center font-bold text-2xl text-teal-600 ll-node cursor-pointer">
+                                    3
+                                </div>
+                                <div class="w-10 h-0.5 bg-teal-400 relative">
+                                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-teal-400"></div>
+                                </div>
+
+                                <!-- Node 4 -->
+                                <div class="w-14 h-14 rounded-xl border-[3px] border-rose-400 bg-rose-50 flex items-center justify-center font-bold text-2xl text-rose-600 ll-node cursor-pointer">
+                                    4
+                                </div>
+                            </div>
+                            
+                            <!-- End Null indicator -->
+                            <div class="flex items-center ml-2">
+                                <div class="w-8 h-0 border-t-2 border-dashed border-gray-300"></div>
+                                <div class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs font-bold bg-gray-50">∅</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Solution Editor -->
+            <div class="w-full lg:w-5/12 flex flex-col gap-4">
+                
+                <!-- Language Selector -->
+                <div class="flex gap-2">
+                    <button class="bg-amber-400 text-amber-900 px-4 py-2 rounded-t-xl rounded-b-sm font-bold text-sm shadow-[0_2px_0_0_#b45309] flex items-center gap-2">
+                        💛 JavaScript
+                    </button>
+                    <button class="bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 px-4 py-2 rounded-t-xl rounded-b-sm font-bold text-sm border-b border-gray-300 flex items-center gap-2 transition-colors">
+                        🐍 Python
+                    </button>
+                    <button class="bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 px-4 py-2 rounded-t-xl rounded-b-sm font-bold text-sm border-b border-gray-300 flex items-center gap-2 transition-colors">
+                        ☕ Java
+                    </button>
+                </div>
+
+                <!-- Editor Container -->
+                <div class="bg-[#1E1E2E] rounded-2xl rounded-tl-none shadow-xl border border-gray-800 flex flex-col overflow-hidden h-[600px]">
+                    
+                    <!-- Editor Header -->
+                    <div class="px-4 py-3 bg-[#181825] border-b border-gray-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-gray-300 text-sm font-mono font-medium">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Solution <span class="text-gray-500">•</span> JavaScript
+                        </div>
+                    </div>
+
+                    <!-- Text Area (Mock CodeMirror) -->
+                    <div class="flex-grow p-4 font-mono text-[13px] leading-relaxed overflow-y-auto text-gray-300 custom-scrollbar relative group">
+                        <pre class="m-0"><code><span class="text-gray-500 italic">/**</span>
+<span class="text-gray-500 italic"> * Definition for singly-linked list.</span>
+<span class="text-gray-500 italic"> * function ListNode(val, next) {</span>
+<span class="text-gray-500 italic"> *     this.val = (val === undefined ? 0 : val)</span>
+<span class="text-gray-500 italic"> *     this.next = (next === undefined ? null : next)</span>
+<span class="text-gray-500 italic"> * }</span>
+<span class="text-gray-500 italic"> */</span>
+<span class="text-brand-purple">function</span> <span class="text-blue-400">reverseList</span>(head) {
+    <span class="text-brand-purple">let</span> prev = <span class="text-orange-400">null</span>;
+    <span class="text-brand-purple">let</span> curr = head;
+
+    <span class="text-brand-purple">while</span> (curr !== <span class="text-orange-400">null</span>) {
+        <span class="text-brand-purple">let</span> next = curr.next;
+        
+        curr.next = prev;
+        
+        prev = curr;
+        curr = next;
+    }
+    
+    <span class="text-brand-purple">return</span> prev;
+};</code></pre>
+                        
+                        <!-- Resize Handle Mock -->
+                        <div class="absolute bottom-2 right-2 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-se-resize">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Editor Footer / Actions -->
+                    <div class="p-4 bg-[#181825] border-t border-gray-800 flex justify-between items-center gap-3">
+                        <button class="text-gray-400 hover:text-white text-sm font-medium flex items-center gap-1.5 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Reset
+                        </button>
+                        
+                        <div class="flex gap-3">
+                            <button class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors">
+                                ▶ Run Tests
+                            </button>
+                            <button class="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-colors">
+                                🚀 Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Inline script just for mimicking UI interactions if necessary (optional) -->
+    <script>
+        // No complex logic needed for the visual redesign mockup, 
+        // pure CSS and HTML structure handles the layout and feel.
+    </script>
+</body>
+</html>

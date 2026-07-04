@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aya Coding Lab - Pointer Trace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: { purple: '#8B5CF6', light: '#F5F3FF', dark: '#6D28D9' },
+                        appbg: '#F8F9FA'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        body { background-color: #F8F9FA; color: #334155; }
+        
+        /* 3D Node styling to match the reference UI */
+        .node-3d {
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15);
+            transition: transform 0.1s;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <div class="flex gap-1">
+                        <div class="w-3 h-3 rounded-full bg-teal-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-brand-purple"></div>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight text-brand-dark uppercase">Aya Coding Lab</span>
+                </div>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center gap-4">
+                    <a href="#" class="text-gray-500 hover:text-gray-900 font-medium text-sm transition-colors">Dashboard</a>
+                    <button class="flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold transition-colors border border-amber-200">
+                        ☕ Buy Me A Coffee
+                    </button>
+                    <button class="flex items-center gap-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full text-sm font-semibold transition-colors border border-gray-200 bg-white shadow-sm ml-2">
+                        ← Problem Set
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-5">
+        
+        <section class="bg-white rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-gray-100 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-bold shadow-sm border border-orange-200">
+                    #206
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 tracking-tight">Reverse Linked List</h1>
+                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">EASY</span>
+                        <span class="text-xs font-medium text-gray-500 flex items-center gap-1">
+                            <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            79.1% accepted
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <button class="flex items-center gap-2 bg-brand-light text-brand-dark px-4 py-2 rounded-xl font-bold text-sm border border-brand-purple/20 hover:bg-brand-purple hover:text-white transition-colors">
+                ✨ VISUALIZER
+            </button>
+        </section>
+
+        <nav class="flex overflow-x-auto gap-3 pb-1 scrollbar-hide">
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
+                📄 Question
+            </button>
+            <!-- Active Tab -->
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold bg-white border-2 border-brand-purple text-brand-dark shadow-sm whitespace-nowrap">
+                🔍 Pointer Trace
+            </button>
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
+                🎮 Trace Game & Solution
+            </button>
+            <button class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap">
+                🧩 Pointer Sandbox
+            </button>
+        </nav>
+
+        <div class="bg-white rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden flex flex-col">
+            
+            <!-- Toolbar -->
+            <div class="p-4 border-b border-gray-100 bg-white flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <span>🔍</span> Pointer Trace
+                    </h2>
+                    <div class="flex gap-3">
+                        <span class="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase"><div class="w-2.5 h-2.5 rounded bg-rose-400"></div> PREV</span>
+                        <span class="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase"><div class="w-2.5 h-2.5 rounded bg-teal-400"></div> CURR</span>
+                        <span class="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase"><div class="w-2.5 h-2.5 rounded bg-yellow-400"></div> NEXT</span>
+                    </div>
+                </div>
+
+                <!-- Steps Navigation -->
+                <div class="flex flex-wrap gap-2">
+                    <button class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-brand-light text-brand-purple border border-brand-purple/20 flex items-center gap-2">
+                        <span class="w-4 h-4 rounded-full bg-brand-purple text-white flex items-center justify-center text-[10px]">1</span> Initialize Pointers
+                    </button>
+                    <button class="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200 flex items-center gap-2 hover:bg-gray-100 transition-colors">
+                        <span class="text-gray-400">💾</span> Save the Forward Link
+                    </button>
+                    <button class="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200 flex items-center gap-2 hover:bg-gray-100 transition-colors">
+                        <span class="text-gray-400">↩️</span> Reverse the Arrow
+                    </button>
+                    <button class="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200 flex items-center gap-2 hover:bg-gray-100 transition-colors">
+                        <span class="text-gray-400">➡️</span> Slide Both Pointers
+                    </button>
+                </div>
+            </div>
+
+            <!-- Visualizer Main Area -->
+            <div class="p-6 bg-gray-50/50 flex flex-col gap-6">
+                
+                <!-- Target Box (Original List) -->
+                <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm relative">
+                    <div class="absolute -top-3 left-4 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                        📄 Question <span class="text-gray-400 lowercase font-normal">Reverse this linked list</span>
+                    </div>
+                    <div class="flex items-center justify-center py-6">
+                        <!-- Node 1 -->
+                        <div class="w-16 h-16 rounded-2xl border-[3px] border-orange-400 bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-2xl node-3d">1</div>
+                        <div class="w-12 h-1 bg-orange-400 relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[8px] border-l-orange-400"></div></div>
+                        <!-- Node 2 -->
+                        <div class="w-16 h-16 rounded-2xl border-[3px] border-brand-purple bg-brand-light text-brand-dark flex items-center justify-center font-bold text-2xl node-3d">2</div>
+                        <div class="w-12 h-1 bg-brand-purple relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[8px] border-l-brand-purple"></div></div>
+                        <!-- Node 3 -->
+                        <div class="w-16 h-16 rounded-2xl border-[3px] border-teal-400 bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-2xl node-3d">3</div>
+                        <div class="w-12 h-1 bg-teal-400 relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[8px] border-l-teal-400"></div></div>
+                        <!-- Node 4 -->
+                        <div class="w-16 h-16 rounded-2xl border-[3px] border-rose-400 bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-2xl node-3d">4</div>
+                        <div class="w-12 h-0 border-t-2 border-dashed border-gray-300 ml-2"></div>
+                        <div class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs font-bold bg-white ml-2">∅</div>
+                    </div>
+                </div>
+
+                <div class="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm relative min-h-[220px] flex items-center justify-center overflow-hidden">
+                    <div class="absolute -top-3 left-4 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                        🔄 Step-By-Step Trace
+                    </div>
+                    
+                    <div class="flex items-center justify-center pt-8 w-full relative">
+                        
+                        <!-- Null before head -->
+                        <div class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs font-bold bg-white mr-2">∅</div>
+                        <div class="w-12 h-0 border-t-2 border-dashed border-gray-300 mr-2 relative"></div>
+
+                        <!-- Nodes (Same setup as above) -->
+                        <div class="relative">
+                            <!-- Pointer CURR -->
+                            <div class="absolute -top-14 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce">
+                                <div class="bg-teal-400 text-white font-bold text-[10px] px-2 py-1 rounded shadow-sm uppercase tracking-wider">curr</div>
+                                <div class="w-0 h-0 border-x-[6px] border-x-transparent border-t-[8px] border-t-teal-400 mt-1"></div>
+                            </div>
+                            <div class="w-16 h-16 rounded-2xl border-[3px] border-orange-400 bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-2xl node-3d">1</div>
+                        </div>
+                        <div class="w-12 h-1 bg-orange-400 relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[8px] border-l-orange-400"></div></div>
+                        
+                        <div class="w-16 h-16 rounded-2xl border-[3px] border-brand-purple bg-brand-light text-brand-dark flex items-center justify-center font-bold text-2xl node-3d">2</div>
+                        <div class="w-12 h-1 bg-brand-purple relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[8px] border-l-brand-purple"></div></div>
+                        
+                        <div class="w-16 h-16 rounded-2xl border-[3px] border-teal-400 bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-2xl node-3d">3</div>
+                        <div class="w-12 h-1 bg-teal-400 relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[8px] border-l-teal-400"></div></div>
+                        
+                        <div class="w-16 h-16 rounded-2xl border-[3px] border-rose-400 bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-2xl node-3d">4</div>
+                        
+                        <div class="w-12 h-0 border-t-2 border-dashed border-gray-300 ml-2"></div>
+                        <div class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs font-bold bg-white ml-2">∅</div>
+                    </div>
+                </div>
+
+                <!-- Explanation Banner -->
+                <div class="bg-brand-light border border-brand-purple/30 rounded-xl px-5 py-3 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center shadow-sm">🎯</div>
+                        <div>
+                            <h3 class="text-sm font-bold text-brand-dark uppercase tracking-wide">Initialize Pointers</h3>
+                            <p class="text-sm text-gray-700"><code>prev</code> starts null, <code>curr</code> starts at the head.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/60 text-brand-dark font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Step 1 / 14</div>
+                </div>
+
+                <!-- Code Snippet Banner -->
+                <div class="bg-white border border-gray-200 rounded-xl px-5 py-3 font-mono text-sm text-gray-700 shadow-sm flex items-center gap-4">
+                    <div class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">INIT</div>
+                    <div><span class="text-brand-purple font-medium">let</span> prev = <span class="text-orange-500">null</span>; <span class="text-brand-purple font-medium">let</span> curr = head;</div>
+                </div>
+
+                <!-- Expected Solution Preview (Disabled look) -->
+                <div class="border-2 border-dashed border-gray-200 bg-gray-50/50 rounded-xl p-4 relative opacity-70">
+                    <div class="absolute -top-3 left-4 bg-white border border-gray-200 px-2 py-0.5 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                        🎯 Expected Solution <span class="bg-gray-100 px-1 rounded ml-1 text-gray-400">New head: 4</span>
+                    </div>
+                    <div class="flex items-center justify-center py-4 filter grayscale contrast-50">
+                        <div class="w-14 h-14 rounded-2xl border-[3px] border-rose-400 bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xl node-3d">4</div>
+                        <div class="w-8 h-1 bg-teal-400 relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-teal-400"></div></div>
+                        <div class="w-14 h-14 rounded-2xl border-[3px] border-teal-400 bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-xl node-3d">3</div>
+                        <div class="w-8 h-1 bg-brand-purple relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-brand-purple"></div></div>
+                        <div class="w-14 h-14 rounded-2xl border-[3px] border-brand-purple bg-brand-light text-brand-dark flex items-center justify-center font-bold text-xl node-3d">2</div>
+                        <div class="w-8 h-1 bg-orange-400 relative"><div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-orange-400"></div></div>
+                        <div class="w-14 h-14 rounded-2xl border-[3px] border-orange-400 bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-xl node-3d">1</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-white border-t border-gray-100 p-5 flex flex-col gap-4">
+                <!-- Timeline Slider Mock -->
+                <div class="relative w-full h-2 bg-gray-200 rounded-full flex items-center">
+                    <div class="absolute left-0 top-0 h-full w-[7%] bg-brand-purple rounded-full"></div>
+                    <div class="absolute left-[7%] w-4 h-4 bg-white border-4 border-brand-purple rounded-full shadow cursor-pointer -translate-x-1/2"></div>
+                    <!-- Mock timeline dots -->
+                    <div class="absolute left-[25%] w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                    <div class="absolute left-[50%] w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                    <div class="absolute left-[75%] w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">List</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                                <input type="text" value="1, 2, 3, 4" class="px-3 py-1.5 text-sm font-mono text-gray-700 w-24 bg-transparent outline-none">
+                                <button class="bg-brand-light text-brand-purple px-3 py-1.5 text-sm font-bold border-l border-gray-200 hover:bg-brand-purple hover:text-white transition-colors">Load ↺</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button class="bg-gray-100 hover:bg-gray-200 text-gray-500 px-4 py-2 rounded-lg text-sm font-bold transition-colors">⟲</button>
+                        <div class="flex bg-gray-100 rounded-lg p-1">
+                            <button class="px-4 py-1.5 text-sm font-bold text-gray-500 hover:bg-white hover:shadow-sm rounded-md transition-all">◀ Back</button>
+                            <button class="px-4 py-1.5 text-sm font-bold bg-white text-gray-800 shadow-sm rounded-md transition-all">Next ▶</button>
+                        </div>
+                        <button class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ml-2">
+                            ▶ Play
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-center text-[10px] font-medium text-gray-400 uppercase tracking-widest mt-2">
+                    ← → Arrow keys to step · Space to play/pause
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

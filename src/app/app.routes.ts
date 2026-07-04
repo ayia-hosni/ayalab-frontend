@@ -36,5 +36,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin/admin-panel').then((m) => m.AdminPanel),
   },
+  {
+    path: 'lessons',
+    loadComponent: () =>
+      import('./features/lessons/lessons-list/lessons-list').then((m) => m.LessonsList),
+  },
+  {
+    path: 'lessons/:lessonId',
+    loadComponent: () =>
+      import('./features/lessons/lesson-viewer/lesson-viewer').then((m) => m.LessonViewer),
+  },
   { path: '**', redirectTo: '' },
 ];

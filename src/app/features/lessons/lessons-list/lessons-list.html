@@ -1,0 +1,39 @@
+<div class="topbar">
+  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
+  <span class="spacer"></span>
+  <nav class="nav-links">
+    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
+    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+  </nav>
+  <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
+</div>
+
+<div class="wrap">
+  <div class="lessons-head">
+    <div>
+      <div class="lessons-kicker">Data Structures &amp; Algorithms</div>
+      <h1 class="lessons-title">Linked List</h1>
+      <p class="lessons-sub">{{ lang() === 'en' ? 'Pick a lesson to start.' : 'اختاري درس عشان تبدئي.' }}</p>
+    </div>
+    <div class="lang-toggle">
+      <button [class.active]="lang() === 'en'" (click)="setLang('en')">EN</button>
+      <button [class.active]="lang() === 'ar'" (click)="setLang('ar')">AR</button>
+    </div>
+  </div>
+
+  <div class="lessons-grid">
+    @for (l of lessons; track l.title.en; let i = $index) {
+      <a class="lesson-card" [routerLink]="['/lessons', i]">
+        <div class="lesson-card-top">
+          <div class="lesson-icon" [innerHTML]="l.icon"></div>
+          <span class="lesson-count">{{ slideCount(l) }} {{ lang() === 'en' ? 'slides' : 'شريحة' }}</span>
+        </div>
+        <div class="lesson-num">{{ lang() === 'en' ? 'Lesson ' + (i + 1) : 'الدرس ' + (i + 1) }}</div>
+        <h3 class="lesson-title" [class.rtl]="lang() === 'ar'">{{ lang() === 'en' ? l.title.en : l.title.ar }}</h3>
+        <p class="lesson-desc" [class.rtl]="lang() === 'ar'" [innerHTML]="lang() === 'en' ? l.description.en : l.description.ar"></p>
+        <span class="lesson-start">{{ lang() === 'en' ? 'Start lesson →' : 'ابدأ الدرس ←' }}</span>
+      </a>
+    }
+  </div>
+</div>

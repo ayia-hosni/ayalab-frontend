@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 
 import { DashboardService } from '../../core/services/dashboard.service';
@@ -16,15 +16,15 @@ import {
 Chart.register(...registerables);
 
 const METHOD_COLORS: Record<string, string> = {
-  CARD:   '#A55EEA',
-  WALLET: '#FF9F43',
-  KIOSK:  '#1DD1A1',
+  CARD:   '#8B5CF6',
+  WALLET: '#F59E0B',
+  KIOSK:  '#10B981',
 };
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

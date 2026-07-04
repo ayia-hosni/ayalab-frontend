@@ -1,9 +1,12 @@
 <div class="topbar">
   <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
   <span class="spacer"></span>
-  <a class="pill" routerLink="/dashboard">📊 Dashboard</a>
+  <nav class="nav-links">
+    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
+    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+  </nav>
   <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
-  <a class="pill" routerLink="/">← Problem Set</a>
 </div>
 
 @if (loading()) {
@@ -14,6 +17,9 @@
 
 <!-- ── Persistent problem hero ── -->
 <div class="problem-hero-wrap">
+  <a class="hero-back-btn" routerLink="/" title="Back to problems">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+  </a>
   <span class="problem-num-chip">#{{ p.id }}</span>
   <div class="problem-hero-body">
     <h1 class="problem-hero-title">{{ p.title }}</h1>
@@ -39,7 +45,7 @@
   }
 </div>
 
-<div class="wrap">
+<div class="wrap tab-shell">
 
   <!-- shared arrowhead marker — must live outside tab @if blocks so it's always in the DOM -->
   <svg width="0" height="0" style="position:absolute;overflow:hidden">
@@ -84,44 +90,45 @@
       </div>
 
       <!-- ── QUESTION ── -->
-      <div class="viz-section-hdr">
-        <span class="viz-section-label">📋 Question</span>
-        <span class="viz-section-sub">Reverse this linked list</span>
-      </div>
+      <div class="viz-box">
+        <span class="viz-box-label">
+          <span class="viz-section-label">📋 Question</span>
+          <span class="viz-section-sub">Reverse this linked list</span>
+        </span>
 
-      <svg width="100%" [attr.viewBox]="miniViewBox()" class="vsvg vsvg-mini">
-        @if (values().length > 0) {
-          <text x="20" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-          <text [attr.x]="nodeX(values().length - 1) + 78" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-        }
-        @for (v of values(); track $index) {
-          @if ($index < values().length - 1) {
-            <line [attr.x1]="nodeX($index) + 52" y1="55" [attr.x2]="nodeX($index + 1)" y2="55"
-                  [attr.stroke]="nodeColor($index)" stroke-width="3" marker-end="url(#va)"/>
+        <svg width="100%" [attr.viewBox]="miniViewBox()" class="vsvg vsvg-mini">
+          @if (values().length > 0) {
+            <text x="20" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
+            <text [attr.x]="nodeX(values().length - 1) + 78" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
           }
-        }
-        @for (v of values(); track $index) {
-          <rect [attr.x]="nodeX($index)" y="35" width="52" height="52" rx="18" [attr.fill]="nodeShadow($index)"/>
-        }
-        @for (v of values(); track $index) {
-          <rect [attr.x]="nodeX($index)" y="29" width="52" height="52" rx="18"
-                [attr.fill]="nodeBg($index)" [attr.stroke]="nodeColor($index)" stroke-width="3"/>
-          <text [attr.x]="nodeCx($index)" y="55" text-anchor="middle" dominant-baseline="central"
-                font-weight="900" font-size="20" [attr.fill]="nodeColor($index)">{{ v }}</text>
-        }
-      </svg>
+          @for (v of values(); track $index) {
+            @if ($index < values().length - 1) {
+              <line [attr.x1]="nodeX($index) + 52" y1="55" [attr.x2]="nodeX($index + 1)" y2="55"
+                    [attr.stroke]="nodeColor($index)" stroke-width="3" marker-end="url(#va)"/>
+            }
+          }
+          @for (v of values(); track $index) {
+            <rect [attr.x]="nodeX($index)" y="35" width="52" height="52" rx="18" [attr.fill]="nodeShadow($index)"/>
+          }
+          @for (v of values(); track $index) {
+            <rect [attr.x]="nodeX($index)" y="29" width="52" height="52" rx="18"
+                  [attr.fill]="nodeBg($index)" [attr.stroke]="nodeColor($index)" stroke-width="3"/>
+            <text [attr.x]="nodeCx($index)" y="55" text-anchor="middle" dominant-baseline="central"
+                  font-weight="900" font-size="20" [attr.fill]="nodeColor($index)">{{ v }}</text>
+          }
+        </svg>
+      </div>
 
       <!-- ── TRACE ── -->
-      <div class="viz-section-hdr viz-section-hdr--trace" [class.viz-section-hdr--done]="isAnswerReached()">
-        <span class="viz-section-label" [class.viz-section-label--done]="isAnswerReached()">
+      <div class="viz-box viz-box--active" [class.viz-box--done]="isAnswerReached()">
+        <span class="viz-box-label viz-box-label--solid" [class.viz-box-label--done]="isAnswerReached()">
           {{ isAnswerReached() ? '🎯 Expected Solution' : '🔄 Step-by-step Trace' }}
+          @if (isAnswerReached()) {
+            <span class="viz-trace-done-badge">Matched!</span>
+          }
         </span>
-        @if (isAnswerReached()) {
-          <span class="viz-trace-done-badge">Matched!</span>
-        }
-      </div>
 
-      <svg width="100%" [attr.viewBox]="vizViewBox()" class="vsvg" [class.vsvg-answer]="isAnswerReached()">
+        <svg width="100%" [attr.viewBox]="vizViewBox()" class="vsvg" [class.vsvg-answer]="isAnswerReached()">
         <!-- null markers -->
         @if (traceValues().length > 0) {
           <text x="20" y="141" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
@@ -175,19 +182,22 @@
           }
         }
       </svg>
-
-      <div class="viz-stage" [ngClass]="stageClass()">
-        <span class="stage-tech-icon">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].icon }}</span>
-        <div class="stage-content">
-          <span class="stage-tech-name">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].name }}</span>
-          <span class="stage-desc">{{ stageText() }}</span>
-        </div>
-        <span class="step-counter">{{ stageCounter() }}</span>
       </div>
 
-      <div class="codeline">
-        <span class="badge" [ngClass]="badgeClass()">{{ currentStep()?.badge }}</span>
-        <span class="codeline-text">{{ currentStep()?.line }}</span>
+      <div class="viz-step-grid">
+        <div class="viz-stage" [ngClass]="stageClass()">
+          <span class="stage-tech-icon">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].icon }}</span>
+          <div class="stage-content">
+            <span class="stage-tech-name">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].name }}</span>
+            <span class="stage-desc">{{ stageText() }}</span>
+          </div>
+          <span class="step-counter">{{ stageCounter() }}</span>
+        </div>
+
+        <div class="codeline">
+          <span class="badge" [ngClass]="badgeClass()">{{ currentStep()?.badge }}</span>
+          <span class="codeline-text">{{ currentStep()?.line }}</span>
+        </div>
       </div>
 
       <!-- ── EXPECTED SOLUTION (always visible, lights up when reached) ── -->
@@ -229,6 +239,7 @@
         </svg>
       </div>
 
+      <div class="viz-footer">
       <!-- scrubber -->
       <div class="scrubber-wrap">
         <div class="scrubber-track-container">
@@ -277,6 +288,7 @@
         </div>
 
         <div class="kb-hint">← → arrow keys to step &nbsp;·&nbsp; Space to play / pause &nbsp;·&nbsp; Home to restart</div>
+      </div>
       </div>
     </div>
   </div>

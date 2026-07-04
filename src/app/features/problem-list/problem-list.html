@@ -1,9 +1,12 @@
 <div class="topbar">
-  <span class="logo"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab</span>
+  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
   <span class="spacer"></span>
-  <a class="pill" routerLink="/dashboard">Dashboard</a>
+  <nav class="nav-links">
+    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
+    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+  </nav>
   <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
-  <span class="pill active-pill">Problems</span>
 </div>
 
 <div class="wrap">
@@ -27,7 +30,7 @@
         </svg>
         <div class="ring-label">
           <span class="ring-num">{{ totalSolved() }}</span>
-          <span class="ring-denom">/ {{ totalAll() }}</span>
+          <span class="ring-denom">/ {{ totalAll() }} solved</span>
         </div>
       </div>
 
@@ -99,13 +102,12 @@
     }
   </div>
 
-  <!-- Count -->
-  <div class="count-bar">
-    Showing <b>{{ total() }}</b> of <b>{{ totalAll() }}</b> problems
-  </div>
-
   <!-- Table -->
   <div class="table-card">
+    <div class="table-header">
+      <h3>Problem Set</h3>
+      <p class="count-pill"><b>{{ total() }}</b> / {{ totalAll() }} items</p>
+    </div>
     @if (loading()) {
       <div class="empty">
         <div class="spinner"></div>

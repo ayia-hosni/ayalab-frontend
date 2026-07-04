@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { ProblemService } from '../../core/services/problem.service';
@@ -10,7 +10,7 @@ import { ProblemSummary, ProblemFilters } from '../../core/models/problem.models
 @Component({
   selector: 'app-problem-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './problem-list.html',
   styleUrl: './problem-list.css',
 })

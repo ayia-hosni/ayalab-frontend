@@ -1,3 +1,5 @@
+# Backend runs elsewhere (http://api.ayalab.co) — nginx.conf proxies /api there directly.
+# No local backend/postgres service needed in this compose file.
 services:
   frontend:
     image: ayahosny/ayalab-frontend:latest
@@ -6,16 +8,6 @@ services:
     networks:
       - app-network
     restart: unless-stopped
-
-  # backend:
-  #   image: ayahosny/ayalab-backend:latest
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     - SPRING_PROFILES_ACTIVE=docker
-  #   networks:
-  #     - app-network
-  #   restart: unless-stopped
 
 networks:
   app-network:

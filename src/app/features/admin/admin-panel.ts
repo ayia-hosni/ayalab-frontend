@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AdminService } from '../../core/services/admin.service';
 import { AdminProblemDetail, AdminProblemRequest, AdminTestCase } from '../../core/models/admin.models';
@@ -25,7 +25,7 @@ function emptyRequest(): AdminProblemRequest {
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './admin-panel.html',
   styleUrl: './admin-panel.css',
 })

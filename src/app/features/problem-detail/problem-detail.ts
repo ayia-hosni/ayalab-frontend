@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, RouterLinkActive, ActivatedRoute } from '@angular/router';
 
 import { ProblemService } from '../../core/services/problem.service';
 import {
@@ -42,7 +42,7 @@ type GamePhase = 'question' | 'correct' | 'wrong' | 'complete';
 @Component({
   selector: 'app-problem-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PointerSandboxComponent],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, PointerSandboxComponent],
   templateUrl: './problem-detail.html',
   styleUrl: './problem-detail.css',
 })
