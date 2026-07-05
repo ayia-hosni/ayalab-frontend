@@ -1,14 +1,19 @@
 # Backend runs elsewhere (http://api.ayalab.co) — nginx.conf proxies /api there directly.
 # No local backend/postgres service needed in this compose file.
+# TLS + routing for ayalab.co is handled by the shared reverse-proxy stack
+# (see ../reverse-proxy) — this service no longer publishes port 80 itself.
 services:
   frontend:
     image: ayahosny/ayalab-frontend:latest
-    ports:
-      - "80:80"
+    environment:
+      VIRTUAL_HOST: ayalab.co
+      VIRTUAL_PORT: "80"
+      LETSENCRYPT_HOST: ayalab.co
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in .env}
     networks:
-      - app-network
+      - web
     restart: unless-stopped
 
 networks:
-  app-network:
-    driver: bridge
+  web:
+    external: true
