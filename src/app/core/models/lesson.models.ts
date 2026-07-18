@@ -4,6 +4,7 @@ export interface BilingualText {
 }
 
 export interface Slide {
+  id: number;
   kicker: BilingualText;
   title: BilingualText;
   visual: string;
@@ -11,9 +12,13 @@ export interface Slide {
 }
 
 export interface Lesson {
+  id: number;
   icon: string;
   title: BilingualText;
   description: BilingualText;
-  start: number;
-  end: number;
+  slideCount: number;
+}
+
+export interface LessonWithSlides extends Lesson {
+  slides: Slide[];
 }

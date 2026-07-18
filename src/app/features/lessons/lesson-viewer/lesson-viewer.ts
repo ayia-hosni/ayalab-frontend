@@ -2,7 +2,8 @@ import { Component, OnInit, HostListener, signal, computed, inject } from '@angu
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { LINKED_LIST_LESSONS, LINKED_LIST_SLIDES } from '../../../core/data/linked-list-lessons.data';
+import { LessonsService } from '../../../core/services/lessons.service';
+import { LessonWithSlides } from '../../../core/models/lesson.models';
 
 type Lang = 'en' | 'ar';
 type CodeLang = 'cpp' | 'java';
@@ -16,37 +17,40 @@ type CodeLang = 'cpp' | 'java';
 })
 export class LessonViewer implements OnInit {
   private route = inject(ActivatedRoute);
+  private svc = inject(LessonsService);
 
-  readonly lessons = LINKED_LIST_LESSONS;
-  readonly slides = LINKED_LIST_SLIDES;
+  lesson  = signal<LessonWithSlides | null>(null);
+  loading = signal(true);
+  error   = signal<string | null>(null);
 
-  lessonIdx = signal(0);
-  current = signal(0);
-  lang = signal<Lang>('en');
+  current  = signal(0);
+  lang     = signal<Lang>('en');
   codeLang = signal<CodeLang>('cpp');
 
-  lesson = computed(() => this.lessons[this.lessonIdx()]);
-  slide = computed(() => this.slides[this.current()]);
-  posInLesson = computed(() => this.current() - this.lesson().start + 1);
-  totalInLesson = computed(() => this.lesson().end - this.lesson().start);
-  progressPct = computed(() => (this.posInLesson() / this.totalInLesson()) * 100);
-  slideIndices = computed(() => {
-    const l = this.lesson();
-    return Array.from({ length: l.end - l.start }, (_, i) => l.start + i);
-  });
-  isFirst = computed(() => this.current() === this.lesson().start);
-  isLast = computed(() => this.current() === this.lesson().end - 1);
+  slides        = computed(() => this.lesson()?.slides ?? []);
+  slide         = computed(() => this.slides()[this.current()]);
+  posInLesson   = computed(() => this.current() + 1);
+  totalInLesson = computed(() => this.slides().length);
+  progressPct   = computed(() => this.totalInLesson() ? (this.posInLesson() / this.totalInLesson()) * 100 : 0);
+  slideIndices  = computed(() => this.slides().map((_, i) => i));
+  isFirst       = computed(() => this.current() === 0);
+  isLast        = computed(() => this.current() === this.totalInLesson() - 1);
 
   ngOnInit(): void {
-    const idxParam = Number(this.route.snapshot.paramMap.get('lessonId'));
-    const idx = Number.isFinite(idxParam) && this.lessons[idxParam] ? idxParam : 0;
-    this.lessonIdx.set(idx);
-    this.current.set(this.lessons[idx].start);
+    const id = Number(this.route.snapshot.paramMap.get('lessonId'));
+    if (!Number.isFinite(id)) {
+      this.error.set('Lesson not found.');
+      this.loading.set(false);
+      return;
+    }
+    this.svc.get(id).subscribe({
+      next: l => { this.lesson.set(l); this.current.set(0); this.loading.set(false); },
+      error: () => { this.error.set('Could not reach the server.'); this.loading.set(false); },
+    });
   }
 
   goTo(index: number): void {
-    const l = this.lesson();
-    if (index < l.start || index >= l.end) return;
+    if (index < 0 || index >= this.totalInLesson()) return;
     this.current.set(index);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -58,11 +62,11 @@ export class LessonViewer implements OnInit {
   setCodeLang(l: CodeLang): void { this.codeLang.set(l); }
 
   slideNumberInLesson(i: number): number {
-    return i - this.lesson().start + 1;
+    return i + 1;
   }
 
   slideTitle(i: number): string {
-    const s = this.slides[i];
+    const s = this.slides()[i];
     return this.lang() === 'en' ? s.title.en : s.title.ar;
   }
 

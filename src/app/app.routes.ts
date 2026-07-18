@@ -37,6 +37,11 @@ export const routes: Routes = [
       import('./features/admin/admin-panel').then((m) => m.AdminPanel),
   },
   {
+    path: 'admin/lessons',
+    loadComponent: () =>
+      import('./features/admin/lessons/admin-lessons-panel').then((m) => m.AdminLessonsPanel),
+  },
+  {
     path: 'lessons',
     loadComponent: () =>
       import('./features/lessons/lessons-list/lessons-list').then((m) => m.LessonsList),

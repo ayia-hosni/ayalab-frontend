@@ -22,18 +22,30 @@
     </div>
   </div>
 
-  <div class="lessons-grid">
-    @for (l of lessons; track l.title.en; let i = $index) {
-      <a class="lesson-card" [routerLink]="['/lessons', i]">
-        <div class="lesson-card-top">
-          <div class="lesson-icon" [innerHTML]="l.icon"></div>
-          <span class="lesson-count">{{ slideCount(l) }} {{ lang() === 'en' ? 'slides' : 'شريحة' }}</span>
-        </div>
-        <div class="lesson-num">{{ lang() === 'en' ? 'Lesson ' + (i + 1) : 'الدرس ' + (i + 1) }}</div>
-        <h3 class="lesson-title" [class.rtl]="lang() === 'ar'">{{ lang() === 'en' ? l.title.en : l.title.ar }}</h3>
-        <p class="lesson-desc" [class.rtl]="lang() === 'ar'" [innerHTML]="lang() === 'en' ? l.description.en : l.description.ar"></p>
-        <span class="lesson-start">{{ lang() === 'en' ? 'Start lesson →' : 'ابدأ الدرس ←' }}</span>
-      </a>
-    }
-  </div>
+  @if (error()) {
+    <div class="alert-error">⚠️ {{ error() }} <button (click)="load()">Retry</button></div>
+  }
+
+  @if (loading()) {
+    <div class="lessons-grid">
+      @for (i of [1,2,3]; track i) {
+        <div class="lesson-card skeleton-card"></div>
+      }
+    </div>
+  } @else {
+    <div class="lessons-grid">
+      @for (l of lessons(); track l.id; let i = $index) {
+        <a class="lesson-card" [routerLink]="['/lessons', l.id]">
+          <div class="lesson-card-top">
+            <div class="lesson-icon" [innerHTML]="l.icon"></div>
+            <span class="lesson-count">{{ l.slideCount }} {{ lang() === 'en' ? 'slides' : 'شريحة' }}</span>
+          </div>
+          <div class="lesson-num">{{ lang() === 'en' ? 'Lesson ' + (i + 1) : 'الدرس ' + (i + 1) }}</div>
+          <h3 class="lesson-title" [class.rtl]="lang() === 'ar'">{{ lang() === 'en' ? l.title.en : l.title.ar }}</h3>
+          <p class="lesson-desc" [class.rtl]="lang() === 'ar'" [innerHTML]="lang() === 'en' ? l.description.en : l.description.ar"></p>
+          <span class="lesson-start">{{ lang() === 'en' ? 'Start lesson →' : 'ابدأ الدرس ←' }}</span>
+        </a>
+      }
+    </div>
+  }
 </div>

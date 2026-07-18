@@ -1,0 +1,448 @@
+<div class="topbar">
+  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
+  <span class="spacer"></span>
+  <nav class="nav-links">
+    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
+    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
+    <a class="nav-link" routerLink="/admin" routerLinkActive="active">Problem Admin</a>
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+  </nav>
+  <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
+</div>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="page-head">
+    <div>
+      <h1>📚 Lesson Admin</h1>
+      <p class="sub">Manage lesson slide decks — create, edit, and reorder slides.</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">＋ New Lesson</button>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <span class="kpi-icon">📚</span>
+      <div><div class="kpi-value">{{ total() }}</div><div class="kpi-label">Total Lessons</div></div>
+    </div>
+    <div class="kpi-card kpi-purple">
+      <span class="kpi-icon">🖼️</span>
+      <div><div class="kpi-value">{{ totalSlides() }}</div><div class="kpi-label">Total Slides</div></div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert-error">⚠️ {{ error() }} <button (click)="load()">Retry</button></div>
+  }
+
+  @if (loading()) {
+    <div class="table-card skeleton-table">
+      @for (i of [1,2,3]; track i) {
+        <div class="skeleton-row-line"></div>
+      }
+    </div>
+  } @else {
+
+    <!-- Lesson table -->
+    <div class="table-card">
+      <table class="prob-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Icon</th>
+            <th>Title (EN)</th>
+            <th>Title (AR)</th>
+            <th>Slides</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (l of lessons(); track l.id) {
+            <tr>
+              <td class="cell-id">{{ l.ordinal + 1 }}</td>
+              <td class="cell-icon" [innerHTML]="l.icon"></td>
+              <td class="cell-title"><span class="title-text">{{ l.titleEn }}</span></td>
+              <td class="cell-title"><span class="title-text rtl">{{ l.titleAr }}</span></td>
+              <td class="cell-slides">{{ l.slides.length }}</td>
+              <td class="cell-actions">
+                <button class="btn-edit" (click)="openEdit(l)">✏️ Edit</button>
+                @if (deleteConfirm() === l.id) {
+                  <span class="confirm-row">
+                    <button class="btn-del-confirm" (click)="doDelete(l.id)">Delete</button>
+                    <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+                  </span>
+                } @else {
+                  <button class="btn-del" (click)="confirmDelete(l.id)">🗑️</button>
+                }
+              </td>
+            </tr>
+          }
+          @empty {
+            <tr><td colspan="6" class="empty-row">No lessons yet — click "New Lesson" to add one.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</div>
+
+<!-- ── Side panel overlay ──────────────────────────────────────────────── -->
+@if (panelOpen()) {
+  <div class="overlay" (click)="closePanel()"></div>
+  <div class="side-panel">
+
+    <div class="panel-header">
+      <h2>{{ isEdit() ? '✏️ Edit Lesson' : '＋ New Lesson' }}</h2>
+      <button class="close-btn" (click)="closePanel()">✕</button>
+    </div>
+
+    <div class="panel-body">
+
+      @if (saveError()) {
+        <div class="alert-error small">⚠️ {{ saveError() }}</div>
+      }
+
+      <!-- ── Basic Info ── -->
+      <section class="form-section">
+        <h3>Basic Info</h3>
+        <label class="form-field">
+          <span>Icon (HTML entity or emoji) *</span>
+          <input type="text" [value]="form().icon" (input)="updateField('icon', $any($event.target).value)" placeholder="e.g. &#128279; or 🔗" />
+        </label>
+
+        <div class="form-row two-col">
+          <label class="form-field">
+            <span>Title (EN) *</span>
+            <input type="text" [value]="form().titleEn" (input)="updateField('titleEn', $any($event.target).value)" placeholder="e.g. Linked List Basics" />
+          </label>
+          <label class="form-field">
+            <span>Title (AR) *</span>
+            <input type="text" class="rtl-input" [value]="form().titleAr" (input)="updateField('titleAr', $any($event.target).value)" placeholder="مثال: أساسيات الـ Linked List" />
+          </label>
+        </div>
+
+        <label class="form-field">
+          <span>Description (EN)</span>
+        </label>
+        <app-rich-text-editor [html]="form().descriptionEn" (htmlChange)="updateField('descriptionEn', $event)" />
+
+        <label class="form-field" style="margin-top:12px">
+          <span>Description (AR)</span>
+        </label>
+        <app-rich-text-editor [html]="form().descriptionAr" [rtl]="true" (htmlChange)="updateField('descriptionAr', $event)" />
+      </section>
+
+      <!-- ── Slides ── -->
+      <section class="form-section">
+        <div class="section-head-row">
+          <h3>Slides ({{ form().slides.length }})</h3>
+          <button class="btn-add-case" (click)="addSlide()">＋ Add Slide</button>
+        </div>
+        @if (form().slides.length === 0) {
+          <p class="empty-hint">No slides yet.</p>
+        }
+        @if (form().slides.length > 1) {
+          <div class="slide-jump-row">
+            @for (s2 of form().slides; track $index; let jIdx = $index) {
+              <button type="button" class="slide-jump-pill" [class.active]="expandedSlide() === jIdx" (click)="jumpToSlide(jIdx)" [title]="slideSummary(s2)">{{ jIdx + 1 }}</button>
+            }
+          </div>
+        }
+        @for (s of form().slides; track $index; let idx = $index) {
+          <div class="slide-card" [id]="'admin-slide-' + idx" [class.expanded]="expandedSlide() === idx">
+            <div class="slide-summary-row" (click)="toggleSlideExpanded(idx)">
+              <span class="expand-chevron">{{ expandedSlide() === idx ? '▾' : '▸' }}</span>
+              <span class="tc-num">{{ idx + 1 }}</span>
+              <span class="slide-summary-title" [class.placeholder]="!s.titleEn">{{ slideSummary(s) }}</span>
+              <span class="slide-summary-badge">{{ slideKindBadge(s) }}</span>
+              <span class="tc-spacer"></span>
+              <button type="button" class="btn-move" (click)="$event.stopPropagation(); moveSlide(idx, -1)" [disabled]="idx === 0" title="Move up">▲</button>
+              <button type="button" class="btn-move" (click)="$event.stopPropagation(); moveSlide(idx, 1)" [disabled]="idx === form().slides.length - 1" title="Move down">▼</button>
+              <button type="button" class="btn-rm-case" (click)="$event.stopPropagation(); removeSlide(idx)" title="Remove">✕</button>
+            </div>
+
+            @if (expandedSlide() === idx) {
+            <div class="slide-body">
+
+            <div class="tc-row">
+              <label class="form-field">
+                <span>Kicker (EN)</span>
+                <input type="text" [value]="s.kickerEn" (input)="updateSlide(idx, 'kickerEn', $any($event.target).value)" />
+              </label>
+              <label class="form-field">
+                <span>Kicker (AR)</span>
+                <input type="text" class="rtl-input" [value]="s.kickerAr" (input)="updateSlide(idx, 'kickerAr', $any($event.target).value)" />
+              </label>
+            </div>
+
+            <div class="tc-row">
+              <label class="form-field">
+                <span>Title (EN)</span>
+                <input type="text" [value]="s.titleEn" (input)="updateSlide(idx, 'titleEn', $any($event.target).value)" />
+              </label>
+              <label class="form-field">
+                <span>Title (AR)</span>
+                <input type="text" class="rtl-input" [value]="s.titleAr" (input)="updateSlide(idx, 'titleAr', $any($event.target).value)" />
+              </label>
+            </div>
+
+            <div class="visual-mode-row">
+              <span>Visual</span>
+              <button type="button" class="btn-mode-toggle" (click)="toggleVisualMode(idx)">
+                {{ s.visualMode === 'builder' ? '🖊 Switch to Raw HTML' : '🔧 Switch to Builder' }}
+              </button>
+            </div>
+
+            @if (s.visualMode === 'builder') {
+              <div class="builder-box">
+                <div class="kind-toggle-row">
+                  <button type="button" class="btn-kind" [class.active]="s.spec.kind === 'chain'" (click)="setVisualKind(idx, 'chain')">⛓ Chain Diagram</button>
+                  <button type="button" class="btn-kind" [class.active]="s.spec.kind === 'grid'" (click)="setVisualKind(idx, 'grid')">▦ Comparison Grid</button>
+                </div>
+
+                @if (asChain(s.spec); as chain) {
+                  @for (frame of chain.frames; track $index; let frameIdx = $index) {
+                    <div class="frame-card">
+                      <div class="tc-header">
+                        <span class="tc-num">Frame {{ frameIdx + 1 }}</span>
+                        <span class="tc-spacer"></span>
+                        <button type="button" class="btn-move" (click)="moveFrame(idx, frameIdx, -1)" [disabled]="frameIdx === 0" title="Move up">▲</button>
+                        <button type="button" class="btn-move" (click)="moveFrame(idx, frameIdx, 1)" [disabled]="frameIdx === chain.frames.length - 1" title="Move down">▼</button>
+                        <button type="button" class="btn-rm-case" (click)="removeFrame(idx, frameIdx)" title="Remove frame">✕</button>
+                      </div>
+
+                      <label class="form-field">
+                        <span>Note badge (optional)</span>
+                        <input type="text" [value]="frame.note" (input)="updateFrameNote(idx, frameIdx, $any($event.target).value)" placeholder="e.g. Before / After: insert X" />
+                      </label>
+
+                      @for (item of frame.items; track $index; let itemIdx = $index) {
+                        <div class="chain-item-card">
+                          <div class="tc-header">
+                            <span class="tc-num">Item {{ itemIdx + 1 }}</span>
+                            <select class="chain-type-select" [value]="item.type" (change)="setItemType(idx, frameIdx, itemIdx, $any($event.target).value)">
+                              <option value="node">Node</option>
+                              <option value="null">Null (∅)</option>
+                              <option value="split">Split (Data|Next)</option>
+                            </select>
+                            <span class="tc-spacer"></span>
+                            <button type="button" class="btn-move" (click)="moveChainItem(idx, frameIdx, itemIdx, -1)" [disabled]="itemIdx === 0" title="Move left">◀</button>
+                            <button type="button" class="btn-move" (click)="moveChainItem(idx, frameIdx, itemIdx, 1)" [disabled]="itemIdx === frame.items.length - 1" title="Move right">▶</button>
+                            <button type="button" class="btn-rm-case" (click)="removeChainItem(idx, frameIdx, itemIdx)" title="Remove">✕</button>
+                          </div>
+
+                          @if (asNode(item); as node) {
+                            <div class="tc-row">
+                              <label class="form-field">
+                                <span>Label</span>
+                                <input type="text" [value]="node.label" (input)="updateChainNode(idx, frameIdx, itemIdx, { label: $any($event.target).value })" placeholder="e.g. A" />
+                              </label>
+                              <label class="form-field">
+                                <span>Size</span>
+                                <select [value]="node.size" (change)="updateChainNode(idx, frameIdx, itemIdx, { size: $any($event.target).value })">
+                                  <option value="normal">Normal</option>
+                                  <option value="large">Large</option>
+                                </select>
+                              </label>
+                            </div>
+                            <div class="color-swatch-row">
+                              @for (c of NODE_COLORS; track c) {
+                                <button type="button" [class]="'color-swatch swatch-' + c + (node.color === c ? ' active' : '')" [title]="c" (click)="updateChainNode(idx, frameIdx, itemIdx, { color: c })"></button>
+                              }
+                            </div>
+                          } @else if (asNull(item); as nullItem) {
+                            <label class="form-field">
+                              <span>Size</span>
+                              <select [value]="nullItem.size" (change)="updateChainNull(idx, frameIdx, itemIdx, { size: $any($event.target).value })">
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                              </select>
+                            </label>
+                          } @else if (asSplit(item); as split) {
+                            <div class="tc-row">
+                              <label class="form-field">
+                                <span>Left label</span>
+                                <input type="text" [value]="split.leftLabel" (input)="updateChainSplit(idx, frameIdx, itemIdx, { leftLabel: $any($event.target).value })" placeholder="e.g. Data" />
+                              </label>
+                              <label class="form-field">
+                                <span>Right label</span>
+                                <input type="text" [value]="split.rightLabel" (input)="updateChainSplit(idx, frameIdx, itemIdx, { rightLabel: $any($event.target).value })" placeholder="e.g. Next" />
+                              </label>
+                            </div>
+                            <div class="tc-row">
+                              <label class="form-field">
+                                <span>Size</span>
+                                <select [value]="split.size" (change)="updateChainSplit(idx, frameIdx, itemIdx, { size: $any($event.target).value })">
+                                  <option value="normal">Normal</option>
+                                  <option value="large">Large</option>
+                                </select>
+                              </label>
+                              <label class="form-field toggle-field">
+                                <span>Right cell monospace</span>
+                                <input type="checkbox" [checked]="split.rightMono" (change)="updateChainSplit(idx, frameIdx, itemIdx, { rightMono: $any($event.target).checked })" />
+                              </label>
+                            </div>
+                          }
+
+                          <div class="pointer-tag-row">
+                            <span>Pointer tag</span>
+                            <select [value]="item.pointerTag ? item.pointerTag.style : ''"
+                                    (change)="setPointerTag(idx, frameIdx, itemIdx, $any($event.target).value ? { text: $any($event.target).value === 'head' ? 'Head' : 'current', style: $any($event.target).value } : null)">
+                              <option value="">None</option>
+                              <option value="head">Head</option>
+                              <option value="cur">Cur</option>
+                            </select>
+                            @if (item.pointerTag) {
+                              <input type="text" class="pt-text-input" [value]="item.pointerTag.text"
+                                     (input)="setPointerTag(idx, frameIdx, itemIdx, { text: $any($event.target).value, style: item.pointerTag.style })" placeholder="Tag text" />
+                            }
+                          </div>
+                        </div>
+
+                        @if (itemIdx < frame.items.length - 1) {
+                          <div class="connector-row">
+                            <span>Connector</span>
+                            <select [value]="frame.connectors[itemIdx] ?? 'solid'" (change)="setConnector(idx, frameIdx, itemIdx, $any($event.target).value)">
+                              <option value="solid">Solid (colored)</option>
+                              <option value="dashed">Dashed</option>
+                              <option value="none">None</option>
+                            </select>
+                          </div>
+                        }
+                      } @empty {
+                        <p class="empty-hint">No items yet — add a node or null terminator.</p>
+                      }
+
+                      <div class="chain-add-row">
+                        <button type="button" class="btn-add-case" (click)="addChainItem(idx, frameIdx, 'node')">＋ Node</button>
+                        <button type="button" class="btn-add-case" (click)="addChainItem(idx, frameIdx, 'null')">＋ Null (∅)</button>
+                        <button type="button" class="btn-add-case" (click)="addChainItem(idx, frameIdx, 'split')">＋ Split (Data|Next)</button>
+                      </div>
+                    </div>
+                  } @empty {
+                    <p class="empty-hint">No frames yet — add one to start the diagram.</p>
+                  }
+
+                  <div class="chain-add-row">
+                    <button type="button" class="btn-add-case" (click)="addFrame(idx)">＋ Frame</button>
+                  </div>
+
+                  <div class="code-snippet-section">
+                    @if (chain.code) {
+                      <div class="section-head-row">
+                        <span class="code-snippet-label">Code snippet (C++ / Java toggle)</span>
+                        <button type="button" class="btn-rm-case" (click)="removeCodeSnippet(idx)" title="Remove code snippet">✕</button>
+                      </div>
+                      <div class="tc-row">
+                        <label class="form-field">
+                          <span>C++</span>
+                          <textarea class="code-area" rows="3" spellcheck="false" [value]="chain.code.cpp" (input)="updateCodeSnippet(idx, { cpp: $any($event.target).value })"></textarea>
+                        </label>
+                        <label class="form-field">
+                          <span>Java</span>
+                          <textarea class="code-area" rows="3" spellcheck="false" [value]="chain.code.java" (input)="updateCodeSnippet(idx, { java: $any($event.target).value })"></textarea>
+                        </label>
+                      </div>
+                    } @else {
+                      <button type="button" class="btn-add-case" (click)="addCodeSnippet(idx)">＋ Add Code Snippet</button>
+                    }
+                  </div>
+                } @else if (asGrid(s.spec); as gridSpec) {
+                  <label class="form-field">
+                    <span>Columns</span>
+                    <select [value]="gridSpec.columns" (change)="setGridColumns(idx, $any(+$any($event.target).value))">
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                    </select>
+                  </label>
+
+                  @for (card of gridSpec.cards; track $index; let cardIdx = $index) {
+                    <div class="chain-item-card">
+                      <div class="tc-header">
+                        <span class="tc-num">Card {{ cardIdx + 1 }}</span>
+                        <span class="tc-spacer"></span>
+                        <button type="button" class="btn-move" (click)="moveCard(idx, cardIdx, -1)" [disabled]="cardIdx === 0" title="Move left">◀</button>
+                        <button type="button" class="btn-move" (click)="moveCard(idx, cardIdx, 1)" [disabled]="cardIdx === gridSpec.cards.length - 1" title="Move right">▶</button>
+                        <button type="button" class="btn-rm-case" (click)="removeCard(idx, cardIdx)" title="Remove">✕</button>
+                      </div>
+
+                      <div class="color-swatch-row">
+                        @for (c of CARD_COLORS; track c) {
+                          <button type="button" [class]="'color-swatch swatch-' + c + (card.color === c ? ' active' : '')" [title]="c" (click)="updateCard(idx, cardIdx, { color: c })"></button>
+                        }
+                      </div>
+
+                      <div class="tc-row">
+                        <label class="form-field">
+                          <span>Top line style</span>
+                          <select [value]="card.topStyle" (change)="updateCard(idx, cardIdx, { topStyle: $any($event.target).value })">
+                            <option value="icon">Icon / emoji</option>
+                            <option value="mono">Mono value</option>
+                          </select>
+                        </label>
+                        <label class="form-field toggle-field">
+                          <span>Strikethrough</span>
+                          <input type="checkbox" [checked]="card.strikethrough" (change)="updateCard(idx, cardIdx, { strikethrough: $any($event.target).checked })" />
+                        </label>
+                      </div>
+
+                      <label class="form-field">
+                        <span>Top line</span>
+                        <input type="text" [value]="card.topLine" (input)="updateCard(idx, cardIdx, { topLine: $any($event.target).value })" placeholder="e.g. 🔍 or arr[2]" />
+                      </label>
+
+                      <label class="form-field">
+                        <span>Label</span>
+                        <input type="text" [value]="card.label" (input)="updateCard(idx, cardIdx, { label: $any($event.target).value })" placeholder="e.g. Traversal" />
+                      </label>
+                    </div>
+                  } @empty {
+                    <p class="empty-hint">No cards yet — add one to start the grid.</p>
+                  }
+
+                  <div class="chain-add-row">
+                    <button type="button" class="btn-add-case" (click)="addCard(idx)">＋ Card</button>
+                  </div>
+                }
+
+                <div class="preview-box" [innerHTML]="previewFor(s)"></div>
+              </div>
+            } @else {
+              <label class="form-field">
+                <span>Visual (raw HTML)</span>
+                <textarea class="code-area" rows="6" spellcheck="false" [value]="s.visual" (input)="updateSlide(idx, 'visual', $any($event.target).value)"></textarea>
+              </label>
+              <div class="preview-box" [innerHTML]="s.visual"></div>
+            }
+
+            <label class="form-field" style="margin-top:12px">
+              <span>Body (EN)</span>
+            </label>
+            <app-rich-text-editor [html]="s.bodyEn" (htmlChange)="updateSlide(idx, 'bodyEn', $event)" />
+
+            <label class="form-field" style="margin-top:12px">
+              <span>Body (AR)</span>
+            </label>
+            <app-rich-text-editor [html]="s.bodyAr" [rtl]="true" (htmlChange)="updateSlide(idx, 'bodyAr', $event)" />
+
+            </div>
+            }
+          </div>
+        }
+      </section>
+
+    </div><!-- /panel-body -->
+
+    <div class="panel-footer">
+      <button class="btn-ghost" (click)="closePanel()">Cancel</button>
+      <button class="btn-primary" [disabled]="saving()" (click)="save()">
+        {{ saving() ? 'Saving…' : (isEdit() ? 'Save Changes' : 'Create Lesson') }}
+      </button>
+    </div>
+
+  </div>
+}

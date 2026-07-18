@@ -61,3 +61,18 @@
 .lesson-start { font-size: 13px; font-weight: 700; color: var(--secondary); }
 
 .rtl { direction: rtl; text-align: right; font-family: 'Tajawal', sans-serif; }
+
+.alert-error {
+  background: var(--hard-light); border: 1px solid #FECDD3; border-radius: 12px;
+  padding: 14px 18px; font-size: 13px; font-weight: 600; color: var(--hard-shadow);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+}
+.alert-error button { margin-left: auto; font-size: 12px; font-weight: 700; border: 1px solid var(--hard); border-radius: 8px; background: transparent; color: var(--hard-shadow); padding: 3px 12px; cursor: pointer; }
+
+.skeleton-card {
+  height: 180px; border-radius: 20px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { 0%{background-position:100% 0} 100%{background-position:-100% 0} }

@@ -1,0 +1,17 @@
+<div class="rte" [class.rtl]="rtl()">
+  <div class="rte-toolbar">
+    <button type="button" class="rte-btn" title="Bold" (mousedown)="$event.preventDefault()" (click)="bold()"><b>B</b></button>
+    <button type="button" class="rte-btn" title="Italic" (mousedown)="$event.preventDefault()" (click)="italic()"><i>I</i></button>
+    <button type="button" class="rte-btn" title="Inline code" (mousedown)="$event.preventDefault()" (click)="inlineCode()">&lt;/&gt;</button>
+    <button type="button" class="rte-btn" title="Bullet list" (mousedown)="$event.preventDefault()" (click)="bulletList()">• List</button>
+    <button type="button" class="rte-btn" title="Link" (mousedown)="$event.preventDefault()" (click)="link()">🔗</button>
+    <button type="button" class="rte-btn rte-btn-ghost" title="Clear formatting" (mousedown)="$event.preventDefault()" (click)="clear()">Clear</button>
+  </div>
+  <div
+    class="rte-editor"
+    #editor
+    contenteditable="true"
+    [attr.dir]="rtl() ? 'rtl' : 'ltr'"
+    (input)="onInput()"
+  ></div>
+</div>

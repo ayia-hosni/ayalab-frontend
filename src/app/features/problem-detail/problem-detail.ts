@@ -8,9 +8,11 @@ import {
   ProblemDetail as ProblemDetailModel,
   SubmitResult,
 } from '../../core/models/problem.models';
+import { BilingualText } from '../../core/models/lesson.models';
 import { PointerSandboxComponent } from './pointer-sandbox.component';
 
 type Lang = 'javascript' | 'python' | 'java';
+type ExplainLang = 'en' | 'ar';
 
 interface TraceStep {
   prev: number | null;
@@ -19,7 +21,7 @@ interface TraceStep {
   reversed: boolean[];
   line: string;
   badge: string;
-  desc: string;
+  desc: BilingualText;
   done: boolean;
 }
 
@@ -56,6 +58,7 @@ export class ProblemDetail implements OnInit {
 
   activeTab = signal<1 | 2 | 3 | 4>(1);
   lang = signal<Lang>('javascript');
+  explainLang = signal<ExplainLang>('en');
 
   code = signal<string>('');
   private starter: Record<string, string> | null = null;
@@ -180,7 +183,7 @@ export class ProblemDetail implements OnInit {
     return this.getStepLinks(s)[chain[displayIdx]] === chain[displayIdx + 1];
   }
 
-  stageText    = computed(() => this.currentStep()?.desc ?? '');
+  stageText    = computed(() => this.currentStep()?.desc[this.explainLang()] ?? '');
   stageCounter = computed(() => {
     const total = this.steps().length;
     return total ? `Step ${this.stepIndex() + 1} / ${total}` : '';
@@ -251,12 +254,47 @@ export class ProblemDetail implements OnInit {
     'done': '#A55EEA',
   };
 
-  readonly STEP_TECHNIQUE: Record<string, { icon: string; name: string; desc: string }> = {
-    'init': { icon: '🎯', name: 'Initialize Pointers',   desc: "Place prev at null and curr at the head — the three-pointer setup before the loop starts." },
-    '1':    { icon: '💾', name: 'Save the Forward Link', desc: "Store curr.next before overwriting it. Without this save, the rest of the list would be lost forever." },
-    '2':    { icon: '🔄', name: 'Reverse the Arrow',     desc: "Point curr.next backward at prev. This single line IS the reversal — one arrow flipped per node." },
-    '3':    { icon: '➡️', name: 'Slide Both Pointers',   desc: "Move prev and curr one step forward. The reversed portion grows; the remaining list shrinks." },
-    'done': { icon: '🏁', name: 'Return the New Head',   desc: "curr reached null — the loop ends. prev now sits at the original tail, which is the new head." },
+  readonly STEP_TECHNIQUE: Record<string, { icon: string; name: BilingualText; desc: BilingualText }> = {
+    'init': {
+      icon: '🎯',
+      name: { en: 'Initialize Pointers',   ar: 'تهيئة المؤشرات' },
+      desc: {
+        en: "Place prev at null and curr at the head — the three-pointer setup before the loop starts.",
+        ar: 'ضع prev عند null و curr عند رأس القائمة — هذا هو إعداد المؤشرات الثلاثة قبل بدء الحلقة.',
+      },
+    },
+    '1': {
+      icon: '💾',
+      name: { en: 'Save the Forward Link', ar: 'احفظ الرابط التالي' },
+      desc: {
+        en: "Store curr.next before overwriting it. Without this save, the rest of the list would be lost forever.",
+        ar: 'خزّن curr.next قبل الكتابة فوقه. بدون هذا الحفظ، سيُفقد باقي القائمة إلى الأبد.',
+      },
+    },
+    '2': {
+      icon: '🔄',
+      name: { en: 'Reverse the Arrow',     ar: 'اعكس السهم' },
+      desc: {
+        en: "Point curr.next backward at prev. This single line IS the reversal — one arrow flipped per node.",
+        ar: 'وجّه curr.next للخلف نحو prev. هذا السطر وحده هو الانعكاس — سهم واحد ينقلب لكل عقدة.',
+      },
+    },
+    '3': {
+      icon: '➡️',
+      name: { en: 'Slide Both Pointers',   ar: 'حرّك المؤشرين' },
+      desc: {
+        en: "Move prev and curr one step forward. The reversed portion grows; the remaining list shrinks.",
+        ar: 'حرّك prev و curr خطوة للأمام. الجزء المعكوس يكبر، والجزء المتبقي يصغر.',
+      },
+    },
+    'done': {
+      icon: '🏁',
+      name: { en: 'Return the New Head',   ar: 'أرجع الرأس الجديد' },
+      desc: {
+        en: "curr reached null — the loop ends. prev now sits at the original tail, which is the new head.",
+        ar: 'وصل curr إلى null — انتهت الحلقة. الآن prev يقف عند الذيل الأصلي، وهو الرأس الجديد.',
+      },
+    },
   };
 
   gameActiveLineBg = computed(() => {
@@ -388,6 +426,8 @@ export class ProblemDetail implements OnInit {
   }
 
   showTab(n: 1 | 2 | 3 | 4): void { this.activeTab.set(n); }
+
+  setExplainLang(l: ExplainLang): void { this.explainLang.set(l); }
 
   showLang(l: Lang): void {
     this.lang.set(l);
@@ -649,7 +689,7 @@ export class ProblemDetail implements OnInit {
       reversed: [...reversed],
       line: 'prev = null;  curr = head;',
       badge: 'init',
-      desc: 'prev starts null, curr starts at the head.',
+      desc: { en: 'prev starts null, curr starts at the head.', ar: 'يبدأ prev بقيمة null، ويبدأ curr عند رأس القائمة.' },
       done: n === 0,
     });
 
@@ -663,7 +703,7 @@ export class ProblemDetail implements OnInit {
         prev, curr, next, reversed: [...reversed],
         line: 'next = curr.next;',
         badge: '1',
-        desc: 'Save the next node before we break the link.',
+        desc: { en: 'Save the next node before we break the link.', ar: 'احفظ العقدة التالية قبل أن نكسر الرابط.' },
         done: false,
       });
 
@@ -672,7 +712,7 @@ export class ProblemDetail implements OnInit {
         prev, curr, next, reversed: [...reversed],
         line: 'curr.next = prev;',
         badge: '2',
-        desc: 'Flip the arrow — curr now points back at prev.',
+        desc: { en: 'Flip the arrow — curr now points back at prev.', ar: 'اقلب السهم — الآن curr يشير للخلف نحو prev.' },
         done: false,
       });
 
@@ -681,7 +721,7 @@ export class ProblemDetail implements OnInit {
         prev, curr, next, reversed: [...reversed],
         line: 'prev = curr;  curr = next;',
         badge: '3',
-        desc: 'Slide both pointers forward.',
+        desc: { en: 'Slide both pointers forward.', ar: 'حرّك المؤشرين للأمام.' },
         done: false,
       });
     }
@@ -690,7 +730,7 @@ export class ProblemDetail implements OnInit {
       prev, curr: null, next: null, reversed: [...reversed],
       line: 'return prev;',
       badge: 'done',
-      desc: 'curr is null — return prev as the new head!',
+      desc: { en: 'curr is null — return prev as the new head!', ar: 'أصبح curr يساوي null — أرجع prev كرأس جديد للقائمة!' },
       done: true,
     });
 
@@ -706,7 +746,7 @@ export class ProblemDetail implements OnInit {
     const next = this.stepIndex() + delta;
     if (next >= 0 && next < this.steps().length) {
       this.stepIndex.set(next);
-      this.speak(this.currentStep()?.desc ?? '');
+      this.speak(this.stageText());
     }
     if (next >= this.steps().length - 1) this.stopPlay();
   }
@@ -716,11 +756,11 @@ export class ProblemDetail implements OnInit {
       this.stopPlay();
     } else {
       this.playing.set(true);
-      this.speak(this.currentStep()?.desc ?? '');
+      this.speak(this.stageText());
       this.playTimer = setInterval(() => {
         if (this.stepIndex() < this.steps().length - 1) {
           this.stepIndex.set(this.stepIndex() + 1);
-          this.speak(this.currentStep()?.desc ?? '');
+          this.speak(this.stageText());
         } else {
           this.stopPlay();
         }
@@ -742,7 +782,7 @@ export class ProblemDetail implements OnInit {
 
   scrubTo(i: number): void {
     this.stepIndex.set(Math.max(0, Math.min(i, this.steps().length - 1)));
-    this.speak(this.currentStep()?.desc ?? '');
+    this.speak(this.stageText());
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -771,6 +811,7 @@ export class ProblemDetail implements OnInit {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 1.05; u.pitch = 1.1;
+    u.lang = this.explainLang() === 'ar' ? 'ar-SA' : 'en-US';
     window.speechSynthesis.speak(u);
   }
 

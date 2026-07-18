@@ -70,11 +70,17 @@
 
       <div class="viz-head">
         <span class="t">🔍 Pointer Trace</span>
-        <span class="legend">
-          <span style="color:#FF5252"><i style="background:#FF5252"></i>prev</span>
-          <span style="color:#00D2D3"><i style="background:#00D2D3"></i>curr</span>
-          <span style="color:#FECA57"><i style="background:#FECA57"></i>next</span>
-        </span>
+        <div class="viz-head-right">
+          <span class="legend">
+            <span style="color:#FF5252"><i style="background:#FF5252"></i>prev</span>
+            <span style="color:#00D2D3"><i style="background:#00D2D3"></i>curr</span>
+            <span style="color:#FECA57"><i style="background:#FECA57"></i>next</span>
+          </span>
+          <div class="toggle-group">
+            <button [class.active]="explainLang() === 'en'" (click)="setExplainLang('en')">EN</button>
+            <button [class.active]="explainLang() === 'ar'" (click)="setExplainLang('ar')">AR</button>
+          </div>
+        </div>
       </div>
 
       <!-- ── Technique Navigator ── -->
@@ -84,7 +90,7 @@
                   [class.active]="currentStep()?.badge === badge"
                   (click)="jumpToBadge(badge)">
             <span class="bnc-icon">{{ STEP_TECHNIQUE[badge].icon }}</span>
-            <span class="bnc-name">{{ STEP_TECHNIQUE[badge].name }}</span>
+            <span class="bnc-name" [class.rtl]="explainLang() === 'ar'">{{ STEP_TECHNIQUE[badge].name[explainLang()] }}</span>
           </button>
         }
       </div>
@@ -187,8 +193,8 @@
       <div class="viz-step-grid">
         <div class="viz-stage" [ngClass]="stageClass()">
           <span class="stage-tech-icon">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].icon }}</span>
-          <div class="stage-content">
-            <span class="stage-tech-name">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].name }}</span>
+          <div class="stage-content" [class.rtl]="explainLang() === 'ar'">
+            <span class="stage-tech-name">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].name[explainLang()] }}</span>
             <span class="stage-desc">{{ stageText() }}</span>
           </div>
           <span class="step-counter">{{ stageCounter() }}</span>
@@ -253,7 +259,7 @@
               <span class="scrubber-tick"
                     [style.left.%]="tick.pct"
                     [style.background]="tick.color"
-                    [title]="STEP_TECHNIQUE[tick.badge].name"></span>
+                    [title]="STEP_TECHNIQUE[tick.badge].name[explainLang()]"></span>
             }
           </div>
         </div>
@@ -358,10 +364,10 @@
               <span class="gtb-icon">{{ tech.icon }}</span>
               <div class="gtb-body">
                 <div class="gtb-name">
-                  {{ tech.name }}
+                  {{ tech.name[explainLang()] }}
                   <span class="badge badge--{{ q.badge }} gtb-badge">{{ q.badge }}</span>
                 </div>
-                <div class="gtb-desc">{{ tech.desc }}</div>
+                <div class="gtb-desc">{{ tech.desc[explainLang()] }}</div>
               </div>
             </div>
           }
@@ -635,7 +641,7 @@
               <div class="code-walk-viz">
                 @if (codeWalkActiveBadge()) {
                   <div class="cw-step-info">
-                    <span class="cw-step-desc">{{ codeWalkStep()?.desc }}</span>
+                    <span class="cw-step-desc">{{ codeWalkStep()?.desc?.[explainLang()] }}</span>
                     @if (codeWalkExLabel()) {
                       <div class="cw-ex-nav">
                         <button class="sbtn nav-btn" (click)="codeWalkPrevEx()" [disabled]="codeWalkExampleIdx() === 0">◀</button>
