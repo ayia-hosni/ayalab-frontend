@@ -10,7 +10,7 @@ export class PointerSandboxComponent implements AfterViewInit, OnDestroy {
   private root: any;
 
   async ngAfterViewInit(): Promise<void> {
-    const [React, ReactDOM, { default: App }] = await Promise.all([
+    const [{ default: React }, { default: ReactDOM }, { default: App }] = await Promise.all([
       import('react'),
       import('react-dom/client'),
       import('./pointer-sandbox-react'),
