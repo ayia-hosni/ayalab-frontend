@@ -23,7 +23,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: ayahosny/ayalab-frontend:latest
+          no-cache: true
+          pull: true
+          tags: |
+            ayahosny/ayalab-frontend:latest
+            ayahosny/ayalab-frontend:${{ github.sha }}
 
   deploy:
     name: Deploy to Hetzner VPS
