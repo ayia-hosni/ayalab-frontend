@@ -1,0 +1,21 @@
+<div class="topbar">
+  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
+  <span class="spacer"></span>
+  <nav class="nav-links">
+    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">{{ lang.t('navProblems') }}</a>
+    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">{{ lang.t('navLessons') }}</a>
+    @if (extraNav() === 'lessons') {
+      <a class="nav-link" routerLink="/admin/lessons" routerLinkActive="active">{{ lang.t('navAdminLessons') }}</a>
+    } @else if (extraNav() === 'problems') {
+      <a class="nav-link" routerLink="/admin" routerLinkActive="active">{{ lang.t('navAdminProblems') }}</a>
+    }
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">{{ lang.t('navDashboard') }}</a>
+  </nav>
+  <div class="lang-toggle">
+    <button [class.active]="lang.lang() === 'en'" (click)="lang.set('en')">EN</button>
+    <button [class.active]="lang.lang() === 'ar'" (click)="lang.set('ar')">AR</button>
+  </div>
+  @if (showCoffeeBtn()) {
+    <a class="coffee-btn" routerLink="/support">{{ lang.t('coffeeBtn') }}</a>
+  }
+</div>

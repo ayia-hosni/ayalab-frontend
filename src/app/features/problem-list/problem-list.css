@@ -397,3 +397,8 @@ td.center { text-align: center; }
   .seg-group { flex-wrap: wrap; }
   .search-box { min-width: 0; }
 }
+
+/* ── RTL ─────────────────────────────────────────────── */
+:host-context([dir="rtl"]) thead th:not(.center) { text-align: right; }
+:host-context([dir="rtl"]) .viz-badge,
+:host-context([dir="rtl"]) .coming-soon-badge { margin-left: 0; margin-right: 10px; }

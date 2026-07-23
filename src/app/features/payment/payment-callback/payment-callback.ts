@@ -5,6 +5,7 @@ import { interval, switchMap, takeWhile } from 'rxjs';
 
 import { PaymentService } from '../../../core/services/payment.service';
 import { PaymentOrderStatus } from '../../../core/models/payment.models';
+import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-payment-callback',
@@ -16,6 +17,7 @@ import { PaymentOrderStatus } from '../../../core/models/payment.models';
 export class PaymentCallback implements OnInit {
   private route = inject(ActivatedRoute);
   private service = inject(PaymentService);
+  lang = inject(LanguageService);
 
   status = signal<PaymentOrderStatus | null>(null);
   billReference = signal<string | null>(null);

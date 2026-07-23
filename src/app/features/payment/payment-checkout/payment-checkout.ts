@@ -6,6 +6,7 @@ import { parseApiError } from '../../../core/utils/api-error';
 
 import { PaymentService } from '../../../core/services/payment.service';
 import { PaymentMethodType } from '../../../core/models/payment.models';
+import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-payment-checkout',
@@ -17,6 +18,7 @@ import { PaymentMethodType } from '../../../core/models/payment.models';
 export class PaymentCheckout {
   private service = inject(PaymentService);
   private router = inject(Router);
+  lang = inject(LanguageService);
 
   method = signal<PaymentMethodType>('CARD');
   loading = signal(false);
@@ -31,10 +33,10 @@ export class PaymentCheckout {
   readonly CURRENCY = 'EGP';
   readonly currentYear = new Date().getFullYear();
 
-  readonly methods: { value: PaymentMethodType; label: string; icon: string; hint: string }[] = [
-    { value: 'CARD',   label: 'Credit / Debit Card', icon: '💳', hint: 'Pay securely via Paymob iframe' },
-    { value: 'WALLET', label: 'Mobile Wallet',        icon: '📱', hint: 'Vodafone Cash · Etisalat · Orange' },
-    { value: 'KIOSK',  label: 'Kiosk (Aman)',         icon: '🏪', hint: 'Pay at the nearest Aman or Masary outlet' },
+  readonly methods = [
+    { value: 'CARD' as PaymentMethodType,   labelKey: 'pcMethodCardLabel' as const,   icon: '💳', hintKey: 'pcMethodCardHint' as const },
+    { value: 'WALLET' as PaymentMethodType, labelKey: 'pcMethodWalletLabel' as const, icon: '📱', hintKey: 'pcMethodWalletHint' as const },
+    { value: 'KIOSK' as PaymentMethodType,  labelKey: 'pcMethodKioskLabel' as const,  icon: '🏪', hintKey: 'pcMethodKioskHint' as const },
   ];
 
   select(m: PaymentMethodType): void {
@@ -48,11 +50,11 @@ export class PaymentCheckout {
 
   pay(): void {
     if (!this.firstName || !this.lastName || !this.email) {
-      this.error.set('Please fill in all required fields.');
+      this.error.set(this.lang.t('pcErrRequiredFields'));
       return;
     }
     if (this.method() === 'WALLET' && !this.phoneNumber) {
-      this.error.set('Phone number is required for mobile wallet payments.');
+      this.error.set(this.lang.t('pcErrPhoneRequired'));
       return;
     }
 

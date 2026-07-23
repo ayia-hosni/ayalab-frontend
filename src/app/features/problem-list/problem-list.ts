@@ -1,22 +1,25 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { ProblemService } from '../../core/services/problem.service';
 import { ProblemSummary, ProblemFilters } from '../../core/models/problem.models';
+import { LanguageService } from '../../core/services/language.service';
+import { Topbar } from '../../shared/topbar/topbar';
 
 @Component({
   selector: 'app-problem-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, Topbar],
   templateUrl: './problem-list.html',
   styleUrl: './problem-list.css',
 })
 export class ProblemList implements OnInit {
   private service = inject(ProblemService);
   private router = inject(Router);
+  lang = inject(LanguageService);
 
   private _all = signal<ProblemSummary[]>([]);
   private _filtered = signal<ProblemSummary[]>([]);
@@ -58,11 +61,15 @@ export class ProblemList implements OnInit {
   private searchChanged = new Subject<void>();
 
   readonly statusOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'todo', label: 'Todo' },
-    { value: 'attempted', label: 'Attempted' },
-    { value: 'solved', label: 'Solved' },
-  ];
+    { value: 'all', labelKey: 'plFilterAll' },
+    { value: 'todo', labelKey: 'plStatusTodo' },
+    { value: 'attempted', labelKey: 'plStatusAttempted' },
+    { value: 'solved', labelKey: 'plStatusSolved' },
+  ] as const;
+
+  diffLabel(d: string): string {
+    return d === 'easy' ? this.lang.t('plDiffEasy') : d === 'medium' ? this.lang.t('plDiffMedium') : this.lang.t('plDiffHard');
+  }
 
   ngOnInit(): void {
     this.service.tags().subscribe(t => this.tags.set(t));

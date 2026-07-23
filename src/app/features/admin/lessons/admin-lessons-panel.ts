@@ -1,8 +1,9 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AdminLessonService } from '../../../core/services/admin-lesson.service';
+import { LanguageService } from '../../../core/services/language.service';
+import { Topbar } from '../../../shared/topbar/topbar';
 import { AdminLessonDetail, AdminLessonRequest, AdminSlide } from '../../../core/models/lesson-admin.models';
 import {
   CardColorName, ChainItem, ChainNodeItem, ChainNullItem, ChainSplitItem, CodeSnippet, ComparisonCard, ComparisonGrid,
@@ -82,12 +83,13 @@ function emptyLessonForm(ordinal: number): LessonForm {
 @Component({
   selector: 'app-admin-lessons-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RichTextEditor],
+  imports: [CommonModule, Topbar, RichTextEditor],
   templateUrl: './admin-lessons-panel.html',
   styleUrl: './admin-lessons-panel.css',
 })
 export class AdminLessonsPanel implements OnInit {
   private svc = inject(AdminLessonService);
+  lang = inject(LanguageService);
 
   lessons = signal<AdminLessonDetail[]>([]);
   loading = signal(true);

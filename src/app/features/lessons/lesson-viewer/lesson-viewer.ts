@@ -4,8 +4,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { LessonsService } from '../../../core/services/lessons.service';
 import { LessonWithSlides } from '../../../core/models/lesson.models';
+import { LanguageService } from '../../../core/services/language.service';
 
-type Lang = 'en' | 'ar';
 type CodeLang = 'cpp' | 'java';
 
 @Component({
@@ -18,13 +18,13 @@ type CodeLang = 'cpp' | 'java';
 export class LessonViewer implements OnInit {
   private route = inject(ActivatedRoute);
   private svc = inject(LessonsService);
+  lang = inject(LanguageService);
 
   lesson  = signal<LessonWithSlides | null>(null);
   loading = signal(true);
   error   = signal<string | null>(null);
 
   current  = signal(0);
-  lang     = signal<Lang>('en');
   codeLang = signal<CodeLang>('cpp');
 
   slides        = computed(() => this.lesson()?.slides ?? []);
@@ -39,13 +39,13 @@ export class LessonViewer implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('lessonId'));
     if (!Number.isFinite(id)) {
-      this.error.set('Lesson not found.');
+      this.error.set(this.lang.t('lvNotFound'));
       this.loading.set(false);
       return;
     }
     this.svc.get(id).subscribe({
       next: l => { this.lesson.set(l); this.current.set(0); this.loading.set(false); },
-      error: () => { this.error.set('Could not reach the server.'); this.loading.set(false); },
+      error: () => { this.error.set(this.lang.t('llCouldNotReach')); this.loading.set(false); },
     });
   }
 
@@ -58,7 +58,6 @@ export class LessonViewer implements OnInit {
   next(): void { this.goTo(this.current() + 1); }
   back(): void { this.goTo(this.current() - 1); }
 
-  setLang(l: Lang): void { this.lang.set(l); }
   setCodeLang(l: CodeLang): void { this.codeLang.set(l); }
 
   slideNumberInLesson(i: number): number {
@@ -67,7 +66,7 @@ export class LessonViewer implements OnInit {
 
   slideTitle(i: number): string {
     const s = this.slides()[i];
-    return this.lang() === 'en' ? s.title.en : s.title.ar;
+    return this.lang.pick(s.title);
   }
 
   @HostListener('document:keydown', ['$event'])

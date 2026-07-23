@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse Linked List Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 10px; }
+        .group:hover .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background-color: #94a3b8; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800">
+
+    <div class="flex flex-col items-center py-6 px-4 sm:py-10 sm:px-6 md:px-8">
+        <div class="max-w-6xl w-full flex flex-col gap-8">
+            
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-slate-200 pb-6">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">
+                        Reverse Linked List
+                    </h1>
+                    <p id="header-status" class="text-base sm:text-lg text-slate-600 font-medium">
+                        Step 1: Complete the code logic.
+                    </p>
+                </div>
+                <button onclick="handleReset()" class="px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-slate-400 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Restart
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left Column: Code Editor -->
+                <div class="lg:col-span-5 flex flex-col gap-6 relative">
+                    
+                    <div class="bg-[#1e1e1e] rounded-2xl shadow-xl overflow-hidden border border-slate-700/50 flex flex-col relative z-10">
+                        <div class="flex items-center justify-between px-4 py-3 bg-[#252526] border-b border-black/20">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                            </div>
+                            <div class="text-slate-400 text-xs font-mono font-medium tracking-wider">reverseList.js</div>
+                        </div>
+                        <div id="code-editor-content" class="p-4 sm:p-5 font-mono text-[13px] leading-relaxed overflow-x-auto">
+                            <!-- Code lines injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Challenges Panel -->
+                    <div id="challenge-panel-container">
+                        <!-- Challenge options injected here -->
+                    </div>
+
+                    <!-- Feedback Toast -->
+                    <div id="feedback-toast" class="transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 z-50">
+                        <div id="feedback-toast-inner" class="px-5 py-2.5 rounded-full shadow-lg font-semibold flex items-center text-sm">
+                            <span id="feedback-message"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Visualizer -->
+                <div id="visualizer-container" class="lg:col-span-7 flex flex-col gap-6 transition-all duration-500 opacity-40 grayscale-[30%] pointer-events-none">
+                    
+                    <!-- Visualizer Header Controls -->
+                    <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                        <div class="flex-1 bg-blue-50/50 text-slate-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center border border-blue-100/50 min-h-[52px]">
+                            <svg class="w-5 h-5 mr-3 flex-shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span id="vis-status-msg" class="line-clamp-2 leading-tight">
+                                Unlock visualization by completing code.
+                            </span>
+                        </div>
+                        <div class="flex space-x-2 p-1 sm:p-0">
+                            <button id="btn-prev-step" onclick="handlePrevVisStep()" disabled class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-50 text-slate-600 font-semibold rounded-xl transition-all focus:outline-none">
+                                Back
+                            </button>
+                            <button id="btn-next-step" onclick="handleNextVisStep()" disabled class="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-xl shadow-sm transition-all focus:outline-none">
+                                Next
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Area -->
+                    <div class="relative bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 flex-1 min-h-[480px] flex flex-col shadow-sm group">
+                        <div class="absolute inset-0 pointer-events-none opacity-[0.08]" 
+                             style="background-image: radial-gradient(#64748b 1.5px, transparent 1.5px); background-size: 24px 24px;">
+                        </div>
+                        
+                        <div class="absolute top-4 left-6 text-[10px] font-bold text-slate-400 tracking-widest uppercase flex items-center bg-white/80 px-2 py-1 rounded z-10">
+                            Memory Heap View
+                        </div>
+
+                        <!-- Scrollable Canvas Container -->
+                        <div class="w-full overflow-x-auto flex-1 relative custom-scrollbar mt-6">
+                            <div class="min-w-[850px] h-full relative" id="canvas-inner-area">
+                                
+                                <!-- SVG Layer for Links -->
+                                <svg class="absolute top-0 left-0 w-full h-[400px] pointer-events-none z-10">
+                                    <defs>
+                                        <marker id="arrowhead-forward" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                            <polygon points="0 0, 8 3, 0 6" fill="#94a3b8" />
+                                        </marker>
+                                        <marker id="arrowhead-reverse" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                            <polygon points="0 0, 8 3, 0 6" fill="#3b82f6" />
+                                        </marker>
+                                        <marker id="arrowhead-null" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                            <polygon points="0 0, 8 3, 0 6" fill="#ef4444" />
+                                        </marker>
+                                    </defs>
+                                    <g id="svg-links-container"></g>
+                                </svg>
+
+                                <!-- Nodes and Pointers injected here via JS -->
+                                <div id="nodes-container"></div>
+                                <div id="pointers-container"></div>
+
+                            </div>
+                        </div>
+
+                        <!-- Console Output -->
+                        <div class="mt-2 bg-[#1e1e1e] rounded-xl p-3 border border-slate-800 w-full shadow-inner flex flex-col gap-1 relative z-30">
+                            <div class="flex items-center justify-between pb-1 mb-1 border-b border-slate-700/50">
+                                 <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Console Log</span>
+                            </div>
+                            <div class="font-mono text-teal-400 text-xs flex-1 h-[48px] overflow-y-auto flex flex-col justify-end custom-scrollbar">
+                                <div id="console-output" class="flex flex-col gap-0.5 mt-auto">
+                                    <span class="text-slate-600 italic">...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constants & Templates
+        const NODE_W = 80;
+        const NODE_H = 64;
+        const Y_POS = 160;
+
+        const nodePositions = {
+            'n1': { x: 120, y: Y_POS },
+            'n2': { x: 300, y: Y_POS },
+            'n3': { x: 480, y: Y_POS },
+            'n4': { x: 660, y: Y_POS },
+        };
+
+        const initialNodesList = [
+            { id: 'n1', value: 1 },
+            { id: 'n2', value: 2 },
+            { id: 'n3', value: 3 },
+            { id: 'n4', value: 4 },
+        ];
+
+        const codeTemplate = [
+            { line: "function reverseList(head) {", isChallenge: false },
+            { line: "  let prev = null;", isChallenge: true, correctAnswer: "let prev = null;", options: ["let prev = head;", "let prev = null;", "let next = null;"] },
+            { line: "  let curr = head;", isChallenge: false },
+            { line: "  while (curr !== null) {", isChallenge: true, correctAnswer: "while (curr !== null) {", options: ["while (curr.next !== null) {", "while (curr !== null) {", "if (curr !== null) {"] },
+            { line: "    let nextTemp = curr.next;", isChallenge: true, correctAnswer: "let nextTemp = curr.next;", options: ["let nextTemp = prev;", "let nextTemp = curr.next;", "let nextTemp = head;"] },
+            { line: "    curr.next = prev;", isChallenge: true, correctAnswer: "curr.next = prev;", options: ["curr.next = nextTemp;", "curr.next = curr;", "curr.next = prev;"] },
+            { line: "    prev = curr;", isChallenge: true, correctAnswer: "prev = curr;", options: ["prev = curr;", "prev = nextTemp;", "curr = prev;"] },
+            { line: "    curr = nextTemp;", isChallenge: true, correctAnswer: "curr = nextTemp;", options: ["curr = prev;", "curr = nextTemp;", "curr = curr.next;"] },
+            { line: "  }", isChallenge: false },
+            { line: "  return prev;", isChallenge: false },
+            { line: "}", isChallenge: false }
+        ];
+
+        const visualizationSequence = [
+            { line: 0, prev: null, curr: null, nextTemp: null, links: {n1:'n2', n2:'n3', n3:'n4', n4:'null'}, msg: "Start reverseList function.", log: null },
+            { line: 1, prev: 'null', curr: null, nextTemp: null, links: {n1:'n2', n2:'n3', n3:'n4', n4:'null'}, msg: "Initialize 'prev' pointer to null.", log: "prev = null" },
+            { line: 2, prev: 'null', curr: 'n1', nextTemp: null, links: {n1:'n2', n2:'n3', n3:'n4', n4:'null'}, msg: "Initialize 'curr' pointer to 'head' (Node 1).", log: "curr = head (1)" },
+            
+            // Loop 1
+            { line: 3, prev: 'null', curr: 'n1', nextTemp: null, links: {n1:'n2', n2:'n3', n3:'n4', n4:'null'}, msg: "Check: curr (Node 1) !== null is True. Enter loop." },
+            { line: 4, prev: 'null', curr: 'n1', nextTemp: 'n2', links: {n1:'n2', n2:'n3', n3:'n4', n4:'null'}, msg: "Save next node: nextTemp = curr.next (Node 2).", log: "nextTemp = Node 2" },
+            { line: 5, prev: 'null', curr: 'n1', nextTemp: 'n2', links: {n1:'null', n2:'n3', n3:'n4', n4:'null'}, msg: "Reverse link: curr.next points to prev (null).", log: "Node 1 -> null" },
+            { line: 6, prev: 'n1', curr: 'n1', nextTemp: 'n2', links: {n1:'null', n2:'n3', n3:'n4', n4:'null'}, msg: "Move prev forward to curr (Node 1).", log: "prev = Node 1" },
+            { line: 7, prev: 'n1', curr: 'n2', nextTemp: 'n2', links: {n1:'null', n2:'n3', n3:'n4', n4:'null'}, msg: "Move curr forward to nextTemp (Node 2).", log: "curr = Node 2" },
+            
+            // Loop 2
+            { line: 3, prev: 'n1', curr: 'n2', nextTemp: 'n2', links: {n1:'null', n2:'n3', n3:'n4', n4:'null'}, msg: "Check: curr (Node 2) !== null is True." },
+            { line: 4, prev: 'n1', curr: 'n2', nextTemp: 'n3', links: {n1:'null', n2:'n3', n3:'n4', n4:'null'}, msg: "Save next node: nextTemp = curr.next (Node 3).", log: "nextTemp = Node 3" },
+            { line: 5, prev: 'n1', curr: 'n2', nextTemp: 'n3', links: {n1:'null', n2:'n1', n3:'n4', n4:'null'}, msg: "Reverse link: curr.next points to prev (Node 1).", log: "Node 2 -> Node 1" },
+            { line: 6, prev: 'n2', curr: 'n2', nextTemp: 'n3', links: {n1:'null', n2:'n1', n3:'n4', n4:'null'}, msg: "Move prev forward to curr (Node 2).", log: "prev = Node 2" },
+            { line: 7, prev: 'n2', curr: 'n3', nextTemp: 'n3', links: {n1:'null', n2:'n1', n3:'n4', n4:'null'}, msg: "Move curr forward to nextTemp (Node 3).", log: "curr = Node 3" },
+            
+            // Loop 3
+            { line: 3, prev: 'n2', curr: 'n3', nextTemp: 'n3', links: {n1:'null', n2:'n1', n3:'n4', n4:'null'}, msg: "Check: curr (Node 3) !== null is True." },
+            { line: 4, prev: 'n2', curr: 'n3', nextTemp: 'n4', links: {n1:'null', n2:'n1', n3:'n4', n4:'null'}, msg: "Save next node: nextTemp = curr.next (Node 4).", log: "nextTemp = Node 4" },
+            { line: 5, prev: 'n2', curr: 'n3', nextTemp: 'n4', links: {n1:'null', n2:'n1', n3:'n2', n4:'null'}, msg: "Reverse link: curr.next points to prev (Node 2).", log: "Node 3 -> Node 2" },
+            { line: 6, prev: 'n3', curr: 'n3', nextTemp: 'n4', links: {n1:'null', n2:'n1', n3:'n2', n4:'null'}, msg: "Move prev forward to curr (Node 3).", log: "prev = Node 3" },
+            { line: 7, prev: 'n3', curr: 'n4', nextTemp: 'n4', links: {n1:'null', n2:'n1', n3:'n2', n4:'null'}, msg: "Move curr forward to nextTemp (Node 4).", log: "curr = Node 4" },
+            
+            // Loop 4
+            { line: 3, prev: 'n3', curr: 'n4', nextTemp: 'n4', links: {n1:'null', n2:'n1', n3:'n2', n4:'null'}, msg: "Check: curr (Node 4) !== null is True." },
+            { line: 4, prev: 'n3', curr: 'n4', nextTemp: 'null', links: {n1:'null', n2:'n1', n3:'n2', n4:'null'}, msg: "Save next node: nextTemp = curr.next (null).", log: "nextTemp = null" },
+            { line: 5, prev: 'n3', curr: 'n4', nextTemp: 'null', links: {n1:'null', n2:'n1', n3:'n2', n4:'n3'}, msg: "Reverse link: curr.next points to prev (Node 3).", log: "Node 4 -> Node 3" },
+            { line: 6, prev: 'n4', curr: 'n4', nextTemp: 'null', links: {n1:'null', n2:'n1', n3:'n2', n4:'n3'}, msg: "Move prev forward to curr (Node 4).", log: "prev = Node 4" },
+            { line: 7, prev: 'n4', curr: 'null', nextTemp: 'null', links: {n1:'null', n2:'n1', n3:'n2', n4:'n3'}, msg: "Move curr forward to nextTemp (null).", log: "curr = null" },
+            
+            // End Loop
+            { line: 3, prev: 'n4', curr: 'null', nextTemp: 'null', links: {n1:'null', n2:'n1', n3:'n2', n4:'n3'}, msg: "Check: curr (null) !== null is False. Loop ends." },
+            { line: 9, prev: 'n4', curr: 'null', nextTemp: 'null', links: {n1:'null', n2:'n1', n3:'n2', n4:'n3'}, msg: "Return 'prev' (Node 4), which is the head of the newly reversed list.", log: "Returned new head (Node 4)" }
+        ];
+
+        const challengeLines = codeTemplate.map((c, i) => ({ ...c, originalIndex: i })).filter(c => c.isChallenge);
+
+        // State Variables
+        let gameState = 'coding'; // 'coding' or 'visualizing'
+        let userCode = codeTemplate.map(c => c.isChallenge ? "" : c.line);
+        let currentChallengeIndex = 0;
+        let visStep = 0;
+        let activeCodeLine = -1;
+        let feedbackTimeout = null;
+
+        function render() {
+            renderHeader();
+            renderCodeEditor();
+            renderChallengePanel();
+            renderVisualizerControls();
+            renderCanvas();
+            renderConsole();
+            updateVisualizerStyle();
+        }
+
+        function renderHeader() {
+            document.getElementById('header-status').innerText = gameState === 'coding' ? "Step 1: Complete the code logic." : "Step 2: Visualize the pointer manipulation.";
+        }
+
+        function renderCodeEditor() {
+            const container = document.getElementById('code-editor-content');
+            let html = '';
+            const currentChallenge = challengeLines[currentChallengeIndex];
+
+            codeTemplate.forEach((lineDef, index) => {
+                const isCurrentBlank = gameState === 'coding' && lineDef.isChallenge && currentChallenge?.originalIndex === index;
+                const isCompletedBlank = gameState === 'coding' && lineDef.isChallenge && userCode[index] !== "";
+                const isActiveInVis = gameState === 'visualizing' && activeCodeLine === index;
+
+                let displayLine = userCode[index];
+                if (isCurrentBlank) displayLine = "  // <- Select snippet below";
+
+                // Escaping html for display
+                displayLine = displayLine.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                let classes = 'flex rounded px-2 py-1 transition-colors duration-200 ';
+                if (isActiveInVis) classes += 'bg-[#37373d] border-l-[3px] border-yellow-400';
+                else if (isCurrentBlank) classes += 'bg-[#2a2d3e] border-l-[3px] border-blue-400 animate-pulse';
+                else classes += 'border-l-[3px] border-transparent hover:bg-[#2a2a2a]';
+
+                let textClasses = 'whitespace-pre ';
+                if (isCurrentBlank) textClasses += 'text-blue-300/80 italic';
+                else if (isCompletedBlank) textClasses += 'text-green-300 font-bold';
+                else if (displayLine.includes('function') || displayLine.includes('while') || displayLine.includes('return')) textClasses += 'text-purple-400';
+                else if (displayLine.includes('let ')) textClasses += 'text-blue-400';
+                else if (displayLine.includes('null')) textClasses += 'text-red-400';
+                else textClasses += 'text-slate-300';
+
+                html += `
+                    <div class="${classes}">
+                        <span class="w-6 text-right pr-4 text-slate-500 select-none opacity-50">${index + 1}</span>
+                        <span class="${textClasses}">${displayLine}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderChallengePanel() {
+            const container = document.getElementById('challenge-panel-container');
+            if (gameState === 'coding') {
+                const currentChallenge = challengeLines[currentChallengeIndex];
+                if (currentChallenge) {
+                    let optionsHtml = currentChallenge.options.map((opt, i) => `
+                        <button onclick="handleCodeSelection(${i})"
+                            class="text-left font-mono text-[13px] bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 p-3 rounded-xl transition-all text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 group flex items-center justify-between"
+                        >
+                            <span>${opt.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                            <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    `).join('');
+
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl shadow-sm border border-blue-100 p-5 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                            <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center">
+                                <span class="bg-blue-100 text-blue-700 rounded-md w-7 h-7 flex items-center justify-center mr-3 text-sm">
+                                    ${currentChallenge.originalIndex + 1}
+                                </span>
+                                Choose correct code:
+                            </h3>
+                            <div class="flex flex-col gap-2.5">
+                                ${optionsHtml}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                         <div class="bg-slate-100 rounded-2xl p-6 border border-slate-200 flex flex-col items-center justify-center text-center h-40 opacity-60">
+                            <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <p class="font-medium text-slate-500 text-sm">Algorithm logic complete!</p>
+                         </div>
+                    `;
+                }
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
+        function showFeedback(message, type) {
+            const toast = document.getElementById('feedback-toast');
+            const inner = document.getElementById('feedback-toast-inner');
+            const msgSpan = document.getElementById('feedback-message');
+            
+            if (feedbackTimeout) clearTimeout(feedbackTimeout);
+
+            msgSpan.innerText = message;
+            
+            inner.className = 'px-5 py-2.5 rounded-full shadow-lg font-semibold flex items-center text-sm ';
+            if (type === 'success') inner.className += 'bg-green-500 text-white';
+            else if (type === 'error') inner.className += 'bg-red-500 text-white';
+            else inner.className += 'bg-blue-600 text-white';
+
+            toast.classList.remove('translate-y-4', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            feedbackTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, type === 'info' ? 3000 : 1500);
+        }
+
+        function handleCodeSelection(optionIndex) {
+            if (gameState !== 'coding') return;
+            const currentChallenge = challengeLines[currentChallengeIndex];
+            if (!currentChallenge) return;
+            
+            const selectedOption = currentChallenge.options[optionIndex];
+
+            if (selectedOption === currentChallenge.correctAnswer) {
+                userCode[currentChallenge.originalIndex] = selectedOption;
+                showFeedback('Correct!', 'success');
+                
+                setTimeout(() => {
+                    if (currentChallengeIndex < challengeLines.length - 1) {
+                        currentChallengeIndex++;
+                    } else {
+                        gameState = 'visualizing';
+                        showFeedback('Code complete! Let\'s visualize it.', 'info');
+                        updateVisState();
+                    }
+                    render();
+                }, 1000);
+            } else {
+                showFeedback('Oops! Try again.', 'error');
+            }
+            renderCodeEditor(); // immediately update code editor to show selection logic might be needed, but waiting for success is better.
+        }
+
+        function renderCanvas() {
+            const currentVisState = gameState === 'visualizing' ? visualizationSequence[visStep] : visualizationSequence[0];
+            
+            // 1. Render Links (SVG)
+            let svgHtml = '';
+            Object.entries(currentVisState.links).forEach(([fromId, toId]) => {
+                const fromPos = nodePositions[fromId];
+                if (!fromPos) return;
+
+                if (toId === 'null') {
+                    const x = fromPos.x + NODE_W / 2;
+                    const yStart = fromPos.y + NODE_H;
+                    const yEnd = yStart + 45;
+                    svgHtml += `
+                        <g class="transition-all duration-500 ease-in-out">
+                            <path d="M ${x} ${yStart} L ${x} ${yEnd}" stroke="#ef4444" stroke-width="3" fill="none" marker-end="url(#arrowhead-null)" stroke-dasharray="4 2" />
+                            <text x="${x}" y="${yEnd + 15}" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="bold" font-family="monospace">null</text>
+                        </g>
+                    `;
+                    return;
+                }
+
+                const toPos = nodePositions[toId];
+                if (!toPos) return;
+                
+                const isForward = parseInt(fromId.replace('n', '')) < parseInt(toId.replace('n', ''));
+
+                if (isForward) {
+                    const x1 = fromPos.x + NODE_W;
+                    const y1 = fromPos.y + NODE_H / 2;
+                    const x2 = toPos.x - 4; 
+                    const y2 = toPos.y + NODE_H / 2;
+                    svgHtml += `<path d="M ${x1} ${y1} L ${x2} ${y2}" stroke="#94a3b8" stroke-width="3" fill="none" marker-end="url(#arrowhead-forward)" class="transition-all duration-500 ease-in-out opacity-60" />`;
+                } else {
+                    const x1 = fromPos.x + NODE_W / 2;
+                    const y1 = fromPos.y;
+                    const x2 = toPos.x + NODE_W / 2;
+                    const y2 = toPos.y;
+                    const midX = (x1 + x2) / 2;
+                    const midY = fromPos.y - 70;
+                    svgHtml += `<path d="M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2 - 5}" stroke="#3b82f6" stroke-width="3.5" fill="none" marker-end="url(#arrowhead-reverse)" class="transition-all duration-500 ease-in-out drop-shadow-md" />`;
+                }
+            });
+            document.getElementById('svg-links-container').innerHTML = svgHtml;
+
+            // 2. Render Nodes
+            let nodesHtml = '';
+            initialNodesList.forEach(node => {
+                const pos = nodePositions[node.id];
+                const isCurr = currentVisState.curr === node.id && gameState === 'visualizing';
+                
+                let wrapperClasses = `flex items-center justify-center w-20 h-16 rounded-2xl border-2 transition-all duration-300 `;
+                wrapperClasses += isCurr ? 'bg-yellow-50 border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.4)] z-30 scale-105' : 'bg-white border-slate-300 shadow-sm hover:border-slate-400';
+                
+                let textClasses = `text-2xl font-mono ${isCurr ? 'font-black text-slate-800' : 'font-bold text-slate-700'}`;
+
+                nodesHtml += `
+                    <div class="absolute z-20" style="left: ${pos.x}px; top: ${pos.y}px;">
+                        <div class="${wrapperClasses}">
+                            <span class="${textClasses}">${node.value}</span>
+                            <div class="absolute -left-2 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-slate-100 border border-slate-300"></div>
+                            <div class="absolute -right-2 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-slate-100 border border-slate-300"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('nodes-container').innerHTML = nodesHtml;
+
+            // 3. Render Pointers
+            let pointersHtml = '';
+            const buildPointer = (name, targetId, config) => {
+                if (!targetId) return '';
+                
+                let x, y;
+                let isNullTarget = targetId === 'null';
+
+                if (isNullTarget) {
+                    x = name === 'prev' ? 40 : 800;
+                    y = config.pos === 'top' ? Y_POS - 40 : Y_POS + NODE_H + 40;
+                } else {
+                    const node = nodePositions[targetId];
+                    if(!node) return '';
+                    x = node.x + NODE_W / 2 + config.offsetX;
+                    y = config.pos === 'top' ? Y_POS - 50 : Y_POS + NODE_H + 10;
+                }
+
+                const colorMap = {
+                    gray: { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-400', line: 'bg-gray-400' },
+                    orange: { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-400', line: 'bg-orange-500' },
+                    green: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-500', line: 'bg-green-500' },
+                    purple: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-400', line: 'bg-purple-500' }
+                };
+                const colors = colorMap[config.color];
+                
+                let html = `<div class="absolute transition-all duration-500 ease-in-out flex flex-col items-center z-30" style="left: ${x}px; top: ${y}px; transform: translateX(-50%);">`;
+                
+                if (config.pos === 'bottom' && !isNullTarget) {
+                    html += `<div class="w-0.5 h-6 mb-1 ${colors.line}"></div>`;
+                }
+                
+                html += `<div class="${colors.bg} ${colors.border} border ${colors.text} text-xs font-bold px-2.5 py-1 rounded-md shadow-sm whitespace-nowrap">${name}${isNullTarget ? ': null' : ''}</div>`;
+                
+                if (config.pos === 'top' && !isNullTarget) {
+                    html += `<div class="w-0.5 h-6 mt-1 ${colors.line}"></div>`;
+                }
+                
+                html += `</div>`;
+                return html;
+            };
+
+            pointersHtml += buildPointer('head', 'n1', { pos: 'bottom', color: 'gray', offsetX: -25 });
+            pointersHtml += buildPointer('prev', currentVisState.prev, { pos: 'top', color: 'orange', offsetX: -20 });
+            pointersHtml += buildPointer('nextTemp', currentVisState.nextTemp, { pos: 'top', color: 'purple', offsetX: 20 });
+            pointersHtml += buildPointer('curr', currentVisState.curr, { pos: 'bottom', color: 'green', offsetX: 15 });
+
+            document.getElementById('pointers-container').innerHTML = pointersHtml;
+        }
+
+        function renderConsole() {
+            let logsHtml = '';
+            if (gameState === 'visualizing') {
+                let currentLogs = [];
+                for(let i=0; i<=visStep; i++) {
+                    if(visualizationSequence[i].log) {
+                        currentLogs.push(visualizationSequence[i].log);
+                    }
+                }
+                if (currentLogs.length > 0) {
+                    logsHtml = currentLogs.map((log, i) => `
+                        <div class="animate-fade-in flex items-center ${i === currentLogs.length - 1 ? 'text-teal-300' : 'text-slate-500'}">
+                            <span class="mr-2 opacity-50">&gt;</span> ${log}
+                        </div>
+                    `).join('');
+                } else {
+                    logsHtml = `<span class="text-slate-600 italic">...</span>`;
+                }
+            } else {
+                logsHtml = `<span class="text-slate-600 italic">...</span>`;
+            }
+            document.getElementById('console-output').innerHTML = logsHtml;
+        }
+
+        function renderVisualizerControls() {
+            const msgEl = document.getElementById('vis-status-msg');
+            const prevBtn = document.getElementById('btn-prev-step');
+            const nextBtn = document.getElementById('btn-next-step');
+
+            if (gameState === 'visualizing') {
+                msgEl.innerText = visualizationSequence[visStep].msg;
+                prevBtn.disabled = visStep === 0;
+                nextBtn.disabled = visStep === visualizationSequence.length - 1;
+            } else {
+                msgEl.innerText = "Unlock visualization by completing code.";
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+            }
+        }
+
+        function updateVisualizerStyle() {
+            const container = document.getElementById('visualizer-container');
+            if (gameState === 'coding') {
+                container.classList.add('opacity-40', 'grayscale-[30%]', 'pointer-events-none');
+                container.classList.remove('opacity-100');
+            } else {
+                container.classList.remove('opacity-40', 'grayscale-[30%]', 'pointer-events-none');
+                container.classList.add('opacity-100');
+            }
+        }
+
+        function updateVisState() {
+            if (gameState === 'visualizing') {
+                activeCodeLine = visualizationSequence[visStep].line;
+            }
+        }
+
+        function handleNextVisStep() {
+            if (visStep < visualizationSequence.length - 1 && gameState === 'visualizing') {
+                visStep++;
+                updateVisState();
+                render();
+            }
+        }
+
+        function handlePrevVisStep() {
+            if (visStep > 0 && gameState === 'visualizing') {
+                visStep--;
+                updateVisState();
+                render();
+            }
+        }
+
+        function handleReset() {
+            gameState = 'coding';
+            userCode = codeTemplate.map(c => c.isChallenge ? "" : c.line);
+            currentChallengeIndex = 0;
+            visStep = 0;
+            activeCodeLine = -1;
+            if(feedbackTimeout) clearTimeout(feedbackTimeout);
+            document.getElementById('feedback-toast').classList.add('translate-y-4', 'opacity-0', 'pointer-events-none');
+            document.getElementById('feedback-toast').classList.remove('translate-y-0', 'opacity-100');
+            render();
+        }
+
+        // Initial render
+        render();
+
+    </script>
+</body>
+</html>

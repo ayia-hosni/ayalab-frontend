@@ -1,13 +1,4 @@
-<div class="topbar">
-  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
-  <span class="spacer"></span>
-  <nav class="nav-links">
-    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
-    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-  </nav>
-  <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
-</div>
+<app-topbar></app-topbar>
 
 <div class="wrap">
 
@@ -30,28 +21,28 @@
         </svg>
         <div class="ring-label">
           <span class="ring-num">{{ totalSolved() }}</span>
-          <span class="ring-denom">/ {{ totalAll() }} solved</span>
+          <span class="ring-denom">/ {{ totalAll() }} {{ lang.t('plSolvedOf') }}</span>
         </div>
       </div>
 
       <div class="diff-bars">
         <div class="diff-bar-row">
           <div class="diff-bar-meta">
-            <span class="dbl-name easy-text">Easy</span>
+            <span class="dbl-name easy-text">{{ lang.t('plDiffEasy') }}</span>
             <span class="dbl-count"><b>{{ easyStats().solved }}</b><span class="dbl-of"> / {{ easyStats().total }}</span></span>
           </div>
           <div class="dbl-track"><div class="dbl-fill easy-fill" [style.width.%]="pct(easyStats().solved, easyStats().total)"></div></div>
         </div>
         <div class="diff-bar-row">
           <div class="diff-bar-meta">
-            <span class="dbl-name medium-text">Medium</span>
+            <span class="dbl-name medium-text">{{ lang.t('plDiffMedium') }}</span>
             <span class="dbl-count"><b>{{ mediumStats().solved }}</b><span class="dbl-of"> / {{ mediumStats().total }}</span></span>
           </div>
           <div class="dbl-track"><div class="dbl-fill medium-fill" [style.width.%]="pct(mediumStats().solved, mediumStats().total)"></div></div>
         </div>
         <div class="diff-bar-row">
           <div class="diff-bar-meta">
-            <span class="dbl-name hard-text">Hard</span>
+            <span class="dbl-name hard-text">{{ lang.t('plDiffHard') }}</span>
             <span class="dbl-count"><b>{{ hardStats().solved }}</b><span class="dbl-of"> / {{ hardStats().total }}</span></span>
           </div>
           <div class="dbl-track"><div class="dbl-fill hard-fill" [style.width.%]="pct(hardStats().solved, hardStats().total)"></div></div>
@@ -68,35 +59,35 @@
       </svg>
       <input
         type="text"
-        placeholder="Search problems…"
+        [placeholder]="lang.t('plSearchPlaceholder')"
         [(ngModel)]="search"
         (ngModelChange)="onSearchInput()">
     </div>
 
     <div class="seg-group">
-      <button class="seg-btn" [class.active]="difficulty === 'all'" (click)="setDifficulty('all')">All</button>
-      <button class="seg-btn easy-seg" [class.active]="difficulty === 'easy'" (click)="setDifficulty('easy')">Easy</button>
-      <button class="seg-btn medium-seg" [class.active]="difficulty === 'medium'" (click)="setDifficulty('medium')">Medium</button>
-      <button class="seg-btn hard-seg" [class.active]="difficulty === 'hard'" (click)="setDifficulty('hard')">Hard</button>
+      <button class="seg-btn" [class.active]="difficulty === 'all'" (click)="setDifficulty('all')">{{ lang.t('plFilterAll') }}</button>
+      <button class="seg-btn easy-seg" [class.active]="difficulty === 'easy'" (click)="setDifficulty('easy')">{{ lang.t('plDiffEasy') }}</button>
+      <button class="seg-btn medium-seg" [class.active]="difficulty === 'medium'" (click)="setDifficulty('medium')">{{ lang.t('plDiffMedium') }}</button>
+      <button class="seg-btn hard-seg" [class.active]="difficulty === 'hard'" (click)="setDifficulty('hard')">{{ lang.t('plDiffHard') }}</button>
     </div>
 
     <div class="seg-group">
       @for (s of statusOptions; track s.value) {
-        <button class="seg-btn" [class.active]="status === s.value" (click)="setStatus(s.value)">{{ s.label }}</button>
+        <button class="seg-btn" [class.active]="status === s.value" (click)="setStatus(s.value)">{{ lang.t(s.labelKey) }}</button>
       }
     </div>
 
     @if (hasActiveFilters()) {
       <button class="clear-btn" (click)="reset()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        Clear
+        {{ lang.t('plClear') }}
       </button>
     }
   </div>
 
   <!-- Topic tags -->
   <div class="tag-row">
-    <button class="chip" [class.active]="activeTag === null" (click)="setTag(null)">All Topics</button>
+    <button class="chip" [class.active]="activeTag === null" (click)="setTag(null)">{{ lang.t('plAllTopics') }}</button>
     @for (tag of tags(); track tag) {
       <button class="chip" [class.active]="activeTag === tag" (click)="setTag(tag)">{{ tag }}</button>
     }
@@ -105,31 +96,31 @@
   <!-- Table -->
   <div class="table-card">
     <div class="table-header">
-      <h3>Problem Set</h3>
-      <p class="count-pill"><b>{{ total() }}</b> / {{ totalAll() }} items</p>
+      <h3>{{ lang.t('plProblemSet') }}</h3>
+      <p class="count-pill"><b>{{ total() }}</b> / {{ totalAll() }} {{ lang.t('plItems') }}</p>
     </div>
     @if (loading()) {
       <div class="empty">
         <div class="spinner"></div>
-        Loading problems…
+        {{ lang.t('plLoading') }}
       </div>
     } @else if (problems().length === 0) {
       <div class="empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-ico">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 16.318A4.486 4.486 0 0 0 12 15a4.486 4.486 0 0 0-3.182 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z"/>
         </svg>
-        <p>No problems match your filters</p>
-        <button class="clear-btn outline" (click)="reset()">Clear filters</button>
+        <p>{{ lang.t('plNoMatch') }}</p>
+        <button class="clear-btn outline" (click)="reset()">{{ lang.t('plClearFilters') }}</button>
       </div>
     } @else {
       <table>
         <thead>
           <tr>
-            <th class="th-num">#</th>
+            <th class="th-num">{{ lang.t('plThNum') }}</th>
             <th class="th-status"></th>
-            <th>Title</th>
-            <th class="th-acc center">Acceptance</th>
-            <th class="th-diff center">Difficulty</th>
+            <th>{{ lang.t('plThTitle') }}</th>
+            <th class="th-acc center">{{ lang.t('plThAcceptance') }}</th>
+            <th class="th-diff center">{{ lang.t('plThDifficulty') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -152,15 +143,15 @@
               <td class="td-title">
                 <span class="title-text">{{ p.title }}</span>
                 @if (p.available && p.hasVisualizer) {
-                  <span class="viz-badge">Visualizer</span>
+                  <span class="viz-badge">{{ lang.t('plVisualizerBadge') }}</span>
                 }
                 @if (!p.available) {
-                  <span class="coming-soon-badge">Coming Soon</span>
+                  <span class="coming-soon-badge">{{ lang.t('plComingSoon') }}</span>
                 }
               </td>
               <td class="td-acc center">{{ p.acceptance.toFixed(1) }}%</td>
               <td class="center">
-                <span class="diff" [class]="p.difficulty">{{ p.difficulty }}</span>
+                <span class="diff" [class]="p.difficulty">{{ diffLabel(p.difficulty) }}</span>
               </td>
             </tr>
           }

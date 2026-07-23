@@ -1,13 +1,4 @@
-<div class="topbar">
-  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
-  <span class="spacer"></span>
-  <nav class="nav-links">
-    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
-    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-  </nav>
-  <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
-</div>
+<app-topbar></app-topbar>
 
 @if (loading()) {
   <div class="wrap"><div class="loading-box">Loading problem… ⏳</div></div>
@@ -35,762 +26,113 @@
 </div>
 
 <div class="tabs">
-  <button class="tab-btn" [class.active]="activeTab() === 1" (click)="showTab(1)">📋 Question</button>
+  <button class="tab-btn" [class.active]="activeTab() === 6" (click)="showTab(6)">{{ siteLang.t('pdSolutionOnly') }}</button>
   @if (p.hasVisualizer) {
-    <button class="tab-btn" [class.active]="activeTab() === 2" (click)="showTab(2)">🔍 Pointer Trace</button>
-    <button class="tab-btn game-tab" [class.active]="activeTab() === 3" (click)="showTab(3)">🎮 Trace Game &amp; Solution</button>
-    <button class="tab-btn sandbox-tab" [class.active]="activeTab() === 4" (click)="showTab(4)">🧩 Pointer Sandbox</button>
-  } @else {
-    <button class="tab-btn" [class.active]="activeTab() === 3" (click)="showTab(3)">💻 Solution</button>
+    <button class="tab-btn" [class.active]="activeTab() === 9" (click)="showTab(9)">{{ siteLang.t('pdMovePointer') }}</button>
+    <button class="tab-btn" [class.active]="activeTab() === 8" (click)="showTab(8)">{{ siteLang.t('pdBothSolutions') }}</button>
+    <button class="tab-btn game-tab" [class.active]="activeTab() === 2" (click)="showTab(2)">{{ siteLang.t('pdTraceGame') }}</button>
   }
 </div>
 
 <div class="wrap tab-shell">
 
-  <!-- shared arrowhead marker — must live outside tab @if blocks so it's always in the DOM -->
-  <svg width="0" height="0" style="position:absolute;overflow:hidden">
-    <defs>
-      <marker id="va" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </marker>
-    </defs>
-  </svg>
-
-  <!-- ============ TAB 1: Question ============ -->
-  @if (activeTab() === 1) {
-  <div class="panel">
-    <div class="prose" [innerHTML]="p.description"></div>
+  <!-- ============ TAB 9: Move the Pointer ============ -->
+  @if (activeTab() === 9 && p.hasVisualizer) {
+  <div class="panel panel--sandbox">
+    <app-move-pointer></app-move-pointer>
   </div>
   }
 
-  <!-- ============ TAB 2: Pointer Trace ============ -->
+  <!-- ============ TAB 8: Both Solutions (slides) ============ -->
+  @if (activeTab() === 8 && p.hasVisualizer) {
+  <div class="panel panel--sandbox">
+    <app-solution-slides></app-solution-slides>
+  </div>
+  }
+
+  <!-- ============ TAB 2: Linked List Game ============ -->
   @if (activeTab() === 2 && p.hasVisualizer) {
-  <div class="panel">
-    <div class="viz">
-
-      <div class="viz-head">
-        <span class="t">🔍 Pointer Trace</span>
-        <div class="viz-head-right">
-          <span class="legend">
-            <span style="color:#FF5252"><i style="background:#FF5252"></i>prev</span>
-            <span style="color:#00D2D3"><i style="background:#00D2D3"></i>curr</span>
-            <span style="color:#FECA57"><i style="background:#FECA57"></i>next</span>
-          </span>
-          <div class="toggle-group">
-            <button [class.active]="explainLang() === 'en'" (click)="setExplainLang('en')">EN</button>
-            <button [class.active]="explainLang() === 'ar'" (click)="setExplainLang('ar')">AR</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Technique Navigator ── -->
-      <div class="badge-nav">
-        @for (badge of BADGE_ORDER; track badge) {
-          <button class="badge-nav-chip badge-nav-chip--{{ badge }}"
-                  [class.active]="currentStep()?.badge === badge"
-                  (click)="jumpToBadge(badge)">
-            <span class="bnc-icon">{{ STEP_TECHNIQUE[badge].icon }}</span>
-            <span class="bnc-name" [class.rtl]="explainLang() === 'ar'">{{ STEP_TECHNIQUE[badge].name[explainLang()] }}</span>
-          </button>
-        }
-      </div>
-
-      <!-- ── QUESTION ── -->
-      <div class="viz-box">
-        <span class="viz-box-label">
-          <span class="viz-section-label">📋 Question</span>
-          <span class="viz-section-sub">Reverse this linked list</span>
-        </span>
-
-        <svg width="100%" [attr.viewBox]="miniViewBox()" class="vsvg vsvg-mini">
-          @if (values().length > 0) {
-            <text x="20" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-            <text [attr.x]="nodeX(values().length - 1) + 78" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-          }
-          @for (v of values(); track $index) {
-            @if ($index < values().length - 1) {
-              <line [attr.x1]="nodeX($index) + 52" y1="55" [attr.x2]="nodeX($index + 1)" y2="55"
-                    [attr.stroke]="nodeColor($index)" stroke-width="3" marker-end="url(#va)"/>
-            }
-          }
-          @for (v of values(); track $index) {
-            <rect [attr.x]="nodeX($index)" y="35" width="52" height="52" rx="18" [attr.fill]="nodeShadow($index)"/>
-          }
-          @for (v of values(); track $index) {
-            <rect [attr.x]="nodeX($index)" y="29" width="52" height="52" rx="18"
-                  [attr.fill]="nodeBg($index)" [attr.stroke]="nodeColor($index)" stroke-width="3"/>
-            <text [attr.x]="nodeCx($index)" y="55" text-anchor="middle" dominant-baseline="central"
-                  font-weight="900" font-size="20" [attr.fill]="nodeColor($index)">{{ v }}</text>
-          }
-        </svg>
-      </div>
-
-      <!-- ── TRACE ── -->
-      <div class="viz-box viz-box--active" [class.viz-box--done]="isAnswerReached()">
-        <span class="viz-box-label viz-box-label--solid" [class.viz-box-label--done]="isAnswerReached()">
-          {{ isAnswerReached() ? '🎯 Expected Solution' : '🔄 Step-by-step Trace' }}
-          @if (isAnswerReached()) {
-            <span class="viz-trace-done-badge">Matched!</span>
-          }
-        </span>
-
-        <svg width="100%" [attr.viewBox]="vizViewBox()" class="vsvg" [class.vsvg-answer]="isAnswerReached()">
-        <!-- null markers -->
-        @if (traceValues().length > 0) {
-          <text x="20" y="141" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-          <text [attr.x]="nodeX(traceValues().length - 1) + 78" y="141" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-        }
-
-        <!-- arrows: drawn only when adjacent chain positions are actually linked (always left→right) -->
-        @for (v of traceValues(); track $index) {
-          @if (traceArrowExists($index)) {
-            <line [attr.x1]="nodeX($index) + 52" y1="141" [attr.x2]="nodeX($index + 1)" y2="141"
-                  [attr.stroke]="nodeColor(traceOrigIdx($index))" stroke-width="3" marker-end="url(#va)"/>
-          }
-        }
-
-        <!-- node shadows -->
-        @for (v of traceValues(); track $index) {
-          <rect [attr.x]="nodeX($index)" y="121" width="52" height="52" rx="18" [attr.fill]="nodeShadow(traceOrigIdx($index))"/>
-        }
-
-        <!-- node faces -->
-        @for (v of traceValues(); track $index) {
-          <rect [attr.x]="nodeX($index)" y="115" width="52" height="52" rx="18"
-                [attr.fill]="nodeBg(traceOrigIdx($index))" [attr.stroke]="nodeColor(traceOrigIdx($index))"
-                [attr.stroke-width]="pointerLabel('curr', traceOrigIdx($index)) ? 4 : 3"/>
-          <text [attr.x]="nodeCx($index)" y="141" text-anchor="middle" dominant-baseline="central"
-                font-weight="900" font-size="20" [attr.fill]="nodeColor(traceOrigIdx($index))">{{ v }}</text>
-        }
-
-        <!-- pointer flags: track physical display position of each pointer via traceDisplayPos -->
-        @if (!isAnswerReached()) {
-          @if (traceDisplayPos(prevIdx()) !== null) {
-            <line [attr.x1]="nodeCx(traceDisplayPos(prevIdx())!)" y1="59"
-                  [attr.x2]="nodeCx(traceDisplayPos(prevIdx())!)" y2="111"
-                  stroke="#FF5252" stroke-width="2.5" marker-end="url(#va)"/>
-            <rect [attr.x]="nodeCx(traceDisplayPos(prevIdx())!) - 24" y="37" width="48" height="22" rx="8" fill="#FF5252"/>
-            <text [attr.x]="nodeCx(traceDisplayPos(prevIdx())!)" y="52" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#FFF">prev</text>
-          }
-          @if (traceDisplayPos(currIdx()) !== null) {
-            <line [attr.x1]="nodeCx(traceDisplayPos(currIdx())!)" y1="89"
-                  [attr.x2]="nodeCx(traceDisplayPos(currIdx())!)" y2="111"
-                  stroke="#00D2D3" stroke-width="2.5" marker-end="url(#va)"/>
-            <rect [attr.x]="nodeCx(traceDisplayPos(currIdx())!) - 24" y="67" width="48" height="22" rx="8" fill="#00D2D3"/>
-            <text [attr.x]="nodeCx(traceDisplayPos(currIdx())!)" y="82" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#FFF">curr</text>
-          }
-          @if (traceDisplayPos(nextIdx()) !== null) {
-            <line [attr.x1]="nodeCx(traceDisplayPos(nextIdx())!)" y1="29"
-                  [attr.x2]="nodeCx(traceDisplayPos(nextIdx())!)" y2="111"
-                  stroke="#FECA57" stroke-width="2.5" marker-end="url(#va)"/>
-            <rect [attr.x]="nodeCx(traceDisplayPos(nextIdx())!) - 24" y="7" width="48" height="22" rx="8" fill="#FECA57"/>
-            <text [attr.x]="nodeCx(traceDisplayPos(nextIdx())!)" y="22" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#2D3436">next</text>
-          }
-        }
-      </svg>
-      </div>
-
-      <div class="viz-step-grid">
-        <div class="viz-stage" [ngClass]="stageClass()">
-          <span class="stage-tech-icon">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].icon }}</span>
-          <div class="stage-content" [class.rtl]="explainLang() === 'ar'">
-            <span class="stage-tech-name">{{ STEP_TECHNIQUE[currentStep()?.badge ?? 'init'].name[explainLang()] }}</span>
-            <span class="stage-desc">{{ stageText() }}</span>
-          </div>
-          <span class="step-counter">{{ stageCounter() }}</span>
-        </div>
-
-        <div class="codeline">
-          <span class="badge" [ngClass]="badgeClass()">{{ currentStep()?.badge }}</span>
-          <span class="codeline-text">{{ currentStep()?.line }}</span>
-        </div>
-      </div>
-
-      <!-- ── EXPECTED SOLUTION (always visible, lights up when reached) ── -->
-      <div class="viz-answer-panel" [class.viz-answer-panel--reached]="isAnswerReached()">
-        <div class="viz-answer-hdr">
-          <span class="viz-answer-title">
-            {{ isAnswerReached() ? '🎉' : '🎯' }} Expected Solution
-          </span>
-          @if (answerHeadValue() !== null) {
-            <span class="viz-answer-sub">New head: <strong>{{ answerHeadValue() }}</strong></span>
-          }
-          @if (isAnswerReached()) {
-            <span class="viz-answer-reached-badge">Reached!</span>
-          }
-        </div>
-        <svg width="100%" [attr.viewBox]="miniViewBox()"
-             class="vsvg vsvg-mini"
-             [class.vsvg-answer]="isAnswerReached()"
-             [class.vsvg-answer-pending]="!isAnswerReached()">
-          @if (reversedValues().length > 0) {
-            <text x="20" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-            <text [attr.x]="nodeX(reversedValues().length - 1) + 78" y="55" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-          }
-          @for (v of reversedValues(); track $index) {
-            @if ($index < reversedValues().length - 1) {
-              <line [attr.x1]="nodeX($index) + 52" y1="55" [attr.x2]="nodeX($index + 1)" y2="55"
-                    [attr.stroke]="nodeColor(reversedOrigIdx($index))" stroke-width="3" marker-end="url(#va)"/>
-            }
-          }
-          @for (v of reversedValues(); track $index) {
-            <rect [attr.x]="nodeX($index)" y="35" width="52" height="52" rx="18" [attr.fill]="nodeShadow(reversedOrigIdx($index))"/>
-          }
-          @for (v of reversedValues(); track $index) {
-            <rect [attr.x]="nodeX($index)" y="29" width="52" height="52" rx="18"
-                  [attr.fill]="nodeBg(reversedOrigIdx($index))" [attr.stroke]="nodeColor(reversedOrigIdx($index))" stroke-width="3"/>
-            <text [attr.x]="nodeCx($index)" y="55" text-anchor="middle" dominant-baseline="central"
-                  font-weight="900" font-size="20" [attr.fill]="nodeColor(reversedOrigIdx($index))">{{ v }}</text>
-          }
-        </svg>
-      </div>
-
-      <div class="viz-footer">
-      <!-- scrubber -->
-      <div class="scrubber-wrap">
-        <div class="scrubber-track-container">
-          <input type="range" class="scrubber"
-                 min="0" [attr.max]="steps().length - 1"
-                 [value]="stepIndex()"
-                 [style.--pct]="progressPct() + '%'"
-                 (input)="scrubTo(+$any($event.target).value)"/>
-          <div class="scrubber-ticks" aria-hidden="true">
-            @for (tick of badgeTicks(); track tick.badge) {
-              <span class="scrubber-tick"
-                    [style.left.%]="tick.pct"
-                    [style.background]="tick.color"
-                    [title]="STEP_TECHNIQUE[tick.badge].name[explainLang()]"></span>
-            }
-          </div>
-        </div>
-        <span class="scrubber-label">{{ stageCounter() }}</span>
-      </div>
-
-      <div class="viz-ctrl">
-        <div class="ctrl-section-label">⚙ Configure</div>
-        <div class="ctrl-row ctrl-row--input">
-          <div class="input-group">
-            <span class="lbl">List</span>
-            <input type="text" [(ngModel)]="listInput" spellcheck="false" placeholder="e.g. 1, 2, 3, 4">
-            <button class="sbtn load" (click)="loadList()">Load ↺</button>
-          </div>
-          <span class="ctrl-spacer"></span>
-          <button class="sbtn speed" (click)="toggleSpeed()" title="Toggle playback speed">{{ speedLabel() }}</button>
-          <button class="sbtn voice-btn" [class.voice-on]="voiceEnabled()" (click)="toggleVoice()" title="Toggle voice narration">
-            {{ voiceEnabled() ? '🔊' : '🔇' }}
-          </button>
-        </div>
-
-        <div class="ctrl-divider"></div>
-        <div class="ctrl-section-label">▶ Playback</div>
-        <div class="ctrl-row ctrl-row--playback">
-          <button class="sbtn nav-btn" (click)="restart()" [disabled]="stepIndex() === 0" title="Restart (Home)">↩</button>
-          <button class="sbtn nav-btn" (click)="step(-1)" [disabled]="stepIndex() === 0" title="Previous step (←)">◀ Back</button>
-          <button class="sbtn nav-btn" (click)="step(1)" [disabled]="stepIndex() >= steps().length - 1" title="Next step (→)">Next ▶</button>
-          <span class="ctrl-spacer"></span>
-          <button class="sbtn play-btn" (click)="togglePlay()">
-            {{ playing() ? '⏸ Pause' : '▶ Play' }}
-          </button>
-        </div>
-
-        <div class="kb-hint">← → arrow keys to step &nbsp;·&nbsp; Space to play / pause &nbsp;·&nbsp; Home to restart</div>
-      </div>
-      </div>
-    </div>
+  <div class="panel panel--sandbox">
+    <app-linked-list-game></app-linked-list-game>
   </div>
   }
 
-  <!-- ============ TAB 3: Trace Game + Solution ============ -->
-  @if (activeTab() === 3) {
+  <!-- ============ TAB 6: Solution (Question + Code Editor) ============ -->
+  @if (activeTab() === 6) {
   <div class="panel game-split-panel">
+    <div class="code-col">
+      <div class="prose prose--inset" [innerHTML]="p.description"></div>
 
-    <!-- LEFT: game area (only when visualizer exists) -->
-    @if (p.hasVisualizer) {
-    <div class="game-col">
-    <div class="game-shell">
-
-      <!-- header row -->
-      <div class="game-hdr">
-        <span class="game-title">🎮 Trace Game</span>
-        <span class="game-subtitle">Predict what the algorithm does — one step at a time</span>
-        <div class="game-score-pill">
-          <span class="game-score-num">{{ gameScore() }}</span>
-          <span class="game-score-sep">/</span>
-          <span class="game-score-den">{{ gameTotalQ() }}</span>
-          <span class="game-score-lbl">correct</span>
-        </div>
+      <div class="lang-switch">
+        <button class="lang-btn" [class.active]="lang() === 'javascript'" (click)="showLang('javascript')">💛 JavaScript</button>
+        <button class="lang-btn" [class.active]="lang() === 'python'" (click)="showLang('python')">🐍 Python</button>
+        <button class="lang-btn" [class.active]="lang() === 'java'" (click)="showLang('java')">☕ Java</button>
       </div>
 
-      @if (gamePhase() !== 'complete') {
+      <div class="editor-head">
+        <span class="ttl">{{ siteLang.t('pdSolutionLabel') }} · {{ langLabel() }}</span>
+        <span class="spacer"></span>
+        @if (readOnlyCode) { <span class="ro-badge">Reference (read-only)</span> }
+      </div>
 
-        <!-- progress bar -->
-        <div class="game-progress-bar">
-          <div class="game-progress-fill" [style.width.%]="gameProgress()"></div>
+      <div class="ed-shell">
+        <app-code-editor
+          [value]="code()"
+          [language]="lang()"
+          [readOnly]="readOnlyCode"
+          (valueChange)="code.set($event)"
+        ></app-code-editor>
+        @if (!readOnlyCode) {
+        <div class="ed-foot">
+          <button class="btn ghost" (click)="resetCode()">{{ siteLang.t('pdReset') }}</button>
+          <span class="spacer"></span>
+          <button class="btn run" (click)="run(false)" [disabled]="running()">{{ siteLang.t('pdRunTests') }}</button>
+          <button class="btn primary" (click)="run(true)" [disabled]="running()">{{ siteLang.t('pdSubmit') }}</button>
         </div>
-        <div class="game-progress-lbl">Question {{ gameStepIndex() + 1 }} of {{ gameTotalQ() }}</div>
+        } @else {
+        <div class="ed-foot">
+          <span class="hint-text">Switch to JavaScript or Java to run against the judge. Python is a reference solution.</span>
+        </div>
+        }
+      </div>
 
-        @if (currentGameQ(); as q) {
+      @if (running()) {
+        <div class="results"><div class="res-head"><span>🎯 Test Results</span><span class="verdict running">Running…</span></div></div>
+      }
 
-          <!-- question prompt -->
-          <div class="game-question-bubble">
-            <span class="game-q-icon">❓</span>
-            <p class="game-q-text">{{ q.text }}</p>
-          </div>
+      @if (result(); as r) {
+      <div class="results">
+        <div class="res-head">
+          <span>🎯 Test Results</span>
+          <span class="verdict" [class.ok]="r.accepted" [class.bad]="!r.accepted">{{ r.verdict }}</span>
+          <span class="spacer"></span>
+          @if (r.runtimeMs > 0) { <span class="timing">{{ r.runtimeMs }} ms</span> }
+        </div>
 
-          <!-- full code block: all lines, active line glows in step color -->
-          <div class="game-code-block" [style.--ac]="q.pointerColor" [style.--ac-bg]="gameActiveLineBg()">
-            @for (line of CODE_LINES; track $index) {
-              <div class="gcb-line"
-                   [class.gcb-line--active]="line.badge === q.badge"
-                   [class.gcb-line--tagged]="line.badge !== null && line.badge !== q.badge"
-                   [class.gcb-line--plain]="line.badge === null">
-                @if (line.badge) {
-                  <span class="gcb-dot" [style.background]="BADGE_COLORS[line.badge]"
-                        [class.gcb-dot--active]="line.badge === q.badge"></span>
-                } @else {
-                  <span class="gcb-spacer"></span>
-                }
-                <code class="gcb-code" [class.gcb-code--active]="line.badge === q.badge">{{ line.code }}</code>
-                @if (line.badge === q.badge) {
-                  <span class="gcb-arrow">← you are here</span>
-                }
-              </div>
-            }
-          </div>
-
-          <!-- technique banner for current step -->
-          @if (STEP_TECHNIQUE[q.badge]; as tech) {
-            <div class="game-technique-banner" [style.--tc]="q.pointerColor" [style.--tc-bg]="gameActiveLineBg()">
-              <span class="gtb-icon">{{ tech.icon }}</span>
-              <div class="gtb-body">
-                <div class="gtb-name">
-                  {{ tech.name[explainLang()] }}
-                  <span class="badge badge--{{ q.badge }} gtb-badge">{{ q.badge }}</span>
-                </div>
-                <div class="gtb-desc">{{ tech.desc[explainLang()] }}</div>
-              </div>
-            </div>
-          }
-
-          <!-- read-only SVG visualization -->
-          <div class="game-viz-wrap" [class.game-viz-wrap--dragging]="isDragging()">
-            <div class="game-viz-hdr">
-              <span class="viz-section-label">📍 Current state</span>
-              <span class="legend">
-                <span style="color:#FF5252"><i style="background:#FF5252"></i>prev</span>
-                <span style="color:#00D2D3"><i style="background:#00D2D3"></i>curr</span>
-                <span style="color:#FECA57"><i style="background:#FECA57"></i>next</span>
-              </span>
-            </div>
-
-            <!-- drag chip floats above the SVG when answering -->
-            @if (gamePhase() === 'question') {
-              <div class="game-chip-row">
-                <div class="game-drag-chip"
-                     draggable="true"
-                     [style.background]="q.pointerColor"
-                     [style.color]="q.pointerTextColor"
-                     [class.game-drag-chip--held]="isDragging()"
-                     (dragstart)="onChipDragStart($event)"
-                     (dragend)="onChipDragEnd()">
-                  {{ q.pointerLabel }}
-                </div>
-                <span class="game-chip-instr">
-                  {{ isDragging() ? 'Drop on a node ↓' : 'Drag onto a node · or click a node directly' }}
-                </span>
-                @if (!gameHintShown()) {
-                  <button class="game-hint-btn" (click)="showGameHint()">💡 Hint</button>
-                }
-              </div>
-            }
-
-            <svg width="100%" [attr.viewBox]="vizViewBox()" class="vsvg game-vsvg"
-                 [class.game-svg--interactive]="gamePhase() === 'question'">
-
-              @if (gameTraceValues().length > 0) {
-                <!-- null drop target (left) -->
-                <rect x="4" y="125" width="32" height="32" rx="10"
-                      [attr.fill]="gameNullFill()"
-                      [attr.stroke]="gameNullColor()"
-                      [attr.opacity]="gameNullOpacity()"
-                      stroke-width="2.5" stroke-dasharray="5,3"
-                      [class.game-svg-target]="gamePhase() === 'question'"
-                      (dragover)="onZoneDragOver($event, 'null')"
-                      (dragleave)="onSvgNodeDragLeave($event, 'null')"
-                      (drop)="onZoneDrop($event, 'null')"
-                      (click)="selectGameNode('null')"/>
-                <text x="20" y="141" text-anchor="middle" dominant-baseline="central"
-                      font-weight="900" font-size="16" [attr.fill]="gameNullColor()"
-                      [attr.opacity]="gameNullOpacity()" pointer-events="none">∅</text>
-
-                <!-- result badge on null -->
-                @if (gamePhase() !== 'question' && q.correctOrigIdx === 'null') {
-                  <text x="20" y="115" text-anchor="middle" dominant-baseline="central" font-size="14" fill="#00C48C" pointer-events="none">✓</text>
-                } @else if (gamePhase() === 'wrong' && gameSelectedOrigIdx() === 'null') {
-                  <text x="20" y="115" text-anchor="middle" dominant-baseline="central" font-size="14" fill="#FF6B6B" pointer-events="none">✗</text>
-                }
-
-                <text [attr.x]="nodeX(gameTraceValues().length - 1) + 78" y="141"
-                      text-anchor="middle" dominant-baseline="central"
-                      font-weight="900" font-size="16" fill="#B2BEC3" pointer-events="none">∅</text>
-              }
-
-              <!-- arrows -->
-              @for (v of gameTraceValues(); track $index) {
-                @if (gameTraceArrowExists($index)) {
-                  <line [attr.x1]="nodeX($index) + 52" y1="141" [attr.x2]="nodeX($index + 1)" y2="141"
-                        [attr.stroke]="gameNodeStroke(gameTraceOrigIdx($index))"
-                        [attr.opacity]="gameNodeOpacity(gameTraceOrigIdx($index))"
-                        stroke-width="3" marker-end="url(#va)" pointer-events="none"/>
-                }
-              }
-
-              <!-- shadow rects -->
-              @for (v of gameTraceValues(); track $index) {
-                <rect [attr.x]="nodeX($index)" y="121" width="52" height="52" rx="18"
-                      [attr.fill]="nodeShadow(gameTraceOrigIdx($index))"
-                      [attr.opacity]="gameNodeOpacity(gameTraceOrigIdx($index))"
-                      pointer-events="none"/>
-              }
-
-              <!-- main node rects + values (interactive) -->
-              @for (v of gameTraceValues(); track $index) {
-                <rect [attr.x]="nodeX($index)" y="115" width="52" height="52" rx="18"
-                      [attr.fill]="gameNodeFill(gameTraceOrigIdx($index))"
-                      [attr.stroke]="gameNodeStroke(gameTraceOrigIdx($index))"
-                      [attr.stroke-width]="gameNodeStrokeW(gameTraceOrigIdx($index))"
-                      [attr.opacity]="gameNodeOpacity(gameTraceOrigIdx($index))"
-                      [class.game-svg-target]="gamePhase() === 'question'"
-                      (dragover)="onZoneDragOver($event, gameTraceOrigIdx($index))"
-                      (dragleave)="onSvgNodeDragLeave($event, gameTraceOrigIdx($index))"
-                      (drop)="onZoneDrop($event, gameTraceOrigIdx($index))"
-                      (click)="selectGameNode(gameTraceOrigIdx($index))"/>
-                <text [attr.x]="nodeCx($index)" y="141" text-anchor="middle" dominant-baseline="central"
-                      font-weight="900" font-size="20"
-                      [attr.fill]="gameNodeStroke(gameTraceOrigIdx($index))"
-                      [attr.opacity]="gameNodeOpacity(gameTraceOrigIdx($index))"
-                      pointer-events="none">{{ v }}</text>
-
-                <!-- result badge on node -->
-                @if (gamePhase() !== 'question' && q.correctOrigIdx === gameTraceOrigIdx($index)) {
-                  <text [attr.x]="nodeCx($index)" y="105" text-anchor="middle" dominant-baseline="central"
-                        font-size="16" fill="#00C48C" pointer-events="none">✓</text>
-                } @else if (gamePhase() === 'wrong' && gameSelectedOrigIdx() === gameTraceOrigIdx($index)) {
-                  <text [attr.x]="nodeCx($index)" y="105" text-anchor="middle" dominant-baseline="central"
-                        font-size="16" fill="#FF6B6B" pointer-events="none">✗</text>
-                }
-              }
-
-              <!-- pointer flags (visible / hidden per question) -->
-              @if (q.hidePointer !== 'prev' && gameTraceDisplayPos(gamePrevIdx()) !== null) {
-                <line [attr.x1]="nodeCx(gameTraceDisplayPos(gamePrevIdx())!)" y1="59"
-                      [attr.x2]="nodeCx(gameTraceDisplayPos(gamePrevIdx())!)" y2="111"
-                      stroke="#FF5252" stroke-width="2.5" marker-end="url(#va)" pointer-events="none"/>
-                <rect [attr.x]="nodeCx(gameTraceDisplayPos(gamePrevIdx())!) - 24" y="37" width="48" height="22" rx="8" fill="#FF5252" pointer-events="none"/>
-                <text [attr.x]="nodeCx(gameTraceDisplayPos(gamePrevIdx())!)" y="52" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#FFF" pointer-events="none">prev</text>
-              }
-              @if (q.hidePointer !== 'curr' && gameTraceDisplayPos(gameCurrIdx()) !== null) {
-                <line [attr.x1]="nodeCx(gameTraceDisplayPos(gameCurrIdx())!)" y1="89"
-                      [attr.x2]="nodeCx(gameTraceDisplayPos(gameCurrIdx())!)" y2="111"
-                      stroke="#00D2D3" stroke-width="2.5" marker-end="url(#va)" pointer-events="none"/>
-                <rect [attr.x]="nodeCx(gameTraceDisplayPos(gameCurrIdx())!) - 24" y="67" width="48" height="22" rx="8" fill="#00D2D3" pointer-events="none"/>
-                <text [attr.x]="nodeCx(gameTraceDisplayPos(gameCurrIdx())!)" y="82" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#FFF" pointer-events="none">curr</text>
-              }
-              @if (q.hidePointer !== 'next' && gameTraceDisplayPos(gameNextIdx()) !== null) {
-                <line [attr.x1]="nodeCx(gameTraceDisplayPos(gameNextIdx())!)" y1="29"
-                      [attr.x2]="nodeCx(gameTraceDisplayPos(gameNextIdx())!)" y2="111"
-                      stroke="#FECA57" stroke-width="2.5" marker-end="url(#va)" pointer-events="none"/>
-                <rect [attr.x]="nodeCx(gameTraceDisplayPos(gameNextIdx())!) - 24" y="7" width="48" height="22" rx="8" fill="#FECA57" pointer-events="none"/>
-                <text [attr.x]="nodeCx(gameTraceDisplayPos(gameNextIdx())!)" y="22" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#2D3436" pointer-events="none">next</text>
-              }
-            </svg>
-          </div>
-
-          <!-- hint box -->
-          @if (gameHintShown()) {
-            <div class="game-hint-box">
-              <span class="game-hint-icon">💡</span>
-              <span>{{ q.hint }}</span>
-            </div>
-          }
-
-          <!-- feedback -->
-          @if (gamePhase() === 'correct') {
-            <div class="game-feedback game-feedback--correct">
-              <div class="game-feedback-top">
-                <span class="game-feedback-icon">✅</span>
-                <strong>{{ gameTries() === 1 ? 'Perfect!' : 'Correct!' }}</strong>
-                @if (gameTries() === 1) { <span class="game-first-badge">+1 First try!</span> }
-              </div>
-              <p class="game-feedback-explain">{{ q.explain }}</p>
-              <button class="game-next-btn" (click)="nextGameStep()">
-                {{ gameStepIndex() + 1 < gameTotalQ() ? 'Next step ▶' : '🎉 See Results' }}
-              </button>
-            </div>
-          }
-
-          @if (gamePhase() === 'wrong') {
-            <div class="game-feedback game-feedback--wrong">
-              <div class="game-feedback-top">
-                <span class="game-feedback-icon">❌</span>
-                <strong>Not quite — try again!</strong>
-              </div>
-              <p class="game-feedback-explain">The correct node is highlighted in green above. Drag the chip onto it.</p>
-              <button class="game-retry-btn" (click)="retryGameStep()">↩ Try Again</button>
-            </div>
-          }
-
+        @if (r.compileError) {
+          <div class="compile-err">{{ r.compileError }}</div>
         }
 
-      } @else {
-
-        <!-- completion screen -->
-        <div class="game-complete">
-
-          <!-- hero: score summary -->
-          <div class="game-complete-hero">
-            @if (gameScorePct() >= 80) {
-              <div class="game-complete-emoji">🏆</div>
-              <h2 class="game-complete-title">Outstanding!</h2>
-            } @else if (gameScorePct() >= 50) {
-              <div class="game-complete-emoji">🎯</div>
-              <h2 class="game-complete-title">Good work!</h2>
+        @for (c of r.cases; track $index) {
+          <div class="case" [class.pass]="c.passed" [class.fail]="!c.passed">
+            <div class="case-top">
+              <span class="badge-case">{{ c.passed ? '✅' : '❌' }} Case {{ $index + 1 }}</span>
+            </div>
+            <div class="case-row"><b>Input:</b> [{{ c.input.join(', ') }}]</div>
+            <div class="case-row"><b>Expected:</b> [{{ c.expected.join(', ') }}]</div>
+            @if (c.error) {
+              <div class="case-row err"><b>Error:</b> {{ c.error }}</div>
             } @else {
-              <div class="game-complete-emoji">💪</div>
-              <h2 class="game-complete-title">Keep practicing!</h2>
+              <div class="case-row"><b>Got:</b> [{{ c.actual?.join(', ') }}]</div>
             }
-            <p class="game-complete-sub">You got <strong>{{ gameScore() }} / {{ gameTotalQ() }}</strong> correct on the first try.</p>
-            <div class="game-complete-bar-wrap">
-              <div class="game-complete-bar" [style.width.%]="gameScorePct()"></div>
-            </div>
-            <button class="game-restart-btn" (click)="restartGame()">🔁 Play Again</button>
           </div>
-
-          <!-- technique card -->
-          <div class="technique-card">
-            <div class="technique-hdr">
-              <span class="technique-icon">🧠</span>
-              <div class="technique-hdr-text">
-                <div class="technique-name">Three-Pointer In-Place Reversal</div>
-                <div class="technique-meta">
-                  <span class="complexity-chip">⏱ O(n) time</span>
-                  <span class="complexity-chip">📦 O(1) space</span>
-                  <span class="complexity-chip">🔁 1 pass</span>
-                </div>
-              </div>
-            </div>
-            <p class="technique-desc">
-              Walk the list once, flipping each arrow backward with three variables:
-              <strong>prev</strong> (the growing reversed portion),
-              <strong>curr</strong> (the node being processed), and
-              <strong>next</strong> (a temporary save so you never lose the rest of the chain).
-            </p>
-            <div class="technique-pattern">
-              <div class="pattern-step ps--1">
-                <span class="ps-num">1</span>
-                <code>next = curr.next</code>
-                <span class="ps-why">Save before breaking</span>
-              </div>
-              <div class="pattern-step ps--2">
-                <span class="ps-num">2</span>
-                <code>curr.next = prev</code>
-                <span class="ps-why">Flip the arrow</span>
-              </div>
-              <div class="pattern-step ps--3">
-                <span class="ps-num">3</span>
-                <code>prev = curr; curr = next</code>
-                <span class="ps-why">Slide forward</span>
-              </div>
-            </div>
-            <div class="technique-uses">
-              <span class="use-lbl">Also used in:</span>
-              <span class="use-chip">Palindrome check</span>
-              <span class="use-chip">k-Group reversal</span>
-              <span class="use-chip">Reorder list</span>
-              <span class="use-chip">Swap pairs</span>
-            </div>
-          </div>
-
-          <!-- interactive code walk -->
-          <div class="code-walk">
-            <div class="code-walk-hdr">
-              <span class="code-walk-title">📖 Full Solution</span>
-              <span class="code-walk-hint">Click a colored line to see it in the visualizer →</span>
-            </div>
-            <div class="code-walk-body">
-
-              <!-- code panel -->
-              <div class="code-walk-code">
-                @for (line of CODE_LINES; track $index) {
-                  <div class="cw-line"
-                       [class.cw-line--active]="codeWalkLineIdx() === $index"
-                       [class.cw-line--clickable]="line.badge !== null"
-                       (click)="selectCodeLine($index)">
-                    <span class="cw-ln">{{ $index + 1 }}</span>
-                    @if (line.badge) {
-                      <span class="badge badge--{{ line.badge }}">{{ line.badge }}</span>
-                    } @else {
-                      <span class="cw-spacer"></span>
-                    }
-                    <code class="cw-code">{{ line.code }}</code>
-                  </div>
-                }
-              </div>
-
-              <!-- viz panel -->
-              <div class="code-walk-viz">
-                @if (codeWalkActiveBadge()) {
-                  <div class="cw-step-info">
-                    <span class="cw-step-desc">{{ codeWalkStep()?.desc?.[explainLang()] }}</span>
-                    @if (codeWalkExLabel()) {
-                      <div class="cw-ex-nav">
-                        <button class="sbtn nav-btn" (click)="codeWalkPrevEx()" [disabled]="codeWalkExampleIdx() === 0">◀</button>
-                        <span class="cw-ex-lbl">{{ codeWalkExLabel() }}</span>
-                        <button class="sbtn nav-btn" (click)="codeWalkNextEx()" [disabled]="codeWalkExampleIdx() >= codeWalkBadgeSteps().length - 1">▶</button>
-                      </div>
-                    }
-                  </div>
-                  <svg width="100%" [attr.viewBox]="vizViewBox()" class="vsvg game-vsvg cw-vsvg">
-                    @if (codeWalkValues().length > 0) {
-                      <text x="20" y="141" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-                      <text [attr.x]="nodeX(codeWalkValues().length - 1) + 78" y="141" text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="16" fill="#B2BEC3">∅</text>
-                    }
-                    @for (v of codeWalkValues(); track $index) {
-                      @if (codeWalkArrowExists($index)) {
-                        <line [attr.x1]="nodeX($index) + 52" y1="141"
-                              [attr.x2]="nodeX($index + 1)"  y2="141"
-                              [attr.stroke]="nodeColor(codeWalkOrigIdx($index))"
-                              stroke-width="3" marker-end="url(#va)"/>
-                      }
-                    }
-                    @for (v of codeWalkValues(); track $index) {
-                      <rect [attr.x]="nodeX($index)" y="121" width="52" height="52" rx="18"
-                            [attr.fill]="nodeShadow(codeWalkOrigIdx($index))"/>
-                    }
-                    @for (v of codeWalkValues(); track $index) {
-                      <rect [attr.x]="nodeX($index)" y="115" width="52" height="52" rx="18"
-                            [attr.fill]="nodeBg(codeWalkOrigIdx($index))"
-                            [attr.stroke]="nodeColor(codeWalkOrigIdx($index))" stroke-width="3"/>
-                      <text [attr.x]="nodeCx($index)" y="141" text-anchor="middle" dominant-baseline="central"
-                            font-weight="900" font-size="20" [attr.fill]="nodeColor(codeWalkOrigIdx($index))">{{ v }}</text>
-                    }
-                    @if (codeWalkDisplayPos(codeWalkPrevIdx()) !== null) {
-                      <line [attr.x1]="nodeCx(codeWalkDisplayPos(codeWalkPrevIdx())!)" y1="59"
-                            [attr.x2]="nodeCx(codeWalkDisplayPos(codeWalkPrevIdx())!)" y2="111"
-                            stroke="#FF5252" stroke-width="2.5" marker-end="url(#va)"/>
-                      <rect [attr.x]="nodeCx(codeWalkDisplayPos(codeWalkPrevIdx())!) - 24" y="37" width="48" height="22" rx="8" fill="#FF5252"/>
-                      <text [attr.x]="nodeCx(codeWalkDisplayPos(codeWalkPrevIdx())!)" y="52"
-                            text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#FFF">prev</text>
-                    }
-                    @if (codeWalkDisplayPos(codeWalkCurrIdx()) !== null) {
-                      <line [attr.x1]="nodeCx(codeWalkDisplayPos(codeWalkCurrIdx())!)" y1="89"
-                            [attr.x2]="nodeCx(codeWalkDisplayPos(codeWalkCurrIdx())!)" y2="111"
-                            stroke="#00D2D3" stroke-width="2.5" marker-end="url(#va)"/>
-                      <rect [attr.x]="nodeCx(codeWalkDisplayPos(codeWalkCurrIdx())!) - 24" y="67" width="48" height="22" rx="8" fill="#00D2D3"/>
-                      <text [attr.x]="nodeCx(codeWalkDisplayPos(codeWalkCurrIdx())!)" y="82"
-                            text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#FFF">curr</text>
-                    }
-                    @if (codeWalkDisplayPos(codeWalkNextIdx()) !== null) {
-                      <line [attr.x1]="nodeCx(codeWalkDisplayPos(codeWalkNextIdx())!)" y1="29"
-                            [attr.x2]="nodeCx(codeWalkDisplayPos(codeWalkNextIdx())!)" y2="111"
-                            stroke="#FECA57" stroke-width="2.5" marker-end="url(#va)"/>
-                      <rect [attr.x]="nodeCx(codeWalkDisplayPos(codeWalkNextIdx())!) - 24" y="7" width="48" height="22" rx="8" fill="#FECA57"/>
-                      <text [attr.x]="nodeCx(codeWalkDisplayPos(codeWalkNextIdx())!)" y="22"
-                            text-anchor="middle" dominant-baseline="central" font-weight="900" font-size="13" fill="#2D3436">next</text>
-                    }
-                  </svg>
-                } @else {
-                  <div class="cw-viz-placeholder">
-                    <span>👆 Click a colored line to see it in the visualizer</span>
-                  </div>
-                }
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-
-      }
-    </div><!-- /.game-shell -->
-    </div><!-- /.game-col -->
-    }
-
-    <!-- RIGHT: code editor -->
-    <div class="code-col">
-    <div class="lang-switch">
-      <button class="lang-btn" [class.active]="lang() === 'javascript'" (click)="showLang('javascript')">💛 JavaScript</button>
-      <button class="lang-btn" [class.active]="lang() === 'python'" (click)="showLang('python')">🐍 Python</button>
-      <button class="lang-btn" [class.active]="lang() === 'java'" (click)="showLang('java')">☕ Java</button>
-    </div>
-
-    <div class="editor-head">
-      <span class="ttl">💻 Solution · {{ langLabel() }}</span>
-      <span class="spacer"></span>
-      @if (readOnlyCode) { <span class="ro-badge">Reference (read-only)</span> }
-    </div>
-
-    <div class="ed-shell">
-      <textarea spellcheck="false" [(ngModel)]="code" [readOnly]="readOnlyCode"></textarea>
-      @if (!readOnlyCode) {
-      <div class="ed-foot">
-        <button class="btn ghost" (click)="resetCode()">↺ Reset</button>
-        <span class="spacer"></span>
-        <button class="btn run" (click)="run(false)" [disabled]="running()">▶ Run Tests</button>
-        <button class="btn primary" (click)="run(true)" [disabled]="running()">🚀 Submit</button>
-      </div>
-      } @else {
-      <div class="ed-foot">
-        <span class="hint-text">Switch to JavaScript to run against the judge. Python &amp; Java are reference solutions.</span>
+        }
       </div>
       }
-    </div>
-
-    @if (running()) {
-      <div class="results"><div class="res-head"><span>🎯 Test Results</span><span class="verdict running">Running…</span></div></div>
-    }
-
-    @if (result(); as r) {
-    <div class="results">
-      <div class="res-head">
-        <span>🎯 Test Results</span>
-        <span class="verdict" [class.ok]="r.accepted" [class.bad]="!r.accepted">{{ r.verdict }}</span>
-        <span class="spacer"></span>
-        @if (r.runtimeMs > 0) { <span class="timing">{{ r.runtimeMs }} ms</span> }
-      </div>
-
-      @if (r.compileError) {
-        <div class="compile-err">{{ r.compileError }}</div>
-      }
-
-      @for (c of r.cases; track $index) {
-        <div class="case" [class.pass]="c.passed" [class.fail]="!c.passed">
-          <div class="case-top">
-            <span class="badge-case">{{ c.passed ? '✅' : '❌' }} Case {{ $index + 1 }}</span>
-          </div>
-          <div class="case-row"><b>Input:</b> [{{ c.input.join(', ') }}]</div>
-          <div class="case-row"><b>Expected:</b> [{{ c.expected.join(', ') }}]</div>
-          @if (c.error) {
-            <div class="case-row err"><b>Error:</b> {{ c.error }}</div>
-          } @else {
-            <div class="case-row"><b>Got:</b> [{{ c.actual?.join(', ') }}]</div>
-          }
-        </div>
-      }
-    </div>
-    }
     </div><!-- /.code-col -->
-
   </div><!-- /.game-split-panel -->
   }
 
-
-  <!-- ============ TAB 4: Pointer Sandbox ============ -->
-  @if (activeTab() === 4 && p.hasVisualizer) {
-  <div class="panel panel--sandbox">
-    <app-pointer-sandbox></app-pointer-sandbox>
-  </div>
-  }
 
 </div>
 }

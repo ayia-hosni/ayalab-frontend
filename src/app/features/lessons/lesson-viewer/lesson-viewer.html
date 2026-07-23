@@ -1,10 +1,10 @@
 @if (loading()) {
   <div class="wrap lesson-wrap">
-    <div class="lesson-loading">Loading lesson…</div>
+    <div class="lesson-loading">{{ lang.t('lvLoading') }}</div>
   </div>
 } @else if (error() || !lesson()) {
   <div class="wrap lesson-wrap">
-    <div class="lesson-loading">⚠️ {{ error() || 'Lesson not found.' }} <a routerLink="/lessons">Back to Lessons</a></div>
+    <div class="lesson-loading">⚠️ {{ error() || lang.t('lvNotFound') }} <a routerLink="/lessons">{{ lang.t('lvBackToLessons') }}</a></div>
   </div>
 } @else {
   @let l = lesson()!;
@@ -15,7 +15,7 @@
     <a class="breadcrumb" routerLink="/lessons">
       <span class="breadcrumb-eyebrow">DSA</span>
       <span class="breadcrumb-sep">/</span>
-      <span class="breadcrumb-current">{{ lang() === 'en' ? l.title.en : l.title.ar }}</span>
+      <span class="breadcrumb-current">{{ lang.lang() === 'en' ? l.title.en : l.title.ar }}</span>
     </a>
 
     <span class="spacer"></span>
@@ -27,20 +27,20 @@
       <button [class.active]="codeLang() === 'java'" (click)="setCodeLang('java')">Java</button>
     </div>
     <div class="toggle-group">
-      <button [class.active]="lang() === 'en'" (click)="setLang('en')">EN</button>
-      <button [class.active]="lang() === 'ar'" (click)="setLang('ar')">AR</button>
+      <button [class.active]="lang.lang() === 'en'" (click)="lang.set('en')">EN</button>
+      <button [class.active]="lang.lang() === 'ar'" (click)="lang.set('ar')">AR</button>
     </div>
   </div>
 
   <div class="wrap lesson-wrap" [attr.data-codelang]="codeLang()">
     <div class="lesson-layout">
       <aside class="lesson-sidebar">
-        <div class="sidebar-label">{{ lang() === 'en' ? 'Outline' : 'المحتويات' }}</div>
+        <div class="sidebar-label">{{ lang.lang() === 'en' ? 'Outline' : 'المحتويات' }}</div>
         <div class="sidebar-list">
           @for (i of slideIndices(); track i) {
             <button class="sidebar-item" [class.active]="i === current()" (click)="goTo(i)">
               <span class="sidebar-num">{{ slideNumberInLesson(i) }}</span>
-              <span class="sidebar-title" [class.rtl]="lang() === 'ar'" [innerHTML]="slideTitle(i)"></span>
+              <span class="sidebar-title" [class.rtl]="lang.lang() === 'ar'" [innerHTML]="slideTitle(i)"></span>
             </button>
           }
         </div>
@@ -48,12 +48,12 @@
 
       <div class="slide-viewport">
         <section class="slide-card">
-          <div class="prose-text" [class.rtl]="lang() === 'ar'">
-            <div class="slide-kicker" [innerHTML]="lang() === 'en' ? slide().kicker.en : slide().kicker.ar"></div>
-            <h2 class="slide-title" [innerHTML]="lang() === 'en' ? slide().title.en : slide().title.ar"></h2>
+          <div class="prose-text" [class.rtl]="lang.lang() === 'ar'">
+            <div class="slide-kicker" [innerHTML]="lang.lang() === 'en' ? slide().kicker.en : slide().kicker.ar"></div>
+            <h2 class="slide-title" [innerHTML]="lang.lang() === 'en' ? slide().title.en : slide().title.ar"></h2>
           </div>
           <div class="slide-visual" [innerHTML]="slide().visual"></div>
-          <div class="prose-text slide-body" [class.rtl]="lang() === 'ar'" [innerHTML]="lang() === 'en' ? slide().body.en : slide().body.ar"></div>
+          <div class="prose-text slide-body" [class.rtl]="lang.lang() === 'ar'" [innerHTML]="lang.lang() === 'en' ? slide().body.en : slide().body.ar"></div>
         </section>
       </div>
     </div>
@@ -63,16 +63,16 @@
     <div class="footer-inner">
       <div class="progress-track"><div class="progress-bar" [style.width.%]="progressPct()"></div></div>
       <div class="footer-row">
-        <button class="footer-btn" (click)="back()" [disabled]="isFirst()">{{ lang() === 'en' ? '◀ Back' : '◀ السابق' }}</button>
+        <button class="footer-btn" (click)="back()" [disabled]="isFirst()">{{ lang.lang() === 'en' ? '◀ Back' : '◀ السابق' }}</button>
         <div class="footer-dots">
           @for (i of slideIndices(); track i) {
             <button class="dot" [class.active]="i === current()" (click)="goTo(i)"></button>
           }
         </div>
-        <button class="footer-btn primary" (click)="next()" [disabled]="isLast()">{{ lang() === 'en' ? 'Next ▶' : 'التالي ▶' }}</button>
+        <button class="footer-btn primary" (click)="next()" [disabled]="isLast()">{{ lang.lang() === 'en' ? 'Next ▶' : 'التالي ▶' }}</button>
       </div>
       <div class="footer-back-row">
-        <a class="back-to-lessons" routerLink="/lessons">{{ lang() === 'en' ? '← Back to Lessons' : 'العودة للدروس →' }}</a>
+        <a class="back-to-lessons" routerLink="/lessons">{{ lang.lang() === 'en' ? '← Back to Lessons' : 'العودة للدروس →' }}</a>
       </div>
     </div>
   </footer>

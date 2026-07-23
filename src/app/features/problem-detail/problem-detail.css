@@ -131,6 +131,10 @@
 .game-split-panel:not(:has(.game-col)) .code-col {
   grid-column: 1 / -1;
 }
+/* Solution tab renders code-col alone (no game-col sibling) — expand full width */
+.game-split-panel:not(:has(.code-col)) .game-col {
+  grid-column: 1 / -1;
+}
 @media (max-width: 900px) {
   .game-split-panel { grid-template-columns: 1fr; }
   .code-col { position: static; }
@@ -147,6 +151,13 @@ h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14p
 .prose {
   padding: 8px 12px 24px;
   font-size: 15px; font-weight: 400; line-height: 1.75;
+}
+/* used when the description sits above another section (Pointer Trace / Solution)
+   instead of alone in its own tab */
+.prose--inset {
+  padding: 4px 20px 20px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
 }
 /* .prose renders backend HTML via [innerHTML], which Angular's view
    encapsulation never tags with its scoping attribute — ::ng-deep is
@@ -216,7 +227,6 @@ h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14p
 .toggle-group button.active { background: #F8FAFC; color: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
 .rtl { direction: rtl; text-align: right; font-family: 'Tajawal', sans-serif; }
 .vsvg { display: block; background: #FAFBFC; border-radius: 16px; border: 1px solid var(--line); margin-bottom: 0; width: 100%; }
-.vsvg-mini { border-radius: 14px; }
 .vsvg-answer { background: var(--easy-light); border-color: #A7F3D0; }
 
 /* boxed sections inside the viz (question / step-by-step trace) — mirrors the
@@ -236,19 +246,23 @@ h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14p
 .viz-box--done { border-color: #A7F3D0; }
 .viz-box--done .viz-box-label { animation: traceDonePop 0.4s ease both; }
 
-.viz-box-label {
+.viz-box-label-group {
   position: absolute; top: -12px; left: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.viz-box-label {
   display: flex; align-items: center; gap: 8px;
   font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
   color: var(--ink-2); background: #F8FAFC; border: 1px solid var(--line);
   padding: 5px 12px; border-radius: 100px;
-  white-space: nowrap; transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  white-space: nowrap; transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, opacity 0.35s ease;
 }
 .viz-section-label { font-weight: 700; }
 .viz-section-sub { font-weight: 500; color: var(--ink-3); text-transform: none; letter-spacing: 0; }
 
 .viz-box-label--solid { background: var(--secondary); color: #fff; border-color: var(--secondary); }
 .viz-box-label--solid.viz-box-label--done { background: var(--easy); border-color: var(--easy); }
+.viz-box-label--dim { opacity: 0.45; }
 .viz-trace-done-badge {
   font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
   background: rgba(255, 255, 255, 0.25); color: #fff;
@@ -275,42 +289,198 @@ h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14p
   display: flex; flex-direction: column; gap: 14px;
 }
 
-/* answer / expected solution panel */
-.viz-answer-panel {
-  background: #FAFBFC;
-  border: 1px dashed var(--line-heavy); border-radius: 16px;
-  padding: 16px 16px 12px; margin: 0 20px 16px;
-  opacity: 0.72;
-  transition: opacity 0.4s, background 0.4s, border-color 0.4s, border-style 0.4s;
+/* explanation slide body typography
+   NOTE: body content is rendered via [innerHTML] (EXPLAIN_SLIDES data), so Angular's
+   view encapsulation never tags it with a scoping attribute — every descendant rule
+   below needs ::ng-deep or it silently never matches. */
+.expl-body {
+  font-size: 15.5px; line-height: 1.85; color: var(--ink-2);
 }
-.viz-answer-panel--reached {
-  background: var(--easy-light);
-  border: 1px solid var(--easy); opacity: 1;
-  animation: answerPop 0.45s ease both;
+.expl-body.rtl { text-align: right; }
+.expl-body ::ng-deep .expl-h4 {
+  font-size: 12.5px; font-weight: 800; color: var(--secondary-shadow); margin: 28px 0 14px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--secondary-light); border-radius: 8px;
+  padding: 7px 12px 7px 10px; width: fit-content;
 }
-.viz-answer-hdr {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+.expl-body ::ng-deep .expl-h4:first-child { margin-top: 0; }
+.expl-body:not(.rtl) ::ng-deep .expl-h4 { text-transform: uppercase; letter-spacing: 0.6px; }
+.expl-body ::ng-deep .expl-h4::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--secondary); flex-shrink: 0;
 }
-.viz-answer-title {
-  font-weight: 700; font-size: 14px; color: var(--ink-2);
+.expl-body ::ng-deep .expl-p { margin: 0 0 14px; }
+.expl-body ::ng-deep .expl-p strong { color: var(--ink); font-weight: 700; }
+.expl-body ::ng-deep .expl-inline-code {
+  direction: ltr; unicode-bidi: isolate; display: inline-block;
+  font-family: var(--mono); font-size: 0.88em; font-variant-ligatures: none;
+  background: var(--secondary-light); color: var(--secondary-shadow); padding: 2px 7px; border-radius: 5px;
+  font-weight: 600;
 }
-.viz-answer-panel--reached .viz-answer-title { color: var(--easy-shadow); }
-.viz-answer-sub {
-  font-size: 13px; font-weight: 500; color: var(--ink-3);
-  background: #EEF2F6; padding: 3px 12px; border-radius: 100px;
+.expl-body ::ng-deep .expl-diagram {
+  direction: ltr; text-align: center;
+  font-family: var(--mono); font-size: 14px; line-height: 1.9; font-variant-ligatures: none;
+  background: linear-gradient(180deg, #FAFBFC 0%, #F8FAFC 100%);
+  border: 1px solid var(--line); border-left: 3px solid var(--secondary-light);
+  border-radius: 12px; padding: 14px 18px; margin: 14px 0 20px; overflow-x: auto; color: var(--ink);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
-.viz-answer-panel--reached .viz-answer-sub {
-  color: var(--easy-shadow); background: rgba(4, 120, 87, 0.1);
+.expl-body ::ng-deep .expl-code {
+  direction: ltr; text-align: left;
+  background: #1E1E2E; border-radius: 14px; padding: 18px 20px 16px;
+  overflow-x: auto; font-family: var(--mono); font-size: 13.5px; font-variant-ligatures: none;
+  color: #CBD5E1; margin: 14px 0 20px; line-height: 1.7;
+  box-shadow: 0 4px 14px -6px rgba(15, 23, 42, 0.25);
+  position: relative;
 }
-.viz-answer-reached-badge {
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
-  background: var(--easy); color: #FFF; padding: 3px 10px; border-radius: 100px;
+.expl-body ::ng-deep .expl-code::before {
+  content: '● ● ●'; display: block; letter-spacing: 4px; font-size: 9px; color: #4B5264;
+  margin-bottom: 10px;
 }
-.vsvg-answer-pending { background: #F1F5F9; border-color: var(--line); filter: grayscale(0.35); }
-@keyframes answerPop {
-  from { transform: scale(0.96); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
+.expl-body ::ng-deep .expl-code code { background: none; padding: 0; color: inherit; font-weight: 400; }
+.expl-body ::ng-deep .expl-list { margin: 10px 0 16px; padding-left: 4px; list-style: none; }
+.expl-body ::ng-deep .expl-list li {
+  margin-bottom: 10px; padding-left: 22px; position: relative;
 }
+.expl-body.rtl ::ng-deep .expl-list li { padding-left: 0; padding-right: 22px; }
+.expl-body ::ng-deep .expl-list li::before {
+  content: ''; position: absolute; left: 0; top: 8px;
+  width: 7px; height: 7px; border-radius: 2px; background: var(--secondary);
+  transform: rotate(45deg);
+}
+.expl-body.rtl ::ng-deep .expl-list li::before { left: auto; right: 0; }
+.expl-body ::ng-deep .expl-table {
+  width: 100%; border-collapse: separate; border-spacing: 0; margin: 14px 0 20px; font-size: 14px;
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+.expl-body ::ng-deep .expl-table th,
+.expl-body ::ng-deep .expl-table td { border-bottom: 1px solid var(--line); padding: 11px 16px; text-align: center; }
+.expl-body ::ng-deep .expl-table tr:last-child td { border-bottom: none; }
+.expl-body ::ng-deep .expl-table th {
+  background: #F8FAFC; font-weight: 800; color: var(--ink-2);
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.expl-body ::ng-deep .expl-table td { color: var(--ink); font-weight: 500; }
+.expl-body ::ng-deep .expl-table tbody tr:hover td { background: #FAFBFC; }
+
+/* explanation slide deck (Tab 5) */
+.slides { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.slides-hdr {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.slides-hdr-left { display: flex; flex-direction: column; gap: 10px; }
+.slides-hdr-left.rtl { align-items: flex-end; }
+
+.slides-stepper { display: flex; align-items: center; }
+.slides-hdr-left.rtl .slides-stepper { flex-direction: row-reverse; }
+.slides-step {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--ink-3); background: none; border: none; padding: 4px 2px; cursor: pointer;
+  transition: color 0.15s;
+}
+.slides-step:hover { color: var(--ink-2); }
+.slides-step-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--line-heavy); flex-shrink: 0;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.slides-step.done .slides-step-dot { background: var(--secondary-light); box-shadow: inset 0 0 0 1.5px var(--secondary); }
+.slides-step.active { color: var(--secondary); }
+.slides-step.active .slides-step-dot { background: var(--secondary); transform: scale(1.3); box-shadow: 0 0 0 4px var(--secondary-light); }
+.slides-step-line { width: 22px; height: 1px; background: var(--line); margin: 0 2px; transition: background 0.2s; }
+.slides-step-line.done { background: var(--secondary-light); }
+
+.slides-title { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
+.slides-hdr-right { display: flex; align-items: center; gap: 12px; }
+.slides-counter {
+  font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink-3);
+  background: #F8FAFC; border: 1px solid var(--line); border-radius: 100px; padding: 5px 14px;
+}
+
+.slides-progress-track {
+  height: 4px; border-radius: 100px; background: var(--line); overflow: hidden;
+}
+.slides-progress-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--secondary), var(--easy));
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slides-progress { display: flex; gap: 6px; flex-wrap: wrap; }
+.slides-dot {
+  width: 22px; height: 6px; border-radius: 100px; border: none; padding: 0; cursor: pointer;
+  background: var(--line); transition: background 0.15s, transform 0.15s, width 0.2s;
+}
+.slides-dot:hover { transform: scaleY(1.5); }
+.slides-dot.done { background: var(--secondary-light); }
+.slides-dot.active { background: var(--secondary); width: 30px; }
+
+.slides-stage {
+  min-height: 340px; overflow: hidden;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 2px 10px -4px rgba(15, 23, 42, 0.06);
+}
+.slides-slide-inner { animation: slideStageIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes slideStageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.slides-body { margin-top: 0; padding: 28px 30px; border: none; background: transparent; }
+.slides-body.rtl :is(h3, h4) { text-align: right; }
+
+.expl-check {
+  margin: 0 30px 26px; padding: 18px 20px 20px;
+  border-radius: 16px; border: 1px solid var(--line); background: #F8FAFC;
+  animation: popIn 0.3s ease both;
+}
+.expl-check.rtl { direction: rtl; }
+.expl-check-q {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14.5px; font-weight: 700; color: var(--ink); margin-bottom: 14px; line-height: 1.5;
+}
+.expl-check-icon { font-size: 17px; line-height: 1; flex-shrink: 0; }
+.expl-check-opts { display: flex; flex-direction: column; gap: 8px; }
+.expl-check-opt {
+  font-family: var(--sans); text-align: left; font-size: 13.5px; font-weight: 600;
+  padding: 11px 16px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink-2); cursor: pointer; transition: all 0.12s;
+}
+.expl-check.rtl .expl-check-opt { text-align: right; }
+.expl-check-opt:hover:not(:disabled) { border-color: var(--secondary); background: var(--secondary-light); color: var(--secondary-shadow); }
+.expl-check-opt:disabled { cursor: default; }
+.expl-check-opt.selected { border-color: var(--secondary); }
+.expl-check-opt.correct { border-color: var(--easy); background: var(--easy-light); color: var(--ink); }
+.expl-check-opt.wrong { border-color: var(--hard); background: var(--hard-light); color: var(--ink); }
+.expl-check-feedback {
+  margin-top: 14px; padding: 12px 16px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; line-height: 1.6; color: var(--ink-2);
+  background: var(--hard-light); border: 1px solid var(--hard);
+  animation: popIn 0.25s ease both;
+}
+.expl-check-feedback.is-correct { background: var(--easy-light); border-color: var(--easy); }
+.expl-check-feedback strong { color: var(--ink); }
+.slides-diagram {
+  direction: ltr;
+  padding: 22px 24px 6px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, #FAFBFC 0%, transparent 100%);
+}
+.slides-diagram .vsvg {
+  background: #FAFBFC; max-width: 480px; margin: 0 auto;
+  border-radius: 14px; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+}
+
+.slides-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.sbtn.nav-btn.primary {
+  background: var(--secondary); color: #FFF; border-color: var(--secondary);
+  box-shadow: 0 2px 6px -2px rgba(139, 92, 246, 0.5);
+}
+.sbtn.nav-btn.primary:hover:not(:disabled) { background: var(--secondary-shadow); border-color: var(--secondary-shadow); }
+.sbtn.nav-btn.primary:disabled { box-shadow: none; }
 
 /* step stage banner */
 .viz-stage {
@@ -454,13 +624,10 @@ h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14p
   background: #1E1E2E; border-radius: 16px; overflow: hidden;
   border: 1px solid #2D2E3E; box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.15); margin-bottom: 22px;
 }
-.ed-shell textarea {
-  width: 100%; min-height: 360px; resize: vertical; border: none; outline: none;
-  background: #1E1E2E; color: #CBD5E1; font-family: var(--mono); font-size: 13px;
-  font-variant-ligatures: none;
-  line-height: 1.7; padding: 20px; display: block;
+.ed-shell app-code-editor {
+  display: block; width: 100%; min-height: 360px; height: 420px;
+  resize: vertical; overflow: auto;
 }
-.ed-shell textarea[readonly] { color: #94A3B8; }
 .ed-foot { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #181825; border-top: 1px solid #2D2E3E; }
 .ed-foot .spacer { flex: 1; }
 .hint-text { font-size: 12px; font-weight: 500; color: #64748B; }

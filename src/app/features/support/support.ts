@@ -1,11 +1,13 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router } from '@angular/router';
 import { parseApiError } from '../../core/utils/api-error';
 
 import { PaymentService } from '../../core/services/payment.service';
 import { PaymentMethodType } from '../../core/models/payment.models';
+import { LanguageService } from '../../core/services/language.service';
+import { Topbar } from '../../shared/topbar/topbar';
 
 interface Tier {
   cups: number;
@@ -17,13 +19,14 @@ interface Tier {
 @Component({
   selector: 'app-support',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, Topbar],
   templateUrl: './support.html',
   styleUrl: './support.css',
 })
 export class Support {
   private service = inject(PaymentService);
   private router = inject(Router);
+  lang = inject(LanguageService);
 
   readonly tiers: Tier[] = [
     { cups: 1, label: '☕',       amountCents: 2900,  price: 'EGP 29'  },
@@ -31,10 +34,10 @@ export class Support {
     { cups: 5, label: '☕×5',     amountCents: 14900, price: 'EGP 149' },
   ];
 
-  readonly methods: { value: PaymentMethodType; label: string; icon: string }[] = [
-    { value: 'CARD',   label: 'Card',          icon: '💳' },
-    { value: 'WALLET', label: 'Mobile Wallet', icon: '📱' },
-    { value: 'KIOSK',  label: 'Kiosk (Aman)',  icon: '🏪' },
+  readonly methods = [
+    { value: 'CARD' as PaymentMethodType,   labelKey: 'supMethodCard' as const,   icon: '💳' },
+    { value: 'WALLET' as PaymentMethodType, labelKey: 'supMethodWallet' as const, icon: '📱' },
+    { value: 'KIOSK' as PaymentMethodType,  labelKey: 'supMethodKiosk' as const,  icon: '🏪' },
   ];
 
   selectedTier = signal<Tier>(this.tiers[0]);
@@ -62,11 +65,11 @@ export class Support {
 
   pay(): void {
     if (!this.firstName || !this.lastName || !this.email) {
-      this.error.set('Please fill in your name and email.');
+      this.error.set(this.lang.t('supErrFillNameEmail'));
       return;
     }
     if (this.method() === 'WALLET' && !this.phoneNumber) {
-      this.error.set('Phone number is required for mobile wallet.');
+      this.error.set(this.lang.t('supErrPhoneRequired'));
       return;
     }
 

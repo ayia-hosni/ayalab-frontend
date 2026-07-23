@@ -1,24 +1,16 @@
-<div class="topbar">
-  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
-  <span class="spacer"></span>
-  <nav class="nav-links">
-    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
-    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-  </nav>
-</div>
+<app-topbar [showCoffeeBtn]="false"></app-topbar>
 
 <div class="wrap">
   <div class="support-card">
 
     <div class="hero">
       <span class="big-cup">☕</span>
-      <h1>Buy me a coffee!</h1>
-      <p class="tagline">If AyaLab helped you crack an interview or learn something new, a coffee keeps the problems coming ❤️</p>
+      <h1>{{ lang.t('supTitle') }}</h1>
+      <p class="tagline">{{ lang.t('supTagline') }}</p>
     </div>
 
     <!-- Tier picker -->
-    <div class="section-label">How many coffees?</div>
+    <div class="section-label">{{ lang.t('supHowMany') }}</div>
     <div class="tiers">
       @for (tier of tiers; track tier.cups) {
         <button
@@ -33,7 +25,7 @@
     </div>
 
     <!-- Payment method -->
-    <div class="section-label">Pay with</div>
+    <div class="section-label">{{ lang.t('supPayWith') }}</div>
     <div class="methods">
       @for (m of methods; track m.value) {
         <button
@@ -42,7 +34,7 @@
           (click)="selectMethod(m.value)"
           type="button">
           <span>{{ m.icon }}</span>
-          <span>{{ m.label }}</span>
+          <span>{{ lang.t(m.labelKey) }}</span>
         </button>
       }
     </div>
@@ -51,21 +43,21 @@
     <div class="fields">
       <div class="field-row">
         <div class="field">
-          <label>First name *</label>
+          <label>{{ lang.t('supFirstName') }}</label>
           <input [(ngModel)]="firstName" placeholder="Ahmed" />
         </div>
         <div class="field">
-          <label>Last name *</label>
+          <label>{{ lang.t('supLastName') }}</label>
           <input [(ngModel)]="lastName" placeholder="Hassan" />
         </div>
       </div>
       <div class="field">
-        <label>Email *</label>
+        <label>{{ lang.t('supEmail') }}</label>
         <input [(ngModel)]="email" type="email" placeholder="ahmed@example.com" />
       </div>
       @if (showPhone) {
         <div class="field">
-          <label>Mobile number *</label>
+          <label>{{ lang.t('supPhone') }}</label>
           <input [(ngModel)]="phoneNumber" placeholder="01012345678" />
         </div>
       }
@@ -77,12 +69,12 @@
 
     <button class="pay-btn" (click)="pay()" [disabled]="loading()">
       @if (loading()) {
-        <span class="spinner"></span> Processing…
+        <span class="spinner"></span> {{ lang.t('supProcessing') }}
       } @else {
-        Send {{ selectedTier().cups }} coffee{{ selectedTier().cups > 1 ? 's' : '' }} · {{ selectedTier().price }}
+        {{ lang.t('supSend') }} {{ selectedTier().cups }} {{ selectedTier().cups > 1 ? lang.t('supCoffees') : lang.t('supCoffee') }} · {{ selectedTier().price }}
       }
     </button>
 
-    <p class="secure-note">🔒 Secured by Paymob · PCI-DSS compliant</p>
+    <p class="secure-note">{{ lang.t('supSecureNote') }}</p>
   </div>
 </div>

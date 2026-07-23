@@ -78,6 +78,16 @@
 .hdr-secure svg { opacity: 0.6; }
 .hdr-secure strong { color: rgba(255, 255, 255, 0.9); font-weight: 700; }
 
+.lang-toggle {
+  display: flex; background: rgba(255, 255, 255, 0.08); border-radius: 100px; padding: 3px;
+}
+.lang-toggle button {
+  font-family: inherit; font-size: 11px; font-weight: 700; padding: 5px 12px;
+  border-radius: 100px; border: none; background: transparent; color: rgba(255, 255, 255, 0.55);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.lang-toggle button.active { background: rgba(255, 255, 255, 0.92); color: #0B1F4A; }
+
 /* ══════════════════════════════════════
    MAIN LAYOUT
 ══════════════════════════════════════ */
@@ -813,3 +823,7 @@
 
   .pm-badge { height: 36px; font-size: 9.5px; }
 }
+
+/* ── RTL ─────────────────────────────────────────────── */
+:host-context([dir="rtl"]) .method-opt { text-align: right; }
+:host-context([dir="rtl"]) .field input.prefixed { padding-left: 0; padding-right: 12px; }

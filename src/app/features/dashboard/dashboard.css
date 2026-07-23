@@ -261,3 +261,6 @@ h1 {
 .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .page-info { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+
+/* ── RTL ─────────────────────────────────────────────── */
+:host-context([dir="rtl"]) .log-table thead th { text-align: right; }

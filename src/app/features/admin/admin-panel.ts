@@ -1,10 +1,11 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AdminService } from '../../core/services/admin.service';
 import { AdminProblemDetail, AdminProblemRequest, AdminTestCase } from '../../core/models/admin.models';
+import { LanguageService } from '../../core/services/language.service';
+import { Topbar } from '../../shared/topbar/topbar';
 
 const LANGS = ['javascript', 'python', 'java'];
 const VISUALIZER_TYPES = ['', 'POINTER_TRACE'];
@@ -25,12 +26,13 @@ function emptyRequest(): AdminProblemRequest {
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, Topbar],
   templateUrl: './admin-panel.html',
   styleUrl: './admin-panel.css',
 })
 export class AdminPanel implements OnInit {
   private svc = inject(AdminService);
+  lang = inject(LanguageService);
 
   problems  = signal<AdminProblemDetail[]>([]);
   loading   = signal(true);

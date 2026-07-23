@@ -1,48 +1,38 @@
-<div class="topbar">
-  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
-  <span class="spacer"></span>
-  <nav class="nav-links">
-    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
-    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
-    <a class="nav-link" routerLink="/admin/lessons" routerLinkActive="active">Lesson Admin</a>
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-  </nav>
-  <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
-</div>
+<app-topbar extraNav="lessons"></app-topbar>
 
 <div class="wrap">
 
   <!-- Header -->
   <div class="page-head">
     <div>
-      <h1>🎮 Problem Admin</h1>
-      <p class="sub">Manage the problem catalogue — create, edit, and publish problems.</p>
+      <h1>{{ lang.t('apTitle') }}</h1>
+      <p class="sub">{{ lang.t('apSub') }}</p>
     </div>
-    <button class="btn-primary" (click)="openCreate()">＋ New Problem</button>
+    <button class="btn-primary" (click)="openCreate()">{{ lang.t('apNewProblem') }}</button>
   </div>
 
   <!-- KPI row -->
   <div class="kpi-row">
     <div class="kpi-card">
       <span class="kpi-icon">📋</span>
-      <div><div class="kpi-value">{{ total() }}</div><div class="kpi-label">Total Problems</div></div>
+      <div><div class="kpi-value">{{ total() }}</div><div class="kpi-label">{{ lang.t('apKpiTotal') }}</div></div>
     </div>
     <div class="kpi-card kpi-green">
       <span class="kpi-icon">✅</span>
-      <div><div class="kpi-value">{{ available() }}</div><div class="kpi-label">Published</div></div>
+      <div><div class="kpi-value">{{ available() }}</div><div class="kpi-label">{{ lang.t('apKpiPublished') }}</div></div>
     </div>
     <div class="kpi-card kpi-yellow">
       <span class="kpi-icon">🔒</span>
-      <div><div class="kpi-value">{{ total() - available() }}</div><div class="kpi-label">Hidden</div></div>
+      <div><div class="kpi-value">{{ total() - available() }}</div><div class="kpi-label">{{ lang.t('apKpiHidden') }}</div></div>
     </div>
     <div class="kpi-card kpi-purple">
       <span class="kpi-icon">🧩</span>
-      <div><div class="kpi-value">{{ problems().filter(p=>!!p.visualizerType).length }}</div><div class="kpi-label">With Sandbox</div></div>
+      <div><div class="kpi-value">{{ problems().filter(p=>!!p.visualizerType).length }}</div><div class="kpi-label">{{ lang.t('apKpiSandbox') }}</div></div>
     </div>
   </div>
 
   @if (error()) {
-    <div class="alert-error">⚠️ {{ error() }} <button (click)="load()">Retry</button></div>
+    <div class="alert-error">⚠️ {{ error() }} <button (click)="load()">{{ lang.t('apRetry') }}</button></div>
   }
 
   @if (loading()) {
@@ -58,14 +48,14 @@
       <table class="prob-table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Title</th>
-            <th>Slug</th>
-            <th>Difficulty</th>
-            <th>Tags</th>
-            <th>Sandbox</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>{{ lang.t('apThId') }}</th>
+            <th>{{ lang.t('apThTitle') }}</th>
+            <th>{{ lang.t('apThSlug') }}</th>
+            <th>{{ lang.t('apThDifficulty') }}</th>
+            <th>{{ lang.t('apThTags') }}</th>
+            <th>{{ lang.t('apThSandbox') }}</th>
+            <th>{{ lang.t('apThStatus') }}</th>
+            <th>{{ lang.t('apThActions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -98,15 +88,15 @@
               </td>
               <td class="cell-avail">
                 <span class="avail-pill" [class.avail-on]="p.available">
-                  {{ p.available ? '● Live' : '○ Hidden' }}
+                  {{ p.available ? lang.t('apLive') : lang.t('apHiddenPill') }}
                 </span>
               </td>
               <td class="cell-actions">
-                <button class="btn-edit" (click)="openEdit(p)">✏️ Edit</button>
+                <button class="btn-edit" (click)="openEdit(p)">{{ lang.t('apEdit') }}</button>
                 @if (deleteConfirm() === p.id) {
                   <span class="confirm-row">
-                    <button class="btn-del-confirm" (click)="doDelete(p.id)">Delete</button>
-                    <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+                    <button class="btn-del-confirm" (click)="doDelete(p.id)">{{ lang.t('apDelete') }}</button>
+                    <button class="btn-cancel" (click)="cancelDelete()">{{ lang.t('apCancel') }}</button>
                   </span>
                 } @else {
                   <button class="btn-del" (click)="confirmDelete(p.id)">🗑️</button>
@@ -115,7 +105,7 @@
             </tr>
           }
           @empty {
-            <tr><td colspan="8" class="empty-row">No problems yet — click "New Problem" to add one.</td></tr>
+            <tr><td colspan="8" class="empty-row">{{ lang.t('apEmptyRow') }}</td></tr>
           }
         </tbody>
       </table>

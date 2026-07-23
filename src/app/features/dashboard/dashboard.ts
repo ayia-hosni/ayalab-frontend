@@ -5,13 +5,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 
 import { DashboardService } from '../../core/services/dashboard.service';
 import {
   DashboardStats, PaymentLogEntry, Period, TimelinePoint,
 } from '../../core/models/dashboard.models';
+import { LanguageService } from '../../core/services/language.service';
+import { Topbar } from '../../shared/topbar/topbar';
 
 Chart.register(...registerables);
 
@@ -24,12 +25,13 @@ const METHOD_COLORS: Record<string, string> = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, Topbar],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   private svc = inject(DashboardService);
+  lang = inject(LanguageService);
 
   @ViewChild('lineCanvas') lineCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('doughnutCanvas') doughnutCanvas!: ElementRef<HTMLCanvasElement>;
@@ -46,10 +48,10 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   logTotalPages = signal(0);
   eventTypeFilter = '';
 
-  readonly periods: { value: Period; label: string }[] = [
-    { value: 'day',   label: '24h' },
-    { value: 'week',  label: '7d'  },
-    { value: 'month', label: '30d' },
+  readonly periods = [
+    { value: 'day' as Period,   labelKey: 'dashPeriodDay' as const },
+    { value: 'week' as Period,  labelKey: 'dashPeriodWeek' as const },
+    { value: 'month' as Period, labelKey: 'dashPeriodMonth' as const },
   ];
 
   readonly EVENT_TYPES = [

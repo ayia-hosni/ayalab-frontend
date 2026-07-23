@@ -103,6 +103,15 @@ code {
   cursor: pointer; text-decoration: none; transition: background 0.15s;
 }
 .topbar .coffee-btn:hover { background: #FDE68A; }
+.topbar .lang-toggle {
+  display: flex; background: #F1F5F9; border-radius: 100px; padding: 3px; margin-right: 4px;
+}
+.topbar .lang-toggle button {
+  font-family: var(--sans); font-size: 12px; font-weight: 700; padding: 6px 14px;
+  border-radius: 100px; border: none; background: transparent; color: var(--ink-3);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.topbar .lang-toggle button.active { background: var(--card); color: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
 
 .wrap { max-width: 1150px; margin: 0 auto; padding: 0 24px 60px; }
 

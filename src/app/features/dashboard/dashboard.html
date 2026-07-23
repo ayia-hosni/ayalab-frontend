@@ -1,23 +1,14 @@
-<div class="topbar">
-  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
-  <span class="spacer"></span>
-  <nav class="nav-links">
-    <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Problems</a>
-    <a class="nav-link" routerLink="/lessons" routerLinkActive="active">Lessons</a>
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-  </nav>
-  <a class="coffee-btn" routerLink="/support">☕ Buy me a coffee</a>
-</div>
+<app-topbar></app-topbar>
 
 <div class="wrap">
 
   <!-- Header + period selector -->
   <div class="page-head">
-    <h1>💳 Payment Dashboard</h1>
+    <h1>{{ lang.t('dashTitle') }}</h1>
     <div class="period-btns">
       @for (p of periods; track p.value) {
         <button class="period-btn" [class.active]="period() === p.value" (click)="setPeriod(p.value)">
-          {{ p.label }}
+          {{ lang.t(p.labelKey) }}
         </button>
       }
     </div>
@@ -38,35 +29,35 @@
         <span class="kpi-icon">📊</span>
         <div>
           <div class="kpi-value">{{ s.total }}</div>
-          <div class="kpi-label">Total Initiated</div>
+          <div class="kpi-label">{{ lang.t('dashKpiTotal') }}</div>
         </div>
       </div>
       <div class="kpi-card kpi-success">
         <span class="kpi-icon">✅</span>
         <div>
           <div class="kpi-value">{{ s.succeeded }}</div>
-          <div class="kpi-label">Completed</div>
+          <div class="kpi-label">{{ lang.t('dashKpiSuccess') }}</div>
         </div>
       </div>
       <div class="kpi-card kpi-failed">
         <span class="kpi-icon">❌</span>
         <div>
           <div class="kpi-value">{{ s.failed }}</div>
-          <div class="kpi-label">Failed</div>
+          <div class="kpi-label">{{ lang.t('dashKpiFailed') }}</div>
         </div>
       </div>
       <div class="kpi-card kpi-revenue">
         <span class="kpi-icon">💰</span>
         <div>
           <div class="kpi-value">{{ egp(s.totalRevenueCents) }}</div>
-          <div class="kpi-label">Revenue</div>
+          <div class="kpi-label">{{ lang.t('dashKpiRevenue') }}</div>
         </div>
       </div>
       <div class="kpi-card kpi-rate">
         <span class="kpi-icon">📈</span>
         <div>
           <div class="kpi-value">{{ s.successRate.toFixed(1) }}%</div>
-          <div class="kpi-label">Success Rate</div>
+          <div class="kpi-label">{{ lang.t('dashKpiRate') }}</div>
         </div>
       </div>
     </div>
@@ -74,13 +65,13 @@
     <!-- Charts -->
     <div class="charts-row">
       <div class="chart-card chart-wide">
-        <div class="chart-title">Payments over time</div>
+        <div class="chart-title">{{ lang.t('dashChartTimeline') }}</div>
         <div class="chart-body">
           <canvas #lineCanvas></canvas>
         </div>
       </div>
       <div class="chart-card chart-narrow">
-        <div class="chart-title">By method</div>
+        <div class="chart-title">{{ lang.t('dashChartByMethod') }}</div>
         <div class="chart-body">
           <canvas #doughnutCanvas></canvas>
         </div>
@@ -92,10 +83,10 @@
   <!-- Audit log table -->
   <div class="log-card">
     <div class="log-header">
-      <div class="log-title">🗂 Audit Log</div>
+      <div class="log-title">{{ lang.t('dashAuditLog') }}</div>
       <div class="log-filters">
         <select class="log-select" [(ngModel)]="eventTypeFilter" (ngModelChange)="applyFilter()">
-          <option value="">All events</option>
+          <option value="">{{ lang.t('dashAllEvents') }}</option>
           @for (t of EVENT_TYPES; track t) {
             <option [value]="t">{{ t }}</option>
           }
@@ -104,20 +95,20 @@
     </div>
 
     @if (logsLoading()) {
-      <div class="log-empty">Loading… ⏳</div>
+      <div class="log-empty">{{ lang.t('dashLoading') }}</div>
     } @else if (logs().length === 0) {
-      <div class="log-empty">No events yet. Make a payment to see logs here.</div>
+      <div class="log-empty">{{ lang.t('dashNoEvents') }}</div>
     } @else {
       <div class="log-table-wrap">
         <table class="log-table">
           <thead>
             <tr>
-              <th>Event</th>
-              <th>Ref</th>
-              <th>Method</th>
-              <th>Amount</th>
-              <th>Error</th>
-              <th>Time</th>
+              <th>{{ lang.t('dashThEvent') }}</th>
+              <th>{{ lang.t('dashThRef') }}</th>
+              <th>{{ lang.t('dashThMethod') }}</th>
+              <th>{{ lang.t('dashThAmount') }}</th>
+              <th>{{ lang.t('dashThError') }}</th>
+              <th>{{ lang.t('dashThTime') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -139,9 +130,9 @@
 
       <!-- Pagination -->
       <div class="pagination">
-        <button class="page-btn" [disabled]="logPage() === 0" (click)="loadLogs(logPage() - 1)">←</button>
-        <span class="page-info">Page {{ logPage() + 1 }} / {{ logTotalPages() }}</span>
-        <button class="page-btn" [disabled]="logPage() >= logTotalPages() - 1" (click)="loadLogs(logPage() + 1)">→</button>
+        <button class="page-btn" [disabled]="logPage() === 0" (click)="loadLogs(logPage() - 1)">{{ lang.isAr ? '→' : '←' }}</button>
+        <span class="page-info">{{ lang.t('dashPage') }} {{ logPage() + 1 }} / {{ logTotalPages() }}</span>
+        <button class="page-btn" [disabled]="logPage() >= logTotalPages() - 1" (click)="loadLogs(logPage() + 1)">{{ lang.isAr ? '←' : '→' }}</button>
       </div>
     }
   </div>
