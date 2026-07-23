@@ -47,7 +47,8 @@ jobs:
             set -euo pipefail
             cd /var/www/aya-lab/ayalab-frontend
 
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             docker compose pull
             docker compose up -d
             docker image prune -f
