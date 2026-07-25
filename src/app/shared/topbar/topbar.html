@@ -1,5 +1,5 @@
 <div class="topbar">
-  <a class="logo" routerLink="/"><span class="dots"><i></i><i></i><i></i></span> Aya Coding Lab 🧩</a>
+  <a class="logo" routerLink="/"><img src="assets/ayalab.png" alt="Aya Lab" class="logo-img" /></a>
   <span class="spacer"></span>
   <nav class="nav-links">
     <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">{{ lang.t('navProblems') }}</a>
@@ -11,6 +11,10 @@
     }
     <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">{{ lang.t('navDashboard') }}</a>
   </nav>
+  <div class="theme-toggle">
+    <button [class.active]="theme.theme() === 'light'" (click)="theme.set('light')" title="Light theme">☀️</button>
+    <button [class.active]="theme.theme() === 'dark'" (click)="theme.set('dark')" title="Dark theme">🌙</button>
+  </div>
   <div class="lang-toggle">
     <button [class.active]="lang.lang() === 'en'" (click)="lang.set('en')">EN</button>
     <button [class.active]="lang.lang() === 'ar'" (click)="lang.set('ar')">AR</button>
