@@ -37,6 +37,10 @@ interface LessonForm {
   titleAr: string;
   descriptionEn: string;
   descriptionAr: string;
+  sectionEn: string;
+  sectionAr: string;
+  categoryEn: string;
+  categoryAr: string;
   slides: SlideForm[];
 }
 
@@ -77,7 +81,10 @@ function emptySlideForm(ordinal: number): SlideForm {
 }
 
 function emptyLessonForm(ordinal: number): LessonForm {
-  return { ordinal, icon: '', titleEn: '', titleAr: '', descriptionEn: '', descriptionAr: '', slides: [] };
+  return {
+    ordinal, icon: '', titleEn: '', titleAr: '', descriptionEn: '', descriptionAr: '',
+    sectionEn: '', sectionAr: '', categoryEn: '', categoryAr: '', slides: [],
+  };
 }
 
 @Component({
@@ -140,6 +147,10 @@ export class AdminLessonsPanel implements OnInit {
       titleAr: l.titleAr,
       descriptionEn: l.descriptionEn,
       descriptionAr: l.descriptionAr,
+      sectionEn: l.sectionEn,
+      sectionAr: l.sectionAr,
+      categoryEn: l.categoryEn ?? '',
+      categoryAr: l.categoryAr ?? '',
       slides: l.slides.map(toSlideForm),
     });
     this.isEdit.set(true);
@@ -443,6 +454,10 @@ export class AdminLessonsPanel implements OnInit {
       this.saveError.set('Icon, English title, and Arabic title are required.');
       return;
     }
+    if (!f.sectionEn || !f.sectionAr) {
+      this.saveError.set('English and Arabic section are required.');
+      return;
+    }
     this.saving.set(true);
     this.saveError.set(null);
 
@@ -453,6 +468,10 @@ export class AdminLessonsPanel implements OnInit {
       titleAr: f.titleAr,
       descriptionEn: f.descriptionEn,
       descriptionAr: f.descriptionAr,
+      sectionEn: f.sectionEn,
+      sectionAr: f.sectionAr,
+      categoryEn: f.categoryEn.trim() || null,
+      categoryAr: f.categoryAr.trim() || null,
       slides: f.slides.map(toApiSlide),
     };
 

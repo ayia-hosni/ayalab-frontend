@@ -16,6 +16,10 @@ export interface Lesson {
   icon: string;
   title: BilingualText;
   description: BilingualText;
+  /** Topic group, e.g. "Linked Lists" — every lesson belongs to one. */
+  section: BilingualText;
+  /** Optional sub-tag within the section, e.g. "Insertion"; undefined means uncategorized. */
+  category?: BilingualText;
   slideCount: number;
 }
 

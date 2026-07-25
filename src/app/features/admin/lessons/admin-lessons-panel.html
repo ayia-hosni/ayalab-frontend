@@ -44,6 +44,7 @@
             <th>Icon</th>
             <th>Title (EN)</th>
             <th>Title (AR)</th>
+            <th>Section / Category</th>
             <th>{{ lang.t('alThSlides') }}</th>
             <th>{{ lang.t('alThActions') }}</th>
           </tr>
@@ -55,6 +56,9 @@
               <td class="cell-icon" [innerHTML]="l.icon"></td>
               <td class="cell-title"><span class="title-text">{{ l.titleEn }}</span></td>
               <td class="cell-title"><span class="title-text rtl">{{ l.titleAr }}</span></td>
+              <td class="cell-title">
+                {{ l.sectionEn }}@if (l.categoryEn) { <span class="title-text" style="color:var(--ink-3)"> · {{ l.categoryEn }}</span> }
+              </td>
               <td class="cell-slides">{{ l.slides.length }}</td>
               <td class="cell-actions">
                 <button class="btn-edit" (click)="openEdit(l)">{{ lang.t('apEdit') }}</button>
@@ -111,6 +115,28 @@
           <label class="form-field">
             <span>Title (AR) *</span>
             <input type="text" class="rtl-input" [value]="form().titleAr" (input)="updateField('titleAr', $any($event.target).value)" placeholder="مثال: أساسيات الـ Linked List" />
+          </label>
+        </div>
+
+        <div class="form-row two-col">
+          <label class="form-field">
+            <span>Section (EN) *</span>
+            <input type="text" [value]="form().sectionEn" (input)="updateField('sectionEn', $any($event.target).value)" placeholder="e.g. Linked Lists" />
+          </label>
+          <label class="form-field">
+            <span>Section (AR) *</span>
+            <input type="text" class="rtl-input" [value]="form().sectionAr" (input)="updateField('sectionAr', $any($event.target).value)" placeholder="مثال: القوائم المرتبطة" />
+          </label>
+        </div>
+
+        <div class="form-row two-col">
+          <label class="form-field">
+            <span>Category (EN) — optional</span>
+            <input type="text" [value]="form().categoryEn" (input)="updateField('categoryEn', $any($event.target).value)" placeholder="e.g. Insertion" />
+          </label>
+          <label class="form-field">
+            <span>Category (AR) — optional</span>
+            <input type="text" class="rtl-input" [value]="form().categoryAr" (input)="updateField('categoryAr', $any($event.target).value)" placeholder="مثال: الإضافة" />
           </label>
         </div>
 

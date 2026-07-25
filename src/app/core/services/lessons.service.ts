@@ -12,6 +12,10 @@ interface LessonSummaryDto {
   titleAr: string;
   descriptionEn: string;
   descriptionAr: string;
+  sectionEn: string;
+  sectionAr: string;
+  categoryEn: string | null;
+  categoryAr: string | null;
   slideCount: number;
 }
 
@@ -37,6 +41,8 @@ function toLesson(d: LessonSummaryDto): Lesson {
     icon: d.icon,
     title: { en: d.titleEn, ar: d.titleAr },
     description: { en: d.descriptionEn, ar: d.descriptionAr },
+    section: { en: d.sectionEn, ar: d.sectionAr },
+    category: d.categoryEn && d.categoryAr ? { en: d.categoryEn, ar: d.categoryAr } : undefined,
     slideCount: d.slideCount,
   };
 }

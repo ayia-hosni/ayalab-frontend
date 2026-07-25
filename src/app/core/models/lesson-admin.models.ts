@@ -19,6 +19,10 @@ export interface AdminLessonDetail {
   titleAr: string;
   descriptionEn: string;
   descriptionAr: string;
+  sectionEn: string;
+  sectionAr: string;
+  categoryEn: string | null;
+  categoryAr: string | null;
   slides: AdminSlide[];
 }
 
@@ -29,5 +33,9 @@ export interface AdminLessonRequest {
   titleAr: string;
   descriptionEn: string;
   descriptionAr: string;
+  sectionEn: string;
+  sectionAr: string;
+  categoryEn: string | null;
+  categoryAr: string | null;
   slides: AdminSlide[];
 }
