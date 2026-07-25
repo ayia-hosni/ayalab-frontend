@@ -39,28 +39,33 @@
   --primary-shadow: #8A3B3B; /* derived burnt-rose, for small TEXT — #F5CBCB itself has nowhere near enough contrast on white */
   --primary-light: #FBEFEF;
   --primary-border: #FFE2E2;
-  --secondary: #8B5CF6; /* derived — deep enough to carry white text on solid fills (buttons, active tabs/chips) the way the old #723EC3 did */
-  --secondary-shadow: #563371; /* derived, darker still — for small TEXT */
-  --secondary-light: #F1EDF6; /* derived pale tint */
-  --secondary-border: #C5B3D3; /* the palette's lavender swatch, used as-is */
+  /* Brand hue moved from dusty lavender (~274°) to a vivid blue-violet (258°,
+     matching #8B5CF6) — every derived/-shadow/-light/-border token below is
+     recomputed at H258 so nothing is left mismatched against the old hue. */
+  --secondary: #8B5CF6; /* deep + saturated enough to carry white text on solid fills (buttons, active tabs/chips) */
+  --secondary-shadow: #361386; /* darkened, same hue — for small TEXT (13:1 on white) */
+  --secondary-light: #F3EFFA; /* pale tint — pill/badge backgrounds */
+  --secondary-border: #B8A2EB; /* mid-tone — borders on white or on -light fills */
 
-  /* difficulty scale — a lavender severity ramp (lighter = easier, darker/
+  /* difficulty scale — a violet severity ramp (lighter = easier, darker/
      bolder = harder), shades of the single brand hue rather than a third
      color, so the whole app still holds to "max 2 colors total". */
   --easy: #10B981;
    --easy-shadow: #047857;
-  --easy-light: #F1EDF6;
-  --easy-border: #C5B3D3;
-  --medium: #a596af;
-  --medium-shadow: #46295C;
-  --medium-light: #E7DDEE;
-  --medium-border: #D3C3DF;
-  --hard: #653F83;
-  --hard-shadow: #3B2150;
-  --hard-light: #C5B3D3;
-  --hard-border: #8053A2;
+  --easy-light: #F3F0FA;
+  --easy-border: #BCACE2;
+  --medium: #957EC8;
+  --medium-shadow: #341E67;
+  --medium-light: #E7E1F4;
+  --medium-border: #A590D5;
+  --hard: #4A279B;
+  --hard-shadow: #261254;
+  --hard-light: #D0C4EE;
+  --hard-border: #7147D1;
 
-  /* pointer visualizer roles (Trace Game / Move the Pointer — light-only for now, see problem-detail.css) */
+  /* pointer visualizer roles (Trace Game / Move the Pointer — light-only for now, see problem-detail.css).
+     --curr is a deliberate third hue (sage), distinct from the brand ramp above,
+     so it reads clearly against --prev (rose) and --next (amber) in the SVG games. */
   --prev: #FB7185;
   --curr: #E4E8D6;
   --next: #FBBF24;
@@ -107,23 +112,23 @@
     --primary-shadow: #F3CECE;
     --primary-light: #422424;
     --primary-border: #6E3535;
-    --secondary: #8B5CF6;
-    --secondary-shadow: #E3D0F1;
-    --secondary-light: #301F3D;
-    --secondary-border: #503267;
+    --secondary: #9D7DE8;
+    --secondary-shadow: #DAD0F1;
+    --secondary-light: #2C2145;
+    --secondary-border: #533F83;
 
-    --easy: #D3C3DF;
-    --easy-shadow: #ECE0F5;
-    --easy-light: #2C1E3D;
-    --easy-border: #4A3660;
-    --medium: #A569D8;
-    --medium-shadow: #DDCBEB;
-    --medium-light: #352445;
-    --medium-border: #D3C3DF;
-    --hard: #8053A2;
-    --hard-shadow: #F1E7F9;
-    --hard-light: #3F2A50;
-    --hard-border: #6B4F87;
+    --easy: #B8ABD9;
+    --easy-shadow: #E1DAF1;
+    --easy-light: #2D2442;
+    --easy-border: #514077;
+    --medium: #8969D3;
+    --medium-shadow: #D6CDEA;
+    --medium-light: #312749;
+    --medium-border: #4A3B6D;
+    --hard: #6A41C8;
+    --hard-shadow: #E7E0F5;
+    --hard-light: #362B50;
+    --hard-border: #5C4691;
   }
 }
 :root[data-theme="dark"] {
@@ -145,23 +150,23 @@
   --primary-shadow: #F3CECE;
   --primary-light: #422424;
   --primary-border: #6E3535;
-  --secondary: #B88CD9;
-  --secondary-shadow: #E3D0F1;
-  --secondary-light: #301F3D;
-  --secondary-border: #503267;
+  --secondary: #9D7DE8;
+  --secondary-shadow: #DAD0F1;
+  --secondary-light: #2C2145;
+  --secondary-border: #533F83;
 
-  --easy: #D3C3DF;
-  --easy-shadow: #ECE0F5;
-  --easy-light: #2C1E3D;
-  --easy-border: #4A3660;
-  --medium: #A569D8;
-  --medium-shadow: #DDCBEB;
-  --medium-light: #352445;
-  --medium-border: #D3C3DF;
-  --hard: #8053A2;
-  --hard-shadow: #F1E7F9;
-  --hard-light: #3F2A50;
-  --hard-border: #6B4F87;
+  --easy: #B8ABD9;
+  --easy-shadow: #E1DAF1;
+  --easy-light: #2D2442;
+  --easy-border: #514077;
+  --medium: #8969D3;
+  --medium-shadow: #D6CDEA;
+  --medium-light: #312749;
+  --medium-border: #4A3B6D;
+  --hard: #6A41C8;
+  --hard-shadow: #E7E0F5;
+  --hard-light: #362B50;
+  --hard-border: #5C4691;
 }
 
 * { box-sizing: border-box; }

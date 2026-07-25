@@ -168,9 +168,9 @@
   white-space: nowrap;
 }
 .seg-btn:hover:not(.active) { background: var(--surface-3); color: var(--ink); }
-.seg-btn.active { color: var(--secondary-shadow); background: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15); }
+.seg-btn.active { color: #fff; background: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15); }
 
-.easy-seg.active   { background: var(--easy); }
+.easy-seg.active   { background: var(--easy); color: #fff; }
 .medium-seg.active { background: var(--medium-shadow); color: #fff; }
 .hard-seg.active   { background: var(--hard); color: #fff; }
 
@@ -218,7 +218,7 @@
   letter-spacing: 0.1px;
 }
 .chip:hover:not(.active) { color: var(--ink); background: var(--line); }
-.chip.active { background: var(--secondary); color: var(--secondary-shadow); box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.5); }
+.chip.active { background: var(--secondary); color: #fff; box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.5); }
 
 /* ── Table card ──────────────────────────────────────── */
 .table-card {
