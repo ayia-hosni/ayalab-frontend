@@ -89,10 +89,10 @@ h1 {
 }
 
 .kpi-total   .kpi-value { color: var(--ink); }
-.kpi-success .kpi-value { color: var(--easy); }
+.kpi-success .kpi-value { color: var(--easy-shadow); }
 .kpi-failed  .kpi-value { color: var(--hard); }
 .kpi-revenue .kpi-value { color: var(--primary); }
-.kpi-rate    .kpi-value { color: var(--secondary); }
+.kpi-rate    .kpi-value { color: var(--secondary-shadow); }
 
 /* ── Charts ── */
 .charts-row {
@@ -257,7 +257,7 @@ h1 {
   transition: all 0.12s;
   color: var(--ink-2);
 }
-.page-btn:hover:not(:disabled) { border-color: var(--secondary); color: var(--secondary); }
+.page-btn:hover:not(:disabled) { border-color: var(--secondary); color: var(--secondary-shadow); }
 .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .page-info { font-size: 13px; font-weight: 600; color: var(--ink-2); }

@@ -3,7 +3,7 @@
 .lesson-loading {
   padding: 80px 20px; text-align: center; font-size: 14px; font-weight: 600; color: var(--ink-3);
 }
-.lesson-loading a { color: var(--secondary); margin-left: 8px; }
+.lesson-loading a { color: var(--secondary-shadow); margin-left: 8px; }
 
 /* ── Topbar extras: breadcrumb + toggles ─────────────────────────────── */
 .breadcrumb {
@@ -13,7 +13,7 @@
   color: var(--ink-3); transition: background 0.15s;
 }
 .breadcrumb:hover { background: #E2E8F0; }
-.breadcrumb-current { color: var(--secondary); }
+.breadcrumb-current { color: var(--secondary-shadow); }
 .slide-counter {
   font-size: 11px; font-weight: 700; color: var(--ink-3);
   background: #F1F5F9; padding: 6px 14px; border-radius: 100px; white-space: nowrap;
@@ -26,7 +26,7 @@
   border-radius: 8px; border: none; background: transparent; color: var(--ink-3);
   cursor: pointer; transition: all 0.15s;
 }
-.toggle-group button.active { background: var(--card); color: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
+.toggle-group button.active { background: var(--card); color: var(--secondary-shadow); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
 
 /* ── Layout ───────────────────────────────────────────────────────────── */
 .lesson-wrap { padding-top: 28px; padding-bottom: 40px; }
@@ -55,7 +55,7 @@
   font-size: 10px; font-weight: 700; margin-top: 1px;
   background: #F1F5F9; color: var(--ink-3);
 }
-.sidebar-item.active .sidebar-num { background: var(--secondary); color: #fff; }
+.sidebar-item.active .sidebar-num { background: var(--secondary); color: var(--secondary-shadow); }
 .sidebar-title { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
 .sidebar-item.active .sidebar-title { color: var(--secondary-shadow); font-weight: 700; }
 .sidebar-title.rtl { font-family: 'Tajawal', sans-serif; }
@@ -69,7 +69,7 @@
 }
 @media (max-width: 640px) { .slide-card { padding: 24px 20px; } }
 
-.slide-kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--secondary); margin-bottom: 8px; }
+.slide-kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--secondary-shadow); margin-bottom: 8px; }
 .slide-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin: 0 0 24px; }
 
 .slide-visual { margin-bottom: 8px; }
@@ -101,8 +101,8 @@
 }
 .footer-btn:hover:not(:disabled) { background: #F8FAFC; }
 .footer-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.footer-btn.primary { background: var(--secondary); color: #fff; border-color: var(--secondary); }
-.footer-btn.primary:hover:not(:disabled) { background: var(--secondary-shadow); }
+.footer-btn.primary { background: var(--secondary); color: var(--secondary-shadow); border-color: var(--secondary); }
+.footer-btn.primary:hover:not(:disabled) { background: var(--secondary-shadow); color: #fff; }
 
 .footer-dots { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 40%; }
 @media (max-width: 700px) { .footer-dots { display: none; } }
@@ -111,4 +111,4 @@
 
 .footer-back-row { text-align: center; margin-top: 14px; }
 .back-to-lessons { font-size: 12px; font-weight: 700; color: var(--ink-3); transition: color 0.15s; }
-.back-to-lessons:hover { color: var(--secondary); }
+.back-to-lessons:hover { color: var(--secondary-shadow); }

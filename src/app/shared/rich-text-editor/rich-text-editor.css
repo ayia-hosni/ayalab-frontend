@@ -19,7 +19,7 @@
   border: 1px solid transparent; background: var(--card); color: var(--ink-2);
   transition: all 0.12s;
 }
-.rte-btn:hover { border-color: var(--secondary); color: var(--secondary); }
+.rte-btn:hover { border-color: var(--secondary); color: var(--secondary-shadow); }
 .rte-btn-ghost { margin-left: auto; color: var(--ink-3); }
 
 .rte-editor {
@@ -39,7 +39,7 @@
   background: #fff; border: 1px solid var(--line); border-radius: 4px;
   padding: 1px 5px; font-family: var(--mono, monospace); font-size: 13px;
 }
-.rte-editor a { color: var(--secondary); }
+.rte-editor a { color: var(--secondary-shadow); }
 
 .rte.rtl .rte-editor { direction: rtl; text-align: right; font-family: 'Tajawal', sans-serif; }
 .rte.rtl .rte-editor ul { padding-left: 0; padding-right: 20px; }

@@ -10,7 +10,7 @@
 }
 .lessons-kicker {
   font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-  color: var(--secondary); margin-bottom: 6px;
+  color: var(--secondary-shadow); margin-bottom: 6px;
 }
 .lessons-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin: 0 0 6px; }
 .lessons-sub { font-size: 14px; color: var(--ink-3); margin: 0; }
@@ -24,7 +24,24 @@
   border-radius: 8px; border: none; background: transparent; color: var(--ink-3);
   cursor: pointer; transition: all 0.15s;
 }
-.lang-toggle button.active { background: var(--card); color: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
+.lang-toggle button.active { background: var(--card); color: var(--secondary-shadow); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
+
+.section-block { margin-bottom: 8px; }
+.section-hdr {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 10px; margin-bottom: 16px;
+}
+.section-title { font-size: 18px; font-weight: 700; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
+
+.category-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat-chip {
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  padding: 7px 15px; border-radius: 100px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
+  cursor: pointer; transition: all 0.15s;
+}
+.cat-chip:hover:not(.active) { color: var(--ink); background: var(--line); }
+.cat-chip.active { background: var(--secondary); color: var(--secondary-shadow); border-color: var(--secondary); box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.5); }
 
 .lessons-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
@@ -38,15 +55,18 @@
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 .lesson-card:hover {
-  border-color: #DDD6FE;
-  box-shadow: 0 8px 24px -6px rgba(139, 92, 246, 0.18);
+  border-color: var(--line-heavy);
+  box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.12);
   transform: translateY(-2px);
 }
 
 .lesson-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+/* Deliberately neutral, not a purple-tinted box — every lesson had the exact
+   same colored wrapper regardless of content, which read as decorative
+   template filler rather than meaningful. The emoji itself carries the color. */
 .lesson-icon {
   width: 48px; height: 48px; border-radius: 12px;
-  background: var(--secondary-light); border: 1px solid #DDD6FE;
+  background: var(--surface-2); border: 1px solid var(--line);
   display: flex; align-items: center; justify-content: center; font-size: 22px;
 }
 .lesson-count {
@@ -56,9 +76,9 @@
 }
 .lesson-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-3); margin-bottom: 4px; }
 .lesson-title { font-size: 17px; font-weight: 700; color: var(--ink); margin: 0 0 8px; transition: color 0.15s; }
-.lesson-card:hover .lesson-title { color: var(--secondary); }
+.lesson-card:hover .lesson-title { color: var(--secondary-shadow); }
 .lesson-desc { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin: 0 0 16px; }
-.lesson-start { font-size: 13px; font-weight: 700; color: var(--secondary); }
+.lesson-start { font-size: 13px; font-weight: 700; color: var(--secondary-shadow); }
 
 .rtl { direction: rtl; text-align: right; font-family: 'Tajawal', sans-serif; }
 

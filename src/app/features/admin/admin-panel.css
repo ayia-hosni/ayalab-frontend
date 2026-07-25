@@ -33,9 +33,9 @@ h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--in
 .kpi-icon { font-size: 26px; }
 .kpi-value { font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1; }
 .kpi-label { font-size: 11px; font-weight: 700; color: var(--ink-3); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
-.kpi-green .kpi-value { color: var(--easy); }
-.kpi-yellow .kpi-value { color: var(--medium); }
-.kpi-purple .kpi-value { color: var(--secondary); }
+.kpi-green .kpi-value { color: var(--easy-shadow); }
+.kpi-yellow .kpi-value { color: var(--medium-shadow); }
+.kpi-purple .kpi-value { color: var(--secondary-shadow); }
 
 /* ── Alerts ─────────────────────────────────────────────────────── */
 .alert-error {
@@ -100,7 +100,7 @@ h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--in
   border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
   transition: all 0.12s;
 }
-.btn-edit:hover { border-color: var(--secondary); color: var(--secondary); }
+.btn-edit:hover { border-color: var(--secondary); color: var(--secondary-shadow); }
 .btn-del {
   font-family: var(--sans); font-size: 13px;
   padding: 6px 10px; border-radius: 100px; cursor: pointer;
@@ -117,10 +117,10 @@ h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--in
 .btn-primary {
   font-family: var(--sans); font-size: 13px; font-weight: 600;
   padding: 11px 24px; border-radius: 100px; cursor: pointer;
-  border: none; background: var(--secondary); color: #fff;
+  border: none; background: var(--secondary); color: var(--secondary-shadow);
   transition: all 0.12s;
 }
-.btn-primary:hover { background: var(--secondary-shadow); }
+.btn-primary:hover { background: var(--secondary-shadow); color: #fff; }
 .btn-primary:active { transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -297,7 +297,7 @@ h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--in
   text-transform: lowercase;
   transition: all 0.12s;
 }
-.lang-tab.active { background: var(--secondary); color: #fff; border-color: var(--secondary); }
+.lang-tab.active { background: var(--secondary); color: var(--secondary-shadow); border-color: var(--secondary); }
 
 .code-area {
   font-family: var(--mono, monospace);
@@ -321,10 +321,10 @@ h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--in
 .btn-add-case {
   font-family: var(--sans); font-size: 12px; font-weight: 600;
   padding: 6px 16px; border-radius: 100px; cursor: pointer;
-  border: 1px solid var(--secondary); background: var(--card); color: var(--secondary);
+  border: 1px solid var(--secondary); background: var(--card); color: var(--secondary-shadow);
   transition: all 0.12s;
 }
-.btn-add-case:hover { background: var(--secondary); color: #fff; }
+.btn-add-case:hover { background: var(--secondary); color: var(--secondary-shadow); }
 .empty-hint { color: var(--ink-3); font-size: 13px; font-weight: 500; margin: 0; }
 
 /* ── Test case cards ─────────────────────────────────────────────── */

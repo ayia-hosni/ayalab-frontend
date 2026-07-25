@@ -66,18 +66,21 @@
 .dbl-count {
   font-size: 12px;
   font-weight: 500;
-  color: var(--ink-3);
+  color: var(--ink-2);
   padding: 2px 8px;
   border-radius: 6px;
 }
 .dbl-count b { font-weight: 700; color: var(--ink); }
-.diff-bar-meta:has(.easy-text)   .dbl-count { background: var(--easy-light); }
-.diff-bar-meta:has(.medium-text) .dbl-count { background: var(--medium-light); }
-.diff-bar-meta:has(.hard-text)   .dbl-count { background: var(--hard-light); }
+/* Text color matches each pill's own -shadow token (not a flat --ink-3) —
+   the previous flat tertiary gray failed WCAG AA against every one of these
+   tinted backgrounds (as low as 2.14:1; needs 4.5:1). */
+.diff-bar-meta:has(.easy-text)   .dbl-count { background: var(--easy-light);   color: var(--easy-shadow); }
+.diff-bar-meta:has(.medium-text) .dbl-count { background: var(--medium-light); color: var(--medium-shadow); }
+.diff-bar-meta:has(.hard-text)   .dbl-count { background: var(--hard-light);   color: var(--hard-shadow); }
 .dbl-of { color: var(--ink-3); }
 .dbl-track {
   height: 8px;
-  background: #F1F5F9;
+  background: var(--surface-3);
   border-radius: 100px;
   overflow: hidden;
 }
@@ -110,7 +113,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #F8FAFC;
+  background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0 16px;
@@ -145,7 +148,7 @@
 /* Segmented control */
 .seg-group {
   display: flex;
-  background: #F8FAFC;
+  background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 3px;
@@ -164,12 +167,12 @@
   transition: all 0.12s;
   white-space: nowrap;
 }
-.seg-btn:hover:not(.active) { background: #EEF2F6; color: var(--ink); }
-.seg-btn.active { color: #fff; background: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15); }
+.seg-btn:hover:not(.active) { background: var(--surface-3); color: var(--ink); }
+.seg-btn.active { color: var(--secondary-shadow); background: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15); }
 
 .easy-seg.active   { background: var(--easy); }
-.medium-seg.active { background: var(--medium-shadow); }
-.hard-seg.active   { background: var(--hard); }
+.medium-seg.active { background: var(--medium-shadow); color: #fff; }
+.hard-seg.active   { background: var(--hard); color: #fff; }
 
 /* Clear button */
 .clear-btn {
@@ -207,15 +210,15 @@
   font-weight: 600;
   padding: 6px 13px;
   border-radius: 100px;
-  background: #F1F5F9;
+  background: var(--surface-3);
   color: var(--ink-2);
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.12s;
   letter-spacing: 0.1px;
 }
-.chip:hover:not(.active) { color: var(--ink); background: #E2E8F0; }
-.chip.active { background: var(--secondary); color: #fff; box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.5); }
+.chip:hover:not(.active) { color: var(--ink); background: var(--line); }
+.chip.active { background: var(--secondary); color: var(--secondary-shadow); box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.5); }
 
 /* ── Table card ──────────────────────────────────────── */
 .table-card {
@@ -244,7 +247,7 @@
   font-size: 12px;
   font-weight: 500;
   color: var(--ink-2);
-  background: #F1F5F9;
+  background: var(--surface-3);
   padding: 4px 10px;
   border-radius: 100px;
 }
@@ -257,11 +260,11 @@ thead th {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: var(--ink-3);
+  color: var(--ink-2); /* was --ink-3: 2.56:1, fails WCAG AA for scannable column labels */
   text-align: left;
   padding: 14px 20px;
   border-bottom: 1px solid var(--line);
-  background: #FAFBFC;
+  background: var(--surface-2);
 }
 thead th.center { text-align: center; }
 
@@ -277,15 +280,15 @@ thead th.center { text-align: center; }
   transition: background 0.1s;
 }
 .problem-row:last-child { border-bottom: none; }
-.problem-row:hover { background: #FAFAFC; }
-.problem-row:hover .title-text { color: var(--secondary); }
+.problem-row:hover { background: var(--surface-2); }
+.problem-row:hover .title-text { color: var(--secondary-shadow); }
 
 tbody td { padding: 15px 20px; }
 
 .td-num {
   font-size: 13px;
   font-weight: 500;
-  color: var(--ink-3);
+  color: var(--ink-2); /* was --ink-3: 2.56:1, fails WCAG AA */
 }
 .td-status {
   padding-right: 4px !important;
@@ -297,7 +300,7 @@ tbody td { padding: 15px 20px; }
   display: block;
   margin: 0 auto;
 }
-.status-ico.solved   { color: var(--easy); }
+.status-ico.solved   { color: var(--easy-shadow); }
 .status-ico.attempted { color: var(--primary); }
 
 .td-title { width: auto; }
@@ -318,8 +321,8 @@ tbody td { padding: 15px 20px; }
   padding: 2px 8px;
   border-radius: 6px;
   background: var(--secondary-light);
-  color: var(--secondary);
-  border: 1px solid #DDD6FE;
+  color: var(--secondary-shadow);
+  border: 1px solid var(--secondary-border);
   vertical-align: middle;
 }
 
@@ -332,9 +335,14 @@ tbody td { padding: 15px 20px; }
   letter-spacing: 0.4px;
   padding: 2px 8px;
   border-radius: 6px;
-  background: var(--primary-light);
-  color: var(--primary-shadow);
-  border: 1px solid #FDE68A;
+  /* Deliberately neutral/slate, not the amber family — it used to reuse
+     --primary-light/-shadow, which visually collided with the Medium
+     difficulty pill sitting right next to it in the same row. --card (not
+     --surface-3) is required here: --ink-2 on --surface-3 is only 4.34:1,
+     just under WCAG AA; on --card it's 4.76:1. */
+  background: var(--card);
+  color: var(--ink-2);
+  border: 1px solid var(--line-heavy);
   vertical-align: middle;
 }
 
