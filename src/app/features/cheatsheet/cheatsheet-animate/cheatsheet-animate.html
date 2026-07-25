@@ -1,0 +1,103 @@
+<app-topbar></app-topbar>
+
+<div class="wrap">
+
+  <div class="page-hdr">
+    <h1 class="page-title">{{ lang.t('csTitle') }}</h1>
+    <a class="grid-view-btn" [routerLink]="['/cheatsheet']" [queryParams]="{ lang: cheatLang() }">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      {{ lang.t('caGridView') }}
+    </a>
+  </div>
+
+  @if (notFound()) {
+    <div class="empty-card">{{ lang.t('csNotFound') }}</div>
+  } @else {
+    <div class="layout">
+
+      <aside class="sidebar">
+        <div class="seg-group lang-seg">
+          <button class="seg-btn" [class.active]="cheatLang() === 'php'" (click)="setLang('php')">🐘 PHP</button>
+          <button class="seg-btn" [class.active]="cheatLang() === 'java'" (click)="setLang('java')">☕ Java</button>
+        </div>
+
+        <div class="search-box">
+          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+            type="text"
+            [placeholder]="lang.t('csSearchPlaceholder')"
+            [ngModel]="search()"
+            (ngModelChange)="search.set($event)">
+        </div>
+
+        <div class="tag-row">
+          <button class="chip" [class.active]="activeCategory() === null" (click)="setCategory(null)">{{ lang.t('csAllCategories') }}</button>
+          @for (cat of categories(); track cat) {
+            <button class="chip" [class.active]="activeCategory() === cat" (click)="setCategory(cat)">{{ categoryLabel(cat) }}</button>
+          }
+        </div>
+
+        <div class="fn-list">
+          @if (filtered().length === 0) {
+            <div class="empty-small">{{ lang.t('csNoMatch') }}</div>
+          }
+          @for (f of filtered(); track f.slug) {
+            <button class="fn-item" [class.active]="fn()?.slug === f.slug" (click)="select(f)">
+              <span class="fn-item-name">{{ f.name }}</span>
+              <span class="fn-item-cat">{{ categoryLabel(f.category) }}</span>
+            </button>
+          }
+        </div>
+      </aside>
+
+      <main class="stage-wrap">
+        @if (fn(); as f) {
+          @for (row of [f]; track row.slug + '_' + playKey()) {
+
+            <div class="stage-hero">
+              <div class="stage-hero-top">
+                <span class="lang-chip" [class.php]="f.lang === 'php'" [class.java]="f.lang === 'java'">
+                  {{ f.lang === 'php' ? '🐘 PHP' : '☕ Java' }}
+                </span>
+                <span class="cat-chip">{{ categoryLabel(f.category) }}</span>
+                <button class="replay-btn" (click)="replay()">{{ lang.t('caReplay') }}</button>
+              </div>
+              <h1 class="sig-pill">{{ f.name }}</h1>
+              <code class="sig-code">{{ f.signature }}</code>
+            </div>
+
+            <div class="stage">
+              <div class="stage-panel">
+                <span class="stage-lbl">{{ lang.t('csExample') }}</span>
+                <pre class="code-block">@for (line of exampleLines(); track $index) {<span class="code-line" [style.animation-delay.ms]="exampleDelay($index)">{{ line }}</span>}</pre>
+              </div>
+
+              <div class="stage-flow" [style.animation-delay.ms]="runDelay()">
+                <span class="flow-dot"></span>
+                <span class="flow-dot"></span>
+                <span class="flow-dot"></span>
+                <svg class="flow-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M13 5l7 7-7 7M5 12h14"/>
+                </svg>
+              </div>
+
+              <div class="stage-panel">
+                <span class="stage-lbl">{{ lang.t('csOutput') }}</span>
+                <pre class="output-block">@for (line of outputLines(); track $index) {<span class="code-line out" [style.animation-delay.ms]="outputDelay($index)">{{ line }}</span>}</pre>
+              </div>
+            </div>
+
+            <p class="stage-desc" [style.animation-delay.ms]="descDelay()" [dir]="lang.isAr ? 'rtl' : 'ltr'">
+              {{ lang.pick(f.description) }}
+            </p>
+
+          }
+        }
+      </main>
+
+    </div>
+  }
+
+</div>

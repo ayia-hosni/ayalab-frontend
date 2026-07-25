@@ -51,5 +51,30 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/lessons/lesson-viewer/lesson-viewer').then((m) => m.LessonViewer),
   },
+  {
+    path: 'cheatsheet',
+    loadComponent: () =>
+      import('./features/cheatsheet/cheatsheet-list/cheatsheet-list').then((m) => m.CheatsheetList),
+  },
+  {
+    path: 'cheatsheet/animate/:lang/:slug',
+    loadComponent: () =>
+      import('./features/cheatsheet/cheatsheet-animate/cheatsheet-animate').then((m) => m.CheatsheetAnimate),
+  },
+  {
+    path: 'cheatsheet/animate/:lang',
+    loadComponent: () =>
+      import('./features/cheatsheet/cheatsheet-animate/cheatsheet-animate').then((m) => m.CheatsheetAnimate),
+  },
+  {
+    path: 'cheatsheet/animate',
+    loadComponent: () =>
+      import('./features/cheatsheet/cheatsheet-animate/cheatsheet-animate').then((m) => m.CheatsheetAnimate),
+  },
+  {
+    path: 'cheatsheet/:lang/:slug',
+    loadComponent: () =>
+      import('./features/cheatsheet/cheatsheet-detail/cheatsheet-detail').then((m) => m.CheatsheetDetail),
+  },
   { path: '**', redirectTo: '' },
 ];

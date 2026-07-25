@@ -215,8 +215,15 @@ const DICT = {
   alThActions: { en: 'Actions', ar: 'إجراءات' },
 
   // lessons list
+  llPageKicker: { en: 'Learn', ar: 'اتعلمي' },
+  llPageTitle: { en: 'Lessons', ar: 'الدروس' },
   llCouldNotReach: { en: 'Could not reach the server.', ar: 'مقدرناش نوصل للسيرفر.' },
   llRetry: { en: 'Retry', ar: 'حاول تاني' },
+  llAllCategories: { en: 'All', ar: 'الكل' },
+  llCheatsheetSectionTitle: { en: 'Language Reference', ar: 'مرجع اللغات' },
+  llCheatsheetPhpDesc: { en: 'Essential PHP built-in functions for solving DSA problems.', ar: 'أهم الدوال الجاهزة في PHP لحل مسائل الـ DSA.' },
+  llCheatsheetJavaDesc: { en: 'Essential Java built-in functions for solving DSA problems.', ar: 'أهم الدوال الجاهزة في Java لحل مسائل الـ DSA.' },
+  llOpenCheatsheet: { en: 'Open cheat sheet →', ar: 'افتحي المرجع ←' },
 
   // lesson viewer
   lvLoading: { en: 'Loading lesson…', ar: 'بيتحمّل الدرس…' },
@@ -224,14 +231,36 @@ const DICT = {
   lvBackToLessons: { en: 'Back to Lessons', ar: 'ارجع للدروس' },
 
   // problem detail
-  pdTraceGame: { en: '🎮 Trace Game', ar: '🎮 لعبة التتبع' },
-  pdBothSolutions: { en: '📽️ Both Solutions', ar: '📽️ الحلّان' },
-  pdMovePointer: { en: '🖱️ Move the Pointer', ar: '🖱️ حرّك المؤشر' },
-  pdSolutionOnly: { en: '💻 Solution', ar: '💻 الحل' },
-  pdSolutionLabel: { en: '💻 Solution', ar: '💻 الحل' },
+  pdTraceGame: { en: 'Trace Game', ar: 'لعبة التتبع' },
+  pdBothSolutions: { en: 'Both Solutions', ar: 'الحلّان' },
+  pdMovePointer: { en: 'Move the Pointer', ar: 'حرّك المؤشر' },
+  pdSolutionOnly: { en: 'Solution', ar: 'الحل' },
+  pdSolutionLabel: { en: 'Solution', ar: 'الحل' },
   pdReset: { en: '↺ Reset', ar: '↺ إعادة تعيين' },
   pdRunTests: { en: '▶ Run Tests', ar: '▶ شغّل الاختبارات' },
   pdSubmit: { en: '🚀 Submit', ar: '🚀 إرسال' },
+
+  // cheat sheet
+  csTitle: { en: '🧠 Built-in Function Cheat Sheet', ar: '🧠 مرجع الدوال الجاهزة' },
+  csSubtitle: {
+    en: 'The PHP and Java built-ins you\'ll actually reach for solving DSA problems — cross-linked so you can jump between languages.',
+    ar: 'الدوال الجاهزة في PHP وJava اللي هتحتاجها فعلاً وانتي بتحلي مسائل الـ DSA — مربوطة ببعض عشان تقدري تقفزي بين اللغتين.',
+  },
+  csSearchPlaceholder: { en: 'Search functions…', ar: 'دوري على دالة…' },
+  csAllCategories: { en: 'All Categories', ar: 'كل الفئات' },
+  csClear: { en: 'Clear', ar: 'مسح' },
+  csClearFilters: { en: 'Clear filters', ar: 'امسح الفلاتر' },
+  csItems: { en: 'functions', ar: 'دالة' },
+  csNoMatch: { en: 'No functions match your filters', ar: 'مفيش دوال مطابقة للفلاتر دي' },
+  csNotFound: { en: 'Function not found.', ar: 'الدالة مش موجودة.' },
+  csBackToList: { en: 'Back to Cheat Sheet', ar: 'ارجع لمرجع الدوال' },
+  csSignature: { en: 'Signature', ar: 'التوقيع' },
+  csDescription: { en: 'Description', ar: 'الوصف' },
+  csExample: { en: 'Example', ar: 'مثال' },
+  csOutput: { en: 'Output', ar: 'الناتج' },
+  csEquivalentIn: { en: 'Equivalent in', ar: 'المكافئ في' },
+  caReplay: { en: '↻ Replay', ar: '↻ إعادة التشغيل' },
+  caGridView: { en: 'Grid View', ar: 'عرض الشبكة' },
 } satisfies Record<string, Entry>;
 
 export type TKey = keyof typeof DICT;

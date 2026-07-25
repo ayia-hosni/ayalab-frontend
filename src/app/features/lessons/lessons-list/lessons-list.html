@@ -3,8 +3,8 @@
 <div class="wrap">
   <div class="lessons-head">
     <div>
-      <div class="lessons-kicker">Data Structures &amp; Algorithms</div>
-      <h1 class="lessons-title">Linked List</h1>
+      <div class="lessons-kicker">{{ lang.t('llPageKicker') }}</div>
+      <h1 class="lessons-title">{{ lang.t('llPageTitle') }}</h1>
       <p class="lessons-sub">{{ lang.lang() === 'en' ? 'Pick a lesson to start.' : 'اختاري درس عشان تبدئي.' }}</p>
     </div>
   </div>
@@ -20,19 +20,61 @@
       }
     </div>
   } @else {
-    <div class="lessons-grid">
-      @for (l of lessons(); track l.id; let i = $index) {
-        <a class="lesson-card" [routerLink]="['/lessons', l.id]">
+
+    @for (section of sections(); track section.key) {
+      <div class="section-block">
+        <div class="section-hdr">
+          <h2 class="section-title" [class.rtl]="lang.isAr">{{ lang.pick(section.section) }}</h2>
+          @if (section.categories.length > 0) {
+            <div class="category-chips">
+              <button class="cat-chip" [class.active]="activeCategoryOf(section) === null" (click)="setCategory(section, null)">{{ lang.t('llAllCategories') }}</button>
+              @for (cat of section.categories; track cat.en) {
+                <button class="cat-chip" [class.active]="activeCategoryOf(section) === cat.en" (click)="setCategory(section, cat.en)">{{ lang.pick(cat) }}</button>
+              }
+            </div>
+          }
+        </div>
+        <div class="lessons-grid">
+          @for (l of visibleLessons(section); track l.id; let i = $index) {
+            <a class="lesson-card" [routerLink]="['/lessons', l.id]">
+              <div class="lesson-card-top">
+                <div class="lesson-icon" [innerHTML]="l.icon"></div>
+                <span class="lesson-count">{{ l.slideCount }} {{ lang.lang() === 'en' ? 'slides' : 'شريحة' }}</span>
+              </div>
+              <div class="lesson-num">{{ lang.lang() === 'en' ? 'Lesson ' + (i + 1) : 'الدرس ' + (i + 1) }}</div>
+              <h3 class="lesson-title" [class.rtl]="lang.isAr">{{ lang.pick(l.title) }}</h3>
+              <p class="lesson-desc" [class.rtl]="lang.isAr" [innerHTML]="lang.pick(l.description)"></p>
+              <span class="lesson-start">{{ lang.lang() === 'en' ? 'Start lesson →' : 'ابدأ الدرس ←' }}</span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Cheat Sheet — its own section here, not lesson data from the API;
+         cards link out to the standalone animated cheat sheet pages. -->
+    <div class="section-block">
+      <div class="section-hdr">
+        <h2 class="section-title" [class.rtl]="lang.isAr">{{ lang.t('llCheatsheetSectionTitle') }}</h2>
+      </div>
+      <div class="lessons-grid">
+        <a class="lesson-card" routerLink="/cheatsheet/animate/php">
           <div class="lesson-card-top">
-            <div class="lesson-icon" [innerHTML]="l.icon"></div>
-            <span class="lesson-count">{{ l.slideCount }} {{ lang.lang() === 'en' ? 'slides' : 'شريحة' }}</span>
+            <div class="lesson-icon">🐘</div>
           </div>
-          <div class="lesson-num">{{ lang.lang() === 'en' ? 'Lesson ' + (i + 1) : 'الدرس ' + (i + 1) }}</div>
-          <h3 class="lesson-title" [class.rtl]="lang.isAr">{{ lang.pick(l.title) }}</h3>
-          <p class="lesson-desc" [class.rtl]="lang.isAr" [innerHTML]="lang.pick(l.description)"></p>
-          <span class="lesson-start">{{ lang.lang() === 'en' ? 'Start lesson →' : 'ابدأ الدرس ←' }}</span>
+          <h3 class="lesson-title" [class.rtl]="lang.isAr">PHP</h3>
+          <p class="lesson-desc" [class.rtl]="lang.isAr">{{ lang.t('llCheatsheetPhpDesc') }}</p>
+          <span class="lesson-start">{{ lang.t('llOpenCheatsheet') }}</span>
         </a>
-      }
+        <a class="lesson-card" routerLink="/cheatsheet/animate/java">
+          <div class="lesson-card-top">
+            <div class="lesson-icon">☕</div>
+          </div>
+          <h3 class="lesson-title" [class.rtl]="lang.isAr">Java</h3>
+          <p class="lesson-desc" [class.rtl]="lang.isAr">{{ lang.t('llCheatsheetJavaDesc') }}</p>
+          <span class="lesson-start">{{ lang.t('llOpenCheatsheet') }}</span>
+        </a>
+      </div>
     </div>
   }
 </div>

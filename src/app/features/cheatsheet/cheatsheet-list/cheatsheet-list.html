@@ -1,0 +1,69 @@
+<app-topbar></app-topbar>
+
+<div class="wrap">
+
+  <div class="cs-hero">
+    <h1>{{ lang.t('csTitle') }}</h1>
+    <p>{{ lang.t('csSubtitle') }}</p>
+  </div>
+
+  <div class="filters-bar">
+    <div class="seg-group lang-seg">
+      <button class="seg-btn" [class.active]="cheatLang() === 'php'" (click)="setLang('php')">🐘 PHP</button>
+      <button class="seg-btn" [class.active]="cheatLang() === 'java'" (click)="setLang('java')">☕ Java</button>
+    </div>
+
+    <div class="search-box">
+      <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        [placeholder]="lang.t('csSearchPlaceholder')"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)">
+    </div>
+
+    @if (hasActiveFilters()) {
+      <button class="clear-btn" (click)="reset()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        {{ lang.t('csClear') }}
+      </button>
+    }
+  </div>
+
+  <div class="tag-row">
+    <button class="chip" [class.active]="activeCategory() === null" (click)="setCategory(null)">{{ lang.t('csAllCategories') }}</button>
+    @for (cat of categories(); track cat) {
+      <button class="chip" [class.active]="activeCategory() === cat" (click)="setCategory(cat)">{{ categoryLabel(cat) }}</button>
+    }
+  </div>
+
+  <div class="count-row">
+    <b>{{ filtered().length }}</b> / {{ functions().length }} {{ lang.t('csItems') }}
+  </div>
+
+  @if (filtered().length === 0) {
+    <div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-ico">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 16.318A4.486 4.486 0 0 0 12 15a4.486 4.486 0 0 0-3.182 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z"/>
+      </svg>
+      <p>{{ lang.t('csNoMatch') }}</p>
+      <button class="clear-btn outline" (click)="reset()">{{ lang.t('csClearFilters') }}</button>
+    </div>
+  } @else {
+    <div class="fn-grid">
+      @for (fn of filtered(); track fn.slug) {
+        <button class="fn-card" (click)="open(fn.slug)">
+          <div class="fn-card-top">
+            <span class="fn-name">{{ fn.name }}</span>
+            <span class="fn-cat">{{ categoryLabel(fn.category) }}</span>
+          </div>
+          <p class="fn-summary">{{ summaryOf(fn) }}</p>
+          <code class="fn-sig">{{ fn.signature }}</code>
+        </button>
+      }
+    </div>
+  }
+
+</div>

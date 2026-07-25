@@ -1,0 +1,59 @@
+<app-topbar></app-topbar>
+
+<div class="wrap">
+  @if (notFound()) {
+    <div class="empty-card">
+      {{ lang.t('csNotFound') }}
+      <a routerLink="/cheatsheet">{{ lang.t('csBackToList') }}</a>
+    </div>
+  } @else if (fn(); as f) {
+
+    <a class="back-link" [routerLink]="['/cheatsheet']" [queryParams]="{ lang: f.lang }">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      {{ lang.t('csBackToList') }}
+    </a>
+
+    <div class="fn-hero">
+      <div class="fn-hero-top">
+        <span class="lang-chip" [class.php]="f.lang === 'php'" [class.java]="f.lang === 'java'">
+          {{ f.lang === 'php' ? '🐘 PHP' : '☕ Java' }}
+        </span>
+        <span class="cat-chip">{{ categoryLabel(f.category) }}</span>
+      </div>
+      <h1>{{ f.name }}</h1>
+      <p class="summary" [dir]="lang.isAr ? 'rtl' : 'ltr'">{{ lang.pick(f.summary) }}</p>
+    </div>
+
+    <div class="fn-body">
+      <section class="card">
+        <h2>{{ lang.t('csSignature') }}</h2>
+        <code class="sig-block">{{ f.signature }}</code>
+      </section>
+
+      <section class="card">
+        <h2>{{ lang.t('csDescription') }}</h2>
+        <p class="desc" [dir]="lang.isAr ? 'rtl' : 'ltr'">{{ lang.pick(f.description) }}</p>
+      </section>
+
+      <section class="card">
+        <h2>{{ lang.t('csExample') }}</h2>
+        <pre class="code-block">{{ f.example }}</pre>
+        <div class="output-row">
+          <span class="output-lbl">{{ lang.t('csOutput') }}</span>
+          <code class="output-val">{{ f.output }}</code>
+        </div>
+      </section>
+
+      @if (equivalent(); as eq) {
+        <section class="card equiv-card" (click)="goToEquivalent()">
+          <div class="equiv-hdr">
+            <span class="equiv-lbl">{{ lang.t('csEquivalentIn') }} {{ eq.lang === 'php' ? 'PHP' : 'Java' }}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+          <div class="equiv-name">{{ eq.name }}</div>
+          <p class="equiv-summary" [dir]="lang.isAr ? 'rtl' : 'ltr'">{{ lang.pick(eq.summary) }}</p>
+        </section>
+      }
+    </div>
+  }
+</div>
