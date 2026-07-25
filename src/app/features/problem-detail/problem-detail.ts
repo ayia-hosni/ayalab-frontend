@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 
 import { ProblemService } from '../../core/services/problem.service';
 import {
@@ -15,6 +15,10 @@ import { Topbar } from '../../shared/topbar/topbar';
 import { CodeEditor } from '../../shared/code-editor/code-editor';
 
 type Lang = 'javascript' | 'python' | 'java';
+type TabId = 2 | 6 | 8 | 9;
+
+const TAB_TO_SLUG: Record<TabId, string> = { 6: 'solution', 9: 'move-pointer', 8: 'both-solutions', 2: 'trace-game' };
+const SLUG_TO_TAB: Record<string, TabId> = { solution: 6, 'move-pointer': 9, 'both-solutions': 8, 'trace-game': 2 };
 
 @Component({
   selector: 'app-problem-detail',
@@ -26,13 +30,14 @@ type Lang = 'javascript' | 'python' | 'java';
 export class ProblemDetail implements OnInit {
   private service = inject(ProblemService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   siteLang = inject(LanguageService);
 
   problem = signal<ProblemDetailModel | null>(null);
   loading = signal<boolean>(true);
   notFound = signal<boolean>(false);
 
-  activeTab = signal<2 | 6 | 8 | 9>(6);
+  activeTab = signal<TabId>(6);
   lang = signal<Lang>('javascript');
 
   code = signal<string>('');
@@ -54,7 +59,9 @@ export class ProblemDetail implements OnInit {
     this.service.get(slug).subscribe({
       next: (p) => {
         this.problem.set(p);
-        this.activeTab.set(6);
+        const tabParam = this.route.snapshot.queryParamMap.get('tab');
+        const requestedTab = tabParam ? SLUG_TO_TAB[tabParam] : undefined;
+        this.activeTab.set(requestedTab && (requestedTab === 6 || p.hasVisualizer) ? requestedTab : 6);
         if (p.starterCode && Object.keys(p.starterCode).length > 0) {
           this.starter = p.starterCode;
           this.code.set(this.starter['javascript'] ?? '');
@@ -68,7 +75,15 @@ export class ProblemDetail implements OnInit {
     });
   }
 
-  showTab(n: 2 | 6 | 8 | 9): void { this.activeTab.set(n); }
+  showTab(n: TabId): void {
+    this.activeTab.set(n);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: n === 6 ? null : TAB_TO_SLUG[n] },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   showLang(l: Lang): void {
     this.lang.set(l);

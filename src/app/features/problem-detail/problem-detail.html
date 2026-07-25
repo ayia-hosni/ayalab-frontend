@@ -7,7 +7,7 @@
 } @else if (problem(); as p) {
 
 <!-- ── Persistent problem hero ── -->
-<div class="problem-hero-wrap">
+<div class="problem-hero-wrap" [class]="p.difficulty">
   <a class="hero-back-btn" routerLink="/" title="Back to problems">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
   </a>
@@ -15,14 +15,11 @@
   <div class="problem-hero-body">
     <h1 class="problem-hero-title">{{ p.title }}</h1>
     <div class="problem-hero-badges">
-      <span class="diff" [class]="p.difficulty">{{ p.difficulty }}</span>
+      <span class="diff" [class]="p.difficulty"><i class="diff-dot"></i>{{ p.difficulty }}</span>
       <span class="acc-stat"><span class="acc-check">✓</span>{{ p.acceptance.toFixed(1) }}% accepted</span>
       @for (t of p.tags; track t) { <span class="tagpill">{{ t }}</span> }
     </div>
   </div>
-  @if (p.hasVisualizer) {
-    <span class="hero-viz-badge">✨ Visualizer</span>
-  }
 </div>
 
 <div class="tabs">
@@ -39,21 +36,21 @@
   <!-- ============ TAB 9: Move the Pointer ============ -->
   @if (activeTab() === 9 && p.hasVisualizer) {
   <div class="panel panel--sandbox">
-    <app-move-pointer></app-move-pointer>
+    <app-move-pointer [problemSlug]="p.slug"></app-move-pointer>
   </div>
   }
 
   <!-- ============ TAB 8: Both Solutions (slides) ============ -->
   @if (activeTab() === 8 && p.hasVisualizer) {
   <div class="panel panel--sandbox">
-    <app-solution-slides></app-solution-slides>
+    <app-solution-slides [problemSlug]="p.slug"></app-solution-slides>
   </div>
   }
 
   <!-- ============ TAB 2: Linked List Game ============ -->
   @if (activeTab() === 2 && p.hasVisualizer) {
   <div class="panel panel--sandbox">
-    <app-linked-list-game></app-linked-list-game>
+    <app-linked-list-game [problemSlug]="p.slug"></app-linked-list-game>
   </div>
   }
 
@@ -61,7 +58,7 @@
   @if (activeTab() === 6) {
   <div class="panel game-split-panel">
     <div class="code-col">
-      <div class="prose prose--inset" [innerHTML]="p.description"></div>
+      <div class="prose prose--inset" [class.rtl]="siteLang.isAr && p.descriptionAr" [innerHTML]="(siteLang.isAr && p.descriptionAr) ? p.descriptionAr : p.description"></div>
 
       <div class="lang-switch">
         <button class="lang-btn" [class.active]="lang() === 'javascript'" (click)="showLang('javascript')">💛 JavaScript</button>
