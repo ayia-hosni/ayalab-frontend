@@ -15,6 +15,8 @@ export interface ProblemSummary {
 
 export interface ProblemDetail extends ProblemSummary {
   description: string | null;
+  /** Arabic translation of `description`; null when not yet translated. */
+  descriptionAr: string | null;
   /** Starter code per language, e.g. { javascript: '…', python: '…', java: '…' }. */
   starterCode: Record<string, string> | null;
 }
