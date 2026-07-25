@@ -1,6 +1,8 @@
 // @ts-nocheck
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { RotateCcw, CheckCircle, XCircle, Sparkles, MousePointer2 } from 'lucide-react';
+import { POINTER_COLORS as VAR_COLORS, POINTER_TEXT_COLORS as VAR_TEXT_COLORS } from './pointer-colors';
+import { ArrowMarker, ScopeVariableBadge, NodeValueBox } from './game-ui';
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -128,13 +130,11 @@ function displayChain(links, startHints) {
 const nodeX  = (i) => 40 + i * 110;
 const nodeCx = (i) => nodeX(i) + 26;
 
-const VAR_COLORS      = { head: '#8B95A6', prev: '#FF5252', curr: '#00D2D3', next: '#FECA57', p: 'var(--secondary)' };
-const VAR_TEXT_COLORS = { head: '#FFF',    prev: '#FFF',    curr: '#FFF',    next: '#7A5000',  p: '#FFF' };
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
 
-export default function MovePointer() {
-  const [technique, setTechnique] = useState('iterative');
+export default function MovePointer({ initialTechnique, onTechniqueChange } = {}) {
+  const [technique, setTechnique] = useState(initialTechnique === 'recursive' ? 'recursive' : 'iterative');
   const [pointers, setPointers] = useState({ iterative: { ...INITIAL_ITERATIVE }, recursive: { ...INITIAL_RECURSIVE } });
   const [stepIdx, setStepIdx] = useState({ iterative: 0, recursive: 0 });
   const [lastStep, setLastStep] = useState({ iterative: null, recursive: null });
@@ -142,6 +142,22 @@ export default function MovePointer() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [feedback, setFeedback] = useState({ show: false, message: '', type: '' });
   const svgRef = useRef(null);
+  const wrapperRef = useRef(null);
+  const draggingRef = useRef(null);
+  draggingRef.current = dragging;
+
+  // touch-action:none keeps most browsers from panning while a drag is in progress, but it
+  // isn't reliably honored everywhere — React also attaches touchmove listeners passively by
+  // default, so a synthetic onTouchMove handler couldn't preventDefault anyway. A native,
+  // non-passive listener is the belt-and-suspenders fix that actually stops the page from
+  // scrolling out from under a finger mid-drag.
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const onTouchMove = (e) => { if (draggingRef.current) e.preventDefault(); };
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', onTouchMove);
+  }, []);
 
   const { initial, steps, code, lineFor, prelude, epilogue, preludeAfter } = CONFIG[technique];
   const pts = pointers[technique];
@@ -206,9 +222,23 @@ export default function MovePointer() {
     setDragging(null);
   };
 
-  const handleGlobalPointerUp = () => { if (dragging) setDragging(null); };
+  // Touch-originated pointer events keep targeting wherever the drag *started* (the handle),
+  // never wherever the finger currently is — unlike mouse, there's no automatic retargeting
+  // to the element under the pointer. So the per-target onPointerUp handlers below (which
+  // work fine for mouse) never fire on touch; this bubbled-up fallback does the same hit-test
+  // manually via elementFromPoint against the drop targets' data-drop-id.
+  const handleGlobalPointerUp = (e) => {
+    if (!dragging) return;
+    if (e?.pointerType === 'touch') {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const dropEl = el?.closest('[data-drop-id]');
+      if (dropEl) { handlePointerUp(e, dropEl.getAttribute('data-drop-id')); return; }
+    }
+    setDragging(null);
+  };
+  const handleGlobalPointerCancel = () => setDragging(null);
 
-  const switchTechnique = (t) => { setTechnique(t); setDragging(null); setFeedback({ show: false, message: '', type: '' }); };
+  const switchTechnique = (t) => { setTechnique(t); setDragging(null); setFeedback({ show: false, message: '', type: '' }); onTechniqueChange?.(t); };
 
   const handleReset = () => {
     setPointers(prev => ({ ...prev, [technique]: { ...CONFIG[technique].initial } }));
@@ -264,8 +294,8 @@ export default function MovePointer() {
   };
 
   return (
-    <div style={{ fontFamily: 'var(--sans)', color: 'var(--ink)', padding: '24px 24px 48px', userSelect: 'none', WebkitUserSelect: 'none' }}
-      onPointerMove={handlePointerMove} onPointerUp={handleGlobalPointerUp} onMouseLeave={handleGlobalPointerUp}>
+    <div ref={wrapperRef} style={{ fontFamily: 'var(--sans)', color: 'var(--ink)', padding: '24px 24px 48px', userSelect: 'none', WebkitUserSelect: 'none' }}
+      onPointerMove={handlePointerMove} onPointerUp={handleGlobalPointerUp} onPointerCancel={handleGlobalPointerCancel} onMouseLeave={handleGlobalPointerCancel}>
       <div style={{ maxWidth: 1150, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         {/* ── HEADER ──────────────────────────────────────────────────────── */}
@@ -276,7 +306,7 @@ export default function MovePointer() {
         }}>
           <div>
             <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>🖱️</span> Move the Pointer
+              Move the Pointer
             </h1>
             <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: 'var(--ink-2)' }}>
               Drag the highlighted pointer yourself — the code lights up once you get it right
@@ -314,9 +344,11 @@ export default function MovePointer() {
           .mp-btn-press:active { transform: translateY(2px) !important; }
           @keyframes mp-line-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
           .mp-line-in { animation: mp-line-in 0.35s ease; }
+          .mp-two-col { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 20px; align-items: start; }
+          @media (max-width: 900px) { .mp-two-col { grid-template-columns: 1fr; } }
         `}</style>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,3fr)', gap: 20, alignItems: 'start' }}>
+        <div className="mp-two-col">
 
           {/* ── LEFT: CODE + HINT ────────────────────────────────────────────── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative' }}>
@@ -414,16 +446,16 @@ export default function MovePointer() {
               <div style={{ overflowX: 'auto' }}>
                 <svg ref={svgRef} width={Math.max(N, chain.length) * 110 + 80} height="260" style={{ display: 'block', margin: '0 auto' }}>
                   <defs>
-                    <marker id="mp-ah" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#B2BEC3" /></marker>
-                    <marker id="mp-ah-drag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FECA57" /></marker>
+                    <ArrowMarker id="mp-ah" color="#B2BEC3" />
+                    <ArrowMarker id="mp-ah-drag" color="#FECA57" />
                   </defs>
 
                   {/* null endpoints — also valid drop targets */}
-                  <g onPointerUp={(e) => handlePointerUp(e, 'null')}>
+                  <g onPointerUp={(e) => handlePointerUp(e, 'null')} data-drop-id="null">
                     <rect x="0" y="130" width="40" height="52" fill="transparent" />
                     <text x="20" y="156" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="#B2BEC3">∅</text>
                   </g>
-                  <g onPointerUp={(e) => handlePointerUp(e, 'null')}>
+                  <g onPointerUp={(e) => handlePointerUp(e, 'null')} data-drop-id="null">
                     <rect x={nodeX(chain.length - 1) + 58} y="130" width="40" height="52" fill="transparent" />
                     <text x={nodeX(chain.length - 1) + 78} y="156" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="#B2BEC3">∅</text>
                   </g>
@@ -459,17 +491,11 @@ export default function MovePointer() {
                     const draggableHere = canDrag(String(value));
                     return (
                       <g key={origIdx} style={{ transition: 'transform 0.5s' }} transform={`translate(${nodeX(i)},130)`}>
-                        <rect x="0" y="0" width="52" height="52" rx="18"
-                          onPointerUp={(e) => handlePointerUp(e, String(value))}
-                          fill={isActive ? '#FFF3CD' : '#FFF'} stroke={isActive ? '#FECA57' : 'var(--line-heavy)'}
-                          strokeWidth={isActive ? 4 : 3} style={{ cursor: 'default' }} />
-                        <text x="26" y="26" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="20" fill="var(--ink)" style={{ pointerEvents: 'none' }}>
-                          {value}
-                        </text>
+                        <NodeValueBox y={0} value={value} active={isActive} dropId={String(value)} onPointerUp={(e) => handlePointerUp(e, String(value))} />
                         {draggableHere && (
                           <circle cx="52" cy="26" r="8" fill="var(--primary)" stroke="#FFF" strokeWidth="2"
                             onPointerDown={(e) => handlePointerDown(e, String(value))}
-                            style={{ cursor: 'grab', filter: 'drop-shadow(0 0 4px rgba(255,159,67,0.6))' }} />
+                            style={{ cursor: 'grab', touchAction: 'none', filter: 'drop-shadow(0 0 4px rgba(255,159,67,0.6))' }} />
                         )}
                       </g>
                     );
@@ -480,26 +506,13 @@ export default function MovePointer() {
                   {varList.map((varName) => {
                     const { cx, hasTarget, targetPos } = varInfo(varName);
                     const varX = cx - 28;
-                    const draggableHere = canDrag(varName);
                     return (
-                      <g key={varName} style={{ transition: 'transform 0.5s' }} transform={`translate(${varX},0)`}>
-                        {hasTarget ? (
-                          <line x1="28" y1="42" x2={nodeCx(targetPos) - varX} y2="130"
-                            stroke={VAR_COLORS[varName]} strokeWidth="2.5" markerEnd="url(#mp-ah)" style={{ transition: 'all 0.5s' }} />
-                        ) : (
-                          <g>
-                            <path d="M 28 42 L 28 70" stroke={VAR_COLORS[varName]} strokeWidth="2.5" strokeDasharray="4 3" fill="none" markerEnd="url(#mp-ah)" />
-                            <text x="28" y="84" textAnchor="middle" fontSize="11" fontWeight="900" fill={VAR_COLORS[varName]} fontFamily="var(--mono)">null</text>
-                          </g>
-                        )}
-                        <rect x="0" y="20" width="56" height="22" rx="8" fill={VAR_COLORS[varName]} />
-                        <text x="28" y="35" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="13" fill={VAR_TEXT_COLORS[varName]} style={{ pointerEvents: 'none' }}>{varName}</text>
-                        {draggableHere && (
-                          <circle cx="28" cy="50" r="9" fill="#FECA57" stroke="#FFF" strokeWidth="2"
-                            onPointerDown={(e) => handlePointerDown(e, varName)}
-                            style={{ cursor: 'grab', filter: 'drop-shadow(0 0 5px rgba(254,202,87,0.7))' }} />
-                        )}
-                      </g>
+                      <ScopeVariableBadge key={varName}
+                        x={varX} label={varName}
+                        color={VAR_COLORS[varName]} textColor={VAR_TEXT_COLORS[varName]}
+                        hasTarget={hasTarget} targetX={nodeCx(targetPos) - varX}
+                        draggable={canDrag(varName)} onDragStart={(e) => handlePointerDown(e, varName)}
+                        markerId="mp-ah" />
                     );
                   })}
 

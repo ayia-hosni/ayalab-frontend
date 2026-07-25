@@ -1,6 +1,8 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { RotateCcw, CheckCircle, XCircle, Sparkles } from 'lucide-react';
+import { POINTER_COLORS, POINTER_TEXT_COLORS } from './pointer-colors';
+import { ArrowMarker, PointerBadge, NodeValueBox } from './game-ui';
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -167,8 +169,8 @@ const nodeCx = (i) => nodeX(i) + 26;
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
 
-export default function LinkedListGame() {
-  const [technique, setTechnique] = useState('iterative');
+export default function LinkedListGame({ initialTechnique, onTechniqueChange } = {}) {
+  const [technique, setTechnique] = useState(initialTechnique === 'recursive' ? 'recursive' : 'iterative');
 
   const [gameState, setGameState] = useState({ iterative: 'coding', recursive: 'coding' }); // 'coding' | 'visualizing'
   const [userCode, setUserCode] = useState({ iterative: blankUserCode('iterative'), recursive: blankUserCode('recursive') });
@@ -187,7 +189,7 @@ export default function LinkedListGame() {
   const displayPos = (origIdx) => origIdx === null || origIdx === undefined ? null : chain.indexOf(origIdx);
   const arrowExists = (displayIdx) => displayIdx < chain.length - 1 && step.links[chain[displayIdx]] === chain[displayIdx + 1];
 
-  const switchTechnique = (t) => { setTechnique(t); setFeedback({ show: false, message: '', type: '' }); };
+  const switchTechnique = (t) => { setTechnique(t); setFeedback({ show: false, message: '', type: '' }); onTechniqueChange?.(t); };
 
   const handleSelect = (option) => {
     if (!isCoding || !currentChallenge) return;
@@ -239,7 +241,7 @@ export default function LinkedListGame() {
         }}>
           <div>
             <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
-              🎮 Trace Game
+              Trace Game
             </h1>
             <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: 'var(--ink-2)' }}>
               {isCoding ? `Step 1: Complete the ${technique} code.` : 'Step 2: Trace the execution, node by node.'}
@@ -276,9 +278,11 @@ export default function LinkedListGame() {
         <style>{`
           @keyframes llgFadeUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
           .llg-btn-press:active { transform: translateY(2px) !important; }
+          .llg-two-col { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 20px; align-items: start; }
+          @media (max-width: 900px) { .llg-two-col { grid-template-columns: 1fr; } }
         `}</style>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,3fr)', gap: 20, alignItems: 'start' }}>
+        <div className="llg-two-col">
 
           {/* ── LEFT: CODE + CHALLENGE ──────────────────────────────────────── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -416,12 +420,8 @@ export default function LinkedListGame() {
               <div style={{ overflowX: 'auto' }}>
                 <svg width={Math.max(N, chain.length) * 110 + 80} height="220" style={{ display: 'block', margin: '0 auto' }}>
                   <defs>
-                    <marker id="llg-ah" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                      <polygon points="0 0,8 3,0 6" fill="#B2BEC3" />
-                    </marker>
-                    <marker id="llg-ah-flip" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                      <polygon points="0 0,8 3,0 6" fill="#FF5252" />
-                    </marker>
+                    <ArrowMarker id="llg-ah" color="#B2BEC3" />
+                    <ArrowMarker id="llg-ah-flip" color="#FF5252" />
                   </defs>
 
                   <text x="20" y="105" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="#B2BEC3">∅</text>
@@ -455,12 +455,7 @@ export default function LinkedListGame() {
                     const isCurr = technique === 'iterative' ? step.curr === origIdx : step.headIdx === origIdx;
                     return (
                       <g key={origIdx} style={{ transition: 'transform 0.5s' }} transform={`translate(${nodeX(i)},0)`}>
-                        <rect x="0" y="85" width="52" height="52" rx="18"
-                          fill={isCurr ? '#FFF3CD' : '#FFF'} stroke={isCurr ? '#FECA57' : 'var(--line-heavy)'}
-                          strokeWidth={isCurr ? 4 : 3} />
-                        <text x="26" y="111" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="20" fill="var(--ink)">
-                          {VALUES[origIdx]}
-                        </text>
+                        <NodeValueBox y={85} value={VALUES[origIdx]} active={isCurr} />
                       </g>
                     );
                   })}
@@ -468,35 +463,23 @@ export default function LinkedListGame() {
                   {technique === 'iterative' ? (
                     <>
                       {displayPos(step.prev) !== null && (
-                        <g style={{ transition: 'transform 0.5s' }} transform={`translate(${nodeCx(displayPos(step.prev))},0)`}>
-                          <line x1="0" y1="23" x2="0" y2="75" stroke="#FF5252" strokeWidth="2.5" markerEnd="url(#llg-ah)" />
-                          <rect x="-24" y="1" width="48" height="22" rx="8" fill="#FF5252" />
-                          <text x="0" y="16" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="13" fill="#FFF">prev</text>
-                        </g>
+                        <PointerBadge cx={nodeCx(displayPos(step.prev))} width={48} label="prev"
+                          color={POINTER_COLORS.prev} textColor={POINTER_TEXT_COLORS.prev} markerId="llg-ah" />
                       )}
                       {/* `next` only means something while it's being saved/used — stale once we've slid past it */}
                       {(step.badge === 'save' || step.badge === 'flip') && step.next !== null && step.next !== 'null' && displayPos(step.next) !== null && (
-                        <g style={{ transition: 'transform 0.5s' }} transform={`translate(${nodeCx(displayPos(step.next)) + 20},0)`}>
-                          <line x1="0" y1="23" x2="0" y2="75" stroke="#FECA57" strokeWidth="2.5" markerEnd="url(#llg-ah)" />
-                          <rect x="-22" y="1" width="44" height="22" rx="8" fill="#FECA57" />
-                          <text x="0" y="16" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="13" fill="#7A5000">next</text>
-                        </g>
+                        <PointerBadge cx={nodeCx(displayPos(step.next)) + 20} width={44} label="next"
+                          color={POINTER_COLORS.next} textColor={POINTER_TEXT_COLORS.next} markerId="llg-ah" />
                       )}
                       {displayPos(step.curr) !== null && (
-                        <g style={{ transition: 'transform 0.5s' }} transform={`translate(${nodeCx(displayPos(step.curr))},0)`}>
-                          <line x1="0" y1="53" x2="0" y2="75" stroke="#00D2D3" strokeWidth="2.5" markerEnd="url(#llg-ah)" />
-                          <rect x="-24" y="31" width="48" height="22" rx="8" fill="#00D2D3" />
-                          <text x="0" y="46" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="13" fill="#FFF">curr</text>
-                        </g>
+                        <PointerBadge cx={nodeCx(displayPos(step.curr))} width={48} label="curr" side="below"
+                          color={POINTER_COLORS.curr} textColor={POINTER_TEXT_COLORS.curr} markerId="llg-ah" />
                       )}
                     </>
                   ) : (
                     displayPos(step.p) !== null && (
-                      <g style={{ transition: 'transform 0.5s' }} transform={`translate(${nodeCx(displayPos(step.p))},0)`}>
-                        <line x1="0" y1="23" x2="0" y2="75" stroke="var(--secondary)" strokeWidth="2.5" markerEnd="url(#llg-ah)" />
-                        <rect x="-14" y="1" width="28" height="22" rx="8" fill="var(--secondary)" />
-                        <text x="0" y="16" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="13" fill="#FFF">p</text>
-                      </g>
+                      <PointerBadge cx={nodeCx(displayPos(step.p))} width={28} label="p"
+                        color={POINTER_COLORS.p} textColor={POINTER_TEXT_COLORS.p} markerId="llg-ah" />
                     )
                   )}
                 </svg>
