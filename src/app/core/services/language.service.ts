@@ -42,6 +42,8 @@ const DICT = {
   plThTitle: { en: 'Title', ar: 'الاسم' },
   plThAcceptance: { en: 'Acceptance', ar: 'نسبة الحل' },
   plThDifficulty: { en: 'Difficulty', ar: 'الصعوبة' },
+  plThStatus: { en: 'Status', ar: 'الحالة' },
+  plBookmark: { en: 'Bookmark', ar: 'حفظ' },
   plVisualizerBadge: { en: 'Visualizer', ar: 'فيها Visualizer' },
   plComingSoon: { en: 'Coming Soon', ar: 'قريبًا' },
 

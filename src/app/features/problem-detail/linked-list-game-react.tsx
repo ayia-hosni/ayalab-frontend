@@ -55,14 +55,14 @@ const REC_CODE_LINES = [
 const ITER_BADGE_INFO = {
   init: { icon: '🎯', label: 'Initialize',      color: 'var(--secondary)' },
   save: { icon: '💾', label: 'Save the link',    color: 'var(--primary)'  },
-  flip: { icon: '🔄', label: 'Reverse the arrow', color: '#FF5252'        },
+  flip: { icon: '🔄', label: 'Reverse the arrow', color: 'var(--hard)'    },
   slide:{ icon: '➡️', label: 'Slide forward',    color: 'var(--easy)'    },
   done: { icon: '🏁', label: 'Return new head',  color: 'var(--secondary)' },
 };
 
 const REC_BADGE_INFO = {
   base: { icon: '🎯', label: 'Base case',        color: 'var(--secondary)' },
-  flip: { icon: '🔄', label: 'Reverse the arrow', color: '#FF5252'         },
+  flip: { icon: '🔄', label: 'Reverse the arrow', color: 'var(--hard)'     },
   brk:  { icon: '✂️', label: 'Clear old link',    color: 'var(--primary)'  },
   done: { icon: '🏁', label: 'Return new head',   color: 'var(--secondary)' },
 };
@@ -235,8 +235,8 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
 
         {/* ── HEADER ──────────────────────────────────────────────────────── */}
         <div style={{
-          background: 'linear-gradient(135deg, #FFF7F0 0%, #FFF0FF 55%, #F0F4FF 100%)',
-          borderRadius: 32, border: '4px solid #FFF', boxShadow: '0 8px 0 var(--shadow-color)',
+          background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%)',
+          borderRadius: 32, border: '4px solid var(--card)', boxShadow: '0 8px 0 var(--shadow-color)',
           padding: '16px 24px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 14,
         }}>
           <div>
@@ -249,7 +249,7 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
           </div>
 
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 0, background: '#F1F2F6', borderRadius: 100, padding: 3, border: '2px solid var(--line)' }}>
+            <div style={{ display: 'flex', gap: 0, background: 'var(--surface-3)', borderRadius: 100, padding: 3, border: '2px solid var(--line)' }}>
               {['iterative', 'recursive'].map(t => (
                 <button key={t} onClick={() => switchTechnique(t)} className="llg-btn-press" style={{
                   fontFamily: 'var(--sans)', fontSize: 13, fontWeight: 900,
@@ -287,9 +287,9 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
           {/* ── LEFT: CODE + CHALLENGE ──────────────────────────────────────── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            <div style={{ background: '#2D3436', borderRadius: 20, overflow: 'hidden', border: '4px solid #1E2528', boxShadow: '0 6px 0 rgba(0,0,0,0.12)' }}>
-              <div style={{ background: '#232A2D', padding: '8px 16px', borderBottom: '2px solid #1E2528' }}>
-                <span style={{ fontSize: 11, fontWeight: 900, color: '#B2BEC3', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div style={{ background: 'var(--editor-bg)', borderRadius: 20, overflow: 'hidden', border: '4px solid var(--editor-border)', boxShadow: '0 6px 0 rgba(0,0,0,0.12)' }}>
+              <div style={{ background: 'var(--editor-bg-2)', padding: '8px 16px', borderBottom: '2px solid var(--editor-border)' }}>
+                <span style={{ fontSize: 11, fontWeight: 900, color: 'var(--editor-ink-2)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   {technique === 'iterative' ? 'Iterative' : 'Recursive'} · reverseList.js
                 </span>
               </div>
@@ -302,13 +302,13 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
                   return (
                     <div key={index} style={{
                       display: 'flex', gap: 10, padding: '1px 10px', borderRadius: 6,
-                      background: isActive ? 'rgba(254,202,87,0.14)' : isCurrentBlank ? 'rgba(165,94,234,0.14)' : 'transparent',
-                      borderLeft: `3px solid ${isActive ? '#FECA57' : isCurrentBlank ? 'var(--secondary)' : 'transparent'}`,
+                      background: isActive ? 'color-mix(in srgb, var(--medium) 14%, transparent)' : isCurrentBlank ? 'color-mix(in srgb, var(--secondary) 14%, transparent)' : 'transparent',
+                      borderLeft: `3px solid ${isActive ? 'var(--medium)' : isCurrentBlank ? 'var(--secondary)' : 'transparent'}`,
                       whiteSpace: 'pre',
                     }}>
-                      <span style={{ color: '#5A6268', userSelect: 'none', width: 14, textAlign: 'right', flexShrink: 0 }}>{index + 1}</span>
+                      <span style={{ color: 'var(--editor-ink-2)', userSelect: 'none', width: 14, textAlign: 'right', flexShrink: 0 }}>{index + 1}</span>
                       <span style={{
-                        color: isCurrentBlank ? '#C9A0F7' : isFilled ? '#7CE0A8' : '#DFE6E9',
+                        color: isCurrentBlank ? 'var(--secondary)' : isFilled ? 'var(--easy)' : 'var(--editor-ink)',
                         fontStyle: isCurrentBlank ? 'italic' : 'normal',
                         fontWeight: isActive ? 900 : 500,
                       }}>
@@ -322,9 +322,9 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
 
             <div style={{ position: 'relative', minHeight: 180 }}>
               {isCoding && currentChallenge ? (
-                <div style={{ background: 'var(--card)', borderRadius: 24, border: '3px solid #EDD9FF', padding: '18px 20px', boxShadow: '0 5px 0 rgba(165,94,234,0.12)' }}>
+                <div style={{ background: 'var(--card)', borderRadius: 24, border: '3px solid var(--secondary-border)', padding: '18px 20px', boxShadow: '0 5px 0 color-mix(in srgb, var(--secondary) 12%, transparent)' }}>
                   <h3 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 900, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ background: '#F3ECFF', color: 'var(--secondary)', borderRadius: 10, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+                    <span style={{ background: 'var(--secondary-light)', color: 'var(--secondary)', borderRadius: 10, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
                       {currentChallenge.originalIndex + 1}
                     </span>
                     Complete the missing line
@@ -333,7 +333,7 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
                     {currentChallenge.options.map((opt, i) => (
                       <button key={i} onClick={() => handleSelect(opt)} className="llg-btn-press" style={{
                         textAlign: 'left', fontFamily: 'var(--mono)', fontSize: 12.5,
-                        background: '#F8F9FA', border: '2px solid var(--line)', borderRadius: 12,
+                        background: 'var(--surface-2)', border: '2px solid var(--line)', borderRadius: 12,
                         padding: '10px 14px', cursor: 'pointer', color: 'var(--ink-2)',
                         whiteSpace: 'pre',
                       }}>
@@ -343,11 +343,11 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
                   </div>
                 </div>
               ) : isCoding ? (
-                <div style={{ background: '#F8F9FA', borderRadius: 24, border: '3px solid var(--line)', padding: 24, textAlign: 'center', color: 'var(--ink-3)', fontWeight: 700 }}>
+                <div style={{ background: 'var(--surface-2)', borderRadius: 24, border: '3px solid var(--line)', padding: 24, textAlign: 'center', color: 'var(--ink-3)', fontWeight: 700 }}>
                   Code completed!
                 </div>
               ) : (
-                <div style={{ background: 'var(--card)', borderRadius: 24, border: `3px solid ${badge.color}33`, padding: '18px 20px', boxShadow: '0 5px 0 var(--shadow-color)' }}>
+                <div style={{ background: 'var(--card)', borderRadius: 24, border: `3px solid color-mix(in srgb, ${badge.color} 20%, transparent)`, padding: '18px 20px', boxShadow: '0 5px 0 var(--shadow-color)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                     <span style={{ fontSize: 20 }}>{badge.icon}</span>
                     <span style={{ fontSize: 13, fontWeight: 900, color: badge.color, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
@@ -373,7 +373,7 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 100,
                   fontWeight: 900, fontSize: 13, color: '#FFF', whiteSpace: 'nowrap',
-                  background: feedback.type === 'success' ? 'var(--easy)' : feedback.type === 'error' ? '#FF6B6B' : 'var(--secondary)',
+                  background: feedback.type === 'success' ? 'var(--easy)' : feedback.type === 'error' ? 'var(--hard)' : 'var(--secondary)',
                   boxShadow: '0 6px 16px rgba(0,0,0,0.18)',
                 }}>
                   {feedback.type === 'success' && <CheckCircle size={16} />}
@@ -398,7 +398,7 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
               </div>
               <button onClick={() => setVisStep(prev => ({ ...prev, [technique]: Math.max(0, prev[technique] - 1) }))} disabled={isCoding || visStep[technique] === 0} className="llg-btn-press" style={{
                 fontFamily: 'var(--sans)', fontSize: 13, fontWeight: 900, padding: '8px 14px', borderRadius: 100,
-                border: '2px solid var(--line)', background: '#F8F9FA', color: 'var(--ink-2)', cursor: 'pointer',
+                border: '2px solid var(--line)', background: 'var(--surface-2)', color: 'var(--ink-2)', cursor: 'pointer',
                 opacity: (isCoding || visStep[technique] === 0) ? 0.4 : 1,
               }}>◀ Back</button>
               <button onClick={() => setVisStep(prev => ({ ...prev, [technique]: Math.min(STEPS.length - 1, prev[technique] + 1) }))} disabled={isCoding || visStep[technique] >= STEPS.length - 1} className="llg-btn-press" style={{
@@ -410,25 +410,25 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
             </div>
 
             <div style={{
-              background: '#F8F9FA', backgroundImage: 'radial-gradient(circle, #DFE6E9 1.5px, transparent 1.5px)', backgroundSize: '22px 22px',
+              background: 'var(--surface-2)', backgroundImage: 'radial-gradient(circle, var(--line) 1.5px, transparent 1.5px)', backgroundSize: '22px 22px',
               border: '4px solid var(--line)', borderRadius: 28, boxShadow: 'inset 0 4px 0 rgba(0,0,0,0.03), 0 8px 0 var(--shadow-color)',
               padding: '48px 16px 24px', minHeight: 260, position: 'relative', overflow: 'hidden',
             }}>
-              <div style={{ position: 'absolute', top: 14, left: 20, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'rgba(165,94,234,0.55)' }}>
+              <div style={{ position: 'absolute', top: 14, left: 20, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'color-mix(in srgb, var(--secondary) 55%, transparent)' }}>
                 Current State
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <svg width={Math.max(N, chain.length) * 110 + 80} height="220" style={{ display: 'block', margin: '0 auto' }}>
                   <defs>
-                    <ArrowMarker id="llg-ah" color="#B2BEC3" />
-                    <ArrowMarker id="llg-ah-flip" color="#FF5252" />
+                    <ArrowMarker id="llg-ah" color="var(--line-heavy)" />
+                    <ArrowMarker id="llg-ah-flip" color="var(--hard)" />
                   </defs>
 
-                  <text x="20" y="105" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="#B2BEC3">∅</text>
-                  <text x={nodeX(chain.length - 1) + 78} y="105" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="#B2BEC3">∅</text>
+                  <text x="20" y="105" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="var(--line-heavy)">∅</text>
+                  <text x={nodeX(chain.length - 1) + 78} y="105" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="var(--line-heavy)">∅</text>
 
                   {chain.map((origIdx, i) => arrowExists(i) && (
-                    <line key={`a-${origIdx}`} x1={nodeX(i) + 52} y1="105" x2={nodeX(i + 1)} y2="105" stroke="#B2BEC3" strokeWidth="3" markerEnd="url(#llg-ah)" style={{ transition: 'all 0.5s' }} />
+                    <line key={`a-${origIdx}`} x1={nodeX(i) + 52} y1="105" x2={nodeX(i + 1)} y2="105" stroke="var(--line-heavy)" strokeWidth="3" markerEnd="url(#llg-ah)" style={{ transition: 'all 0.5s' }} />
                   ))}
 
                   {/* Spell out "curr.next = prev" explicitly — don't rely on the chain reorder alone,
@@ -440,13 +440,13 @@ export default function LinkedListGame({ initialTechnique, onTechniqueChange } =
                       const x2 = nodeX(toPos) + 26;
                       const midX = (x1 + x2) / 2;
                       return (
-                        <path d={`M ${x1} 137 Q ${midX} 192 ${x2} 137`} stroke="#FF5252" strokeWidth="3" strokeDasharray="7,5" fill="none" markerEnd="url(#llg-ah-flip)" style={{ transition: 'all 0.5s' }} />
+                        <path d={`M ${x1} 137 Q ${midX} 192 ${x2} 137`} stroke="var(--hard)" strokeWidth="3" strokeDasharray="7,5" fill="none" markerEnd="url(#llg-ah-flip)" style={{ transition: 'all 0.5s' }} />
                       );
                     }
                     return (
                       <g style={{ transition: 'transform 0.5s' }}>
-                        <path d={`M ${x1} 137 L ${x1} 168`} stroke="#FF5252" strokeWidth="3" strokeDasharray="4 3" fill="none" markerEnd="url(#llg-ah-flip)" />
-                        <text x={x1} y="182" textAnchor="middle" fontSize="12" fontWeight="900" fill="#FF5252" fontFamily="var(--mono)">null</text>
+                        <path d={`M ${x1} 137 L ${x1} 168`} stroke="var(--hard)" strokeWidth="3" strokeDasharray="4 3" fill="none" markerEnd="url(#llg-ah-flip)" />
+                        <text x={x1} y="182" textAnchor="middle" fontSize="12" fontWeight="900" fill="var(--hard)" fontFamily="var(--mono)">null</text>
                       </g>
                     );
                   })()}

@@ -1,5 +1,7 @@
 <div class="topbar">
-  <a class="logo" routerLink="/"><img src="assets/ayalab.png" alt="Aya Lab" class="logo-img" /></a>
+  <a class="logo" routerLink="/">
+    <img class="logo-mark" [src]="theme.theme() === 'dark' ? 'assets/dm_logo.png' : 'assets/wm_logo.png'" alt="AYA Lab" />
+  </a>
   <span class="spacer"></span>
   <nav class="nav-links">
     <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">{{ lang.t('navProblems') }}</a>
@@ -15,9 +17,17 @@
     <button [class.active]="theme.theme() === 'light'" (click)="theme.set('light')" title="Light theme">☀️</button>
     <button [class.active]="theme.theme() === 'dark'" (click)="theme.set('dark')" title="Dark theme">🌙</button>
   </div>
-  <div class="lang-toggle">
-    <button [class.active]="lang.lang() === 'en'" (click)="lang.set('en')">EN</button>
-    <button [class.active]="lang.lang() === 'ar'" (click)="lang.set('ar')">AR</button>
+  <div class="lang-dropdown" [class.open]="langMenuOpen()">
+    <button class="lang-dropdown-btn" (click)="toggleLangMenu()">
+      {{ lang.lang() === 'en' ? 'EN' : 'AR' }}
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    @if (langMenuOpen()) {
+      <div class="lang-dropdown-menu">
+        <button [class.active]="lang.lang() === 'en'" (click)="chooseLang('en')">EN</button>
+        <button [class.active]="lang.lang() === 'ar'" (click)="chooseLang('ar')">AR</button>
+      </div>
+    }
   </div>
   @if (showCoffeeBtn()) {
     <a class="coffee-btn" routerLink="/support">{{ lang.t('coffeeBtn') }}</a>

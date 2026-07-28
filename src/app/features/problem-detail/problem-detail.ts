@@ -38,7 +38,7 @@ export class ProblemDetail implements OnInit {
   notFound = signal<boolean>(false);
 
   activeTab = signal<TabId>(6);
-  lang = signal<Lang>('javascript');
+  lang = signal<Lang>('java');
 
   code = signal<string>('');
   private starter: Record<string, string> | null = null;
@@ -64,7 +64,7 @@ export class ProblemDetail implements OnInit {
         this.activeTab.set(requestedTab && (requestedTab === 6 || p.hasVisualizer) ? requestedTab : 6);
         if (p.starterCode && Object.keys(p.starterCode).length > 0) {
           this.starter = p.starterCode;
-          this.code.set(this.starter['javascript'] ?? '');
+          this.code.set(this.starter['java'] ?? '');
         }
         this.loading.set(false);
       },

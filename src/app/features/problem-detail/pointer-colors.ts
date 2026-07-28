@@ -12,11 +12,11 @@ export const PALETTE = {
 };
 
 export const POINTER_COLORS = {
-  head: PALETTE.gray,
-  prev: PALETTE.red,
-  curr: PALETTE.sage,
-  next: PALETTE.yellow,
-  nxt: PALETTE.yellow,
+  head: 'var(--pointer-head)',
+  prev: 'var(--pointer-prev)',
+  curr: 'var(--pointer-curr)',
+  next: 'var(--pointer-next)',
+  nxt: 'var(--pointer-next)',
   slow: PALETTE.teal,
   fast: PALETTE.red,
   tmp: PALETTE.gray,
@@ -24,14 +24,17 @@ export const POINTER_COLORS = {
   left: 'var(--secondary)',
   right: PALETTE.orange,
   result: 'var(--secondary)',
+  i: PALETTE.sage,
+  call: 'var(--secondary)',
+  memo: PALETTE.teal,
 };
 
 export const POINTER_TEXT_COLORS = {
-  head: '#FFF',
-  prev: '#FFF',
-  curr: '#2D3436',
-  next: '#7A5000',
-  nxt: '#7A5000',
+  head: 'var(--pointer-head-ink)',
+  prev: 'var(--pointer-prev-ink)',
+  curr: 'var(--pointer-curr-ink)',
+  next: 'var(--pointer-next-ink)',
+  nxt: 'var(--pointer-next-ink)',
   slow: '#FFF',
   fast: '#FFF',
   tmp: '#FFF',
@@ -39,4 +42,7 @@ export const POINTER_TEXT_COLORS = {
   left: '#FFF',
   right: '#FFF',
   result: '#FFF',
+  i: '#2D3436',
+  call: '#FFF',
+  memo: '#FFF',
 };

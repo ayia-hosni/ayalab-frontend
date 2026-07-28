@@ -300,8 +300,8 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
 
         {/* ── HEADER ──────────────────────────────────────────────────────── */}
         <div style={{
-          background: 'linear-gradient(135deg, #FFF7F0 0%, #FFF0FF 55%, #F0F4FF 100%)',
-          borderRadius: 32, border: '4px solid #FFF', boxShadow: '0 8px 0 var(--shadow-color)',
+          background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%)',
+          borderRadius: 32, border: '4px solid var(--card)', boxShadow: '0 8px 0 var(--shadow-color)',
           padding: '16px 24px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 14,
         }}>
           <div>
@@ -314,7 +314,7 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
           </div>
 
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 0, background: '#F1F2F6', borderRadius: 100, padding: 3, border: '2px solid var(--line)' }}>
+            <div style={{ display: 'flex', gap: 0, background: 'var(--surface-3)', borderRadius: 100, padding: 3, border: '2px solid var(--line)' }}>
               {['iterative', 'recursive'].map(t => (
                 <button key={t} onClick={() => switchTechnique(t)} className="mp-btn-press" style={{
                   fontFamily: 'var(--sans)', fontSize: 13, fontWeight: 900,
@@ -353,9 +353,9 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
           {/* ── LEFT: CODE + HINT ────────────────────────────────────────────── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative' }}>
 
-            <div style={{ background: '#2D3436', borderRadius: 20, overflow: 'hidden', border: '4px solid #1E2528', boxShadow: '0 6px 0 rgba(0,0,0,0.12)' }}>
-              <div style={{ background: '#232A2D', padding: '8px 16px', borderBottom: '2px solid #1E2528' }}>
-                <span style={{ fontSize: 11, fontWeight: 900, color: '#B2BEC3', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div style={{ background: 'var(--editor-bg)', borderRadius: 20, overflow: 'hidden', border: '4px solid var(--editor-border)', boxShadow: '0 6px 0 rgba(0,0,0,0.12)' }}>
+              <div style={{ background: 'var(--editor-bg-2)', padding: '8px 16px', borderBottom: '2px solid var(--editor-border)' }}>
+                <span style={{ fontSize: 11, fontWeight: 900, color: 'var(--editor-ink-2)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   {technique === 'iterative' ? 'Iterative' : 'Recursive'} · reverseList.js
                 </span>
               </div>
@@ -366,19 +366,19 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
                   return (
                     <div key={index} className="mp-line-in" style={{
                       display: 'flex', gap: 10, padding: '1px 10px', borderRadius: 6,
-                      background: isActive ? 'rgba(72,187,120,0.16)' : 'transparent',
+                      background: isActive ? 'color-mix(in srgb, var(--easy) 16%, transparent)' : 'transparent',
                       borderLeft: `3px solid ${isActive ? 'var(--easy)' : 'transparent'}`,
                       whiteSpace: 'pre', transition: 'all 0.3s',
                     }}>
-                      <span style={{ color: '#5A6268', userSelect: 'none', width: 14, textAlign: 'right', flexShrink: 0 }}>{index + 1}</span>
-                      <span style={{ color: isActive ? '#7CE0A8' : '#DFE6E9', fontWeight: isActive ? 900 : 500 }}>{text}</span>
+                      <span style={{ color: 'var(--editor-ink-2)', userSelect: 'none', width: 14, textAlign: 'right', flexShrink: 0 }}>{index + 1}</span>
+                      <span style={{ color: isActive ? 'var(--easy)' : 'var(--editor-ink)', fontWeight: isActive ? 900 : 500 }}>{text}</span>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            <div style={{ background: 'var(--card)', borderRadius: 24, border: `3px solid ${isComplete ? '#A8E6CE' : '#EDD9FF'}`, padding: '18px 20px', boxShadow: '0 5px 0 var(--shadow-color)' }}>
+            <div style={{ background: 'var(--card)', borderRadius: 24, border: `3px solid ${isComplete ? 'var(--easy-border)' : 'var(--secondary-border)'}`, padding: '18px 20px', boxShadow: '0 5px 0 var(--shadow-color)' }}>
               {isComplete ? (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--easy)', fontWeight: 900, fontSize: 14, marginBottom: 6 }}>
@@ -391,12 +391,12 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
               ) : (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#D49B1C' }}>Drag</span>
+                    <span style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--medium-shadow)' }}>Drag</span>
                     <span style={{ background: 'var(--primary)', color: '#FFF', fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 900, padding: '3px 10px', borderRadius: 8 }}>
                       {currentHint.from}
                     </span>
-                    <MousePointer2 size={13} style={{ color: '#D49B1C' }} />
-                    <span style={{ background: currentHint.to === 'null' ? '#FF6B6B' : 'var(--easy)', color: '#FFF', fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 900, padding: '3px 10px', borderRadius: 8 }}>
+                    <MousePointer2 size={13} style={{ color: 'var(--medium-shadow)' }} />
+                    <span style={{ background: currentHint.to === 'null' ? 'var(--hard)' : 'var(--easy)', color: '#FFF', fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 900, padding: '3px 10px', borderRadius: 8 }}>
                       {currentHint.to}
                     </span>
                   </div>
@@ -414,7 +414,7 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 100,
                   fontWeight: 900, fontSize: 13, color: '#FFF', whiteSpace: 'nowrap',
-                  background: feedback.type === 'success' ? 'var(--easy)' : '#FF6B6B',
+                  background: feedback.type === 'success' ? 'var(--easy)' : 'var(--hard)',
                   boxShadow: '0 6px 16px rgba(0,0,0,0.18)',
                 }}>
                   {feedback.type === 'success' ? <CheckCircle size={16} /> : <XCircle size={16} />}
@@ -430,38 +430,38 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
               <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'var(--ink-2)' }}>
                 {isComplete ? `All ${steps.length} steps complete!` : `Step ${stepIdx[technique] + 1} of ${steps.length}`}
               </div>
-              <div style={{ height: 8, width: 120, background: 'rgba(165,94,234,0.1)', borderRadius: 100, overflow: 'hidden', border: '2px solid rgba(165,94,234,0.12)' }}>
+              <div style={{ height: 8, width: 120, background: 'color-mix(in srgb, var(--secondary) 10%, transparent)', borderRadius: 100, overflow: 'hidden', border: '2px solid color-mix(in srgb, var(--secondary) 12%, transparent)' }}>
                 <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--secondary), var(--easy))', borderRadius: 100, width: `${Math.round((stepIdx[technique] / steps.length) * 100)}%`, transition: 'width 0.4s' }} />
               </div>
             </div>
 
             <div style={{
-              background: '#F8F9FA', backgroundImage: 'radial-gradient(circle, #DFE6E9 1.5px, transparent 1.5px)', backgroundSize: '22px 22px',
+              background: 'var(--surface-2)', backgroundImage: 'radial-gradient(circle, var(--line) 1.5px, transparent 1.5px)', backgroundSize: '22px 22px',
               border: '4px solid var(--line)', borderRadius: 28, boxShadow: 'inset 0 4px 0 rgba(0,0,0,0.03), 0 8px 0 var(--shadow-color)',
               padding: '48px 16px 24px', minHeight: 320, position: 'relative', overflow: 'hidden', touchAction: 'none',
             }}>
-              <div style={{ position: 'absolute', top: 14, left: 20, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'rgba(165,94,234,0.55)' }}>
+              <div style={{ position: 'absolute', top: 14, left: 20, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'color-mix(in srgb, var(--secondary) 55%, transparent)' }}>
                 Scope Variables
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <svg ref={svgRef} width={Math.max(N, chain.length) * 110 + 80} height="260" style={{ display: 'block', margin: '0 auto' }}>
                   <defs>
-                    <ArrowMarker id="mp-ah" color="#B2BEC3" />
-                    <ArrowMarker id="mp-ah-drag" color="#FECA57" />
+                    <ArrowMarker id="mp-ah" color="var(--line-heavy)" />
+                    <ArrowMarker id="mp-ah-drag" color="var(--medium)" />
                   </defs>
 
                   {/* null endpoints — also valid drop targets */}
                   <g onPointerUp={(e) => handlePointerUp(e, 'null')} data-drop-id="null">
                     <rect x="0" y="130" width="40" height="52" fill="transparent" />
-                    <text x="20" y="156" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="#B2BEC3">∅</text>
+                    <text x="20" y="156" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="var(--line-heavy)">∅</text>
                   </g>
                   <g onPointerUp={(e) => handlePointerUp(e, 'null')} data-drop-id="null">
                     <rect x={nodeX(chain.length - 1) + 58} y="130" width="40" height="52" fill="transparent" />
-                    <text x={nodeX(chain.length - 1) + 78} y="156" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="#B2BEC3">∅</text>
+                    <text x={nodeX(chain.length - 1) + 78} y="156" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="16" fill="var(--line-heavy)">∅</text>
                   </g>
 
                   {chain.map((origIdx, i) => arrowExists(i) && (
-                    <line key={`a-${origIdx}`} x1={nodeX(i) + 52} y1="156" x2={nodeX(i + 1)} y2="156" stroke="#B2BEC3" strokeWidth="3" markerEnd="url(#mp-ah)" style={{ transition: 'all 0.5s' }} />
+                    <line key={`a-${origIdx}`} x1={nodeX(i) + 52} y1="156" x2={nodeX(i + 1)} y2="156" stroke="var(--line-heavy)" strokeWidth="3" markerEnd="url(#mp-ah)" style={{ transition: 'all 0.5s' }} />
                   ))}
 
                   {/* Explicit flip arrow for the move just made — a long jump can land behind other
@@ -475,12 +475,12 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
                     if (toPos !== -1) {
                       const x2 = nodeX(toPos) + 26;
                       const midX = (x1 + x2) / 2;
-                      return <path d={`M ${x1} 182 Q ${midX} 237 ${x2} 182`} stroke="#FF5252" strokeWidth="3" strokeDasharray="7,5" fill="none" markerEnd="url(#mp-ah)" style={{ transition: 'all 0.5s' }} />;
+                      return <path d={`M ${x1} 182 Q ${midX} 237 ${x2} 182`} stroke="var(--hard)" strokeWidth="3" strokeDasharray="7,5" fill="none" markerEnd="url(#mp-ah)" style={{ transition: 'all 0.5s' }} />;
                     }
                     return (
                       <g>
-                        <path d={`M ${x1} 182 L ${x1} 213`} stroke="#FF5252" strokeWidth="3" strokeDasharray="4 3" fill="none" markerEnd="url(#mp-ah)" />
-                        <text x={x1} y="227" textAnchor="middle" fontSize="12" fontWeight="900" fill="#FF5252" fontFamily="var(--mono)">null</text>
+                        <path d={`M ${x1} 182 L ${x1} 213`} stroke="var(--hard)" strokeWidth="3" strokeDasharray="4 3" fill="none" markerEnd="url(#mp-ah)" />
+                        <text x={x1} y="227" textAnchor="middle" fontSize="12" fontWeight="900" fill="var(--hard)" fontFamily="var(--mono)">null</text>
                       </g>
                     );
                   })()}
@@ -493,9 +493,9 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
                       <g key={origIdx} style={{ transition: 'transform 0.5s' }} transform={`translate(${nodeX(i)},130)`}>
                         <NodeValueBox y={0} value={value} active={isActive} dropId={String(value)} onPointerUp={(e) => handlePointerUp(e, String(value))} />
                         {draggableHere && (
-                          <circle cx="52" cy="26" r="8" fill="var(--primary)" stroke="#FFF" strokeWidth="2"
+                          <circle cx="52" cy="26" r="8" fill="var(--primary)" stroke="var(--card)" strokeWidth="2"
                             onPointerDown={(e) => handlePointerDown(e, String(value))}
-                            style={{ cursor: 'grab', touchAction: 'none', filter: 'drop-shadow(0 0 4px rgba(255,159,67,0.6))' }} />
+                            style={{ cursor: 'grab', touchAction: 'none', filter: 'drop-shadow(0 0 4px color-mix(in srgb, var(--primary) 60%, transparent))' }} />
                         )}
                       </g>
                     );
@@ -520,7 +520,7 @@ export default function MovePointer({ initialTechnique, onTechniqueChange } = {}
                   {dragging && (() => {
                     const origin = dragOrigin(dragging.from);
                     if (!origin) return null;
-                    return <line x1={origin.x} y1={origin.y} x2={mousePos.x} y2={mousePos.y} stroke="#FECA57" strokeWidth="2.5" strokeDasharray="6,5" markerEnd="url(#mp-ah-drag)" style={{ pointerEvents: 'none', filter: 'drop-shadow(0 0 4px rgba(254,202,87,0.6))' }} />;
+                    return <line x1={origin.x} y1={origin.y} x2={mousePos.x} y2={mousePos.y} stroke="var(--medium)" strokeWidth="2.5" strokeDasharray="6,5" markerEnd="url(#mp-ah-drag)" style={{ pointerEvents: 'none', filter: 'drop-shadow(0 0 4px color-mix(in srgb, var(--medium) 60%, transparent))' }} />;
                   })()}
                 </svg>
               </div>

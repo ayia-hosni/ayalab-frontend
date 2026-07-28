@@ -1,4 +1,4 @@
-# Pointer Lab — Frontend
+# Aya Lab — Frontend
 
 Angular 21 single-page app (standalone components, signals). Filterable problem list plus a problem detail page with a pointer-trace visualizer and JavaScript code editor.
 

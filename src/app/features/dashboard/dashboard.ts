@@ -139,8 +139,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
           {
             label: 'Completed',
             data: timeline.map(p => p.completed),
-            borderColor: '#1DD1A1',
-            backgroundColor: 'rgba(29,209,161,0.12)',
+            borderColor: '#e4e8d6',
+            backgroundColor: 'rgb(228,232,214)',
             borderWidth: 3,
             pointRadius: 4,
             tension: 0.3,

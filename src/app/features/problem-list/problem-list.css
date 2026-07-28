@@ -12,6 +12,19 @@
   padding: 28px 32px;
   margin-bottom: 20px;
   animation: popIn 0.3s ease both;
+  overflow: hidden;
+  position: relative;
+}
+.hero-illustration {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 220px;
+  margin: -28px -32px -28px 0;
+  pointer-events: none;
+}
+.hero-illustration img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 900px) {
+  .hero-illustration { display: none; }
 }
 
 /* Ring */
@@ -59,10 +72,19 @@
   align-items: center;
   margin-bottom: 7px;
 }
+.dbl-name-wrap { display: flex; align-items: center; gap: 8px; }
 .dbl-name {
   font-size: 13px;
   font-weight: 600;
 }
+.diff-badge {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.diff-badge svg { width: 13px; height: 13px; }
+.easy-badge   { background: var(--easy); }
+.medium-badge { background: var(--medium); }
+.hard-badge   { background: var(--hard); }
 .dbl-count {
   font-size: 12px;
   font-weight: 500;
@@ -170,9 +192,20 @@
 .seg-btn:hover:not(.active) { background: var(--surface-3); color: var(--ink); }
 .seg-btn.active { color: #fff; background: var(--secondary); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15); }
 
-.easy-seg.active   { background: var(--easy); color: #fff; }
+/* Easy/Medium/Hard carry their own severity color even at rest — not just
+   once selected — matching the difficulty badges everywhere else in the app. */
+.easy-seg:not(.active)   { color: var(--easy-shadow); }
+.medium-seg:not(.active) { color: var(--medium-shadow); }
+.hard-seg:not(.active)   { color: var(--hard-shadow); }
+.easy-seg:hover:not(.active)   { background: var(--easy-light); color: var(--easy-shadow); }
+.medium-seg:hover:not(.active) { background: var(--medium-light); color: var(--medium-shadow); }
+.hard-seg:hover:not(.active)   { background: var(--hard-light); color: var(--hard-shadow); }
+
+/* Active fill uses each color's darker -shadow variant (not the vivid base) so
+   white label text always clears WCAG AA — the base tones alone are too light. */
+.easy-seg.active   { background: var(--easy-shadow); color: #fff; }
 .medium-seg.active { background: var(--medium-shadow); color: #fff; }
-.hard-seg.active   { background: var(--hard); color: #fff; }
+.hard-seg.active   { background: var(--hard-shadow); color: #fff; }
 
 /* Clear button */
 .clear-btn {
@@ -205,6 +238,9 @@
   margin-bottom: 18px;
 }
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--sans);
   font-size: 12px;
   font-weight: 600;
@@ -219,6 +255,8 @@
 }
 .chip:hover:not(.active) { color: var(--ink); background: var(--line); }
 .chip.active { background: var(--secondary); color: #fff; box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.5); }
+.chip-ico { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.75; }
+.chip.active .chip-ico { opacity: 1; }
 
 /* ── Table card ──────────────────────────────────────── */
 .table-card {
@@ -268,10 +306,11 @@ thead th {
 }
 thead th.center { text-align: center; }
 
-.th-num    { width: 56px; }
-.th-status { width: 44px; padding-right: 0 !important; }
-.th-acc    { width: 120px; }
-.th-diff   { width: 120px; }
+.th-num      { width: 56px; }
+.th-status   { width: 44px; padding-right: 0 !important; }
+.th-acc      { width: 120px; }
+.th-diff     { width: 120px; }
+.th-bookmark { width: 70px; }
 
 /* Rows */
 .problem-row {
@@ -302,6 +341,17 @@ tbody td { padding: 15px 20px; }
 }
 .status-ico.solved   { color: var(--easy-shadow); }
 .status-ico.attempted { color: var(--primary); }
+
+.bookmark-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; border: none; border-radius: 8px;
+  background: transparent; color: var(--ink-3); cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.bookmark-btn:hover { background: var(--surface-3); color: var(--ink-2); }
+.bookmark-btn svg { width: 17px; height: 17px; }
+.bookmark-btn.active { color: var(--secondary); }
+.bookmark-btn.active svg { fill: var(--secondary); }
 
 .td-title { width: auto; }
 .title-text {

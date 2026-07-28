@@ -28,25 +28,44 @@
       <div class="diff-bars">
         <div class="diff-bar-row">
           <div class="diff-bar-meta">
-            <span class="dbl-name easy-text">{{ lang.t('plDiffEasy') }}</span>
+            <span class="dbl-name-wrap">
+              <span class="diff-badge easy-badge">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 9.5 17 19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="dbl-name easy-text">{{ lang.t('plDiffEasy') }}</span>
+            </span>
             <span class="dbl-count"><b>{{ easyStats().solved }}</b><span class="dbl-of"> / {{ easyStats().total }}</span></span>
           </div>
           <div class="dbl-track"><div class="dbl-fill easy-fill" [style.width.%]="pct(easyStats().solved, easyStats().total)"></div></div>
         </div>
         <div class="diff-bar-row">
           <div class="diff-bar-meta">
-            <span class="dbl-name medium-text">{{ lang.t('plDiffMedium') }}</span>
+            <span class="dbl-name-wrap">
+              <span class="diff-badge medium-badge">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 9.5 17 19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="dbl-name medium-text">{{ lang.t('plDiffMedium') }}</span>
+            </span>
             <span class="dbl-count"><b>{{ mediumStats().solved }}</b><span class="dbl-of"> / {{ mediumStats().total }}</span></span>
           </div>
           <div class="dbl-track"><div class="dbl-fill medium-fill" [style.width.%]="pct(mediumStats().solved, mediumStats().total)"></div></div>
         </div>
         <div class="diff-bar-row">
           <div class="diff-bar-meta">
-            <span class="dbl-name hard-text">{{ lang.t('plDiffHard') }}</span>
+            <span class="dbl-name-wrap">
+              <span class="diff-badge hard-badge">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 9.5 17 19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="dbl-name hard-text">{{ lang.t('plDiffHard') }}</span>
+            </span>
             <span class="dbl-count"><b>{{ hardStats().solved }}</b><span class="dbl-of"> / {{ hardStats().total }}</span></span>
           </div>
           <div class="dbl-track"><div class="dbl-fill hard-fill" [style.width.%]="pct(hardStats().solved, hardStats().total)"></div></div>
         </div>
+      </div>
+
+      <div class="hero-illustration" aria-hidden="true">
+        <img src="assets/banner.png" alt="" />
       </div>
     </div>
   }
@@ -87,9 +106,40 @@
 
   <!-- Topic tags -->
   <div class="tag-row">
-    <button class="chip" [class.active]="activeTag === null" (click)="setTag(null)">{{ lang.t('plAllTopics') }}</button>
+    <button class="chip" [class.active]="activeTag === null" (click)="setTag(null)">
+      <svg lucideGrid3x3 class="chip-ico"></svg>
+      {{ lang.t('plAllTopics') }}
+    </button>
     @for (tag of tags(); track tag) {
-      <button class="chip" [class.active]="activeTag === tag" (click)="setTag(tag)">{{ tag }}</button>
+      <button class="chip" [class.active]="activeTag === tag" (click)="setTag(tag)">
+        @switch (tag) {
+          @case ('Array') { <svg lucideBrackets class="chip-ico"></svg> }
+          @case ('Binary Search') { <svg lucideSearch class="chip-ico"></svg> }
+          @case ('Breadth-First Search') { <svg lucideWaypoints class="chip-ico"></svg> }
+          @case ('Depth-First Search') { <svg lucideGitFork class="chip-ico"></svg> }
+          @case ('Design') { <svg lucideScissors class="chip-ico"></svg> }
+          @case ('Divide and Conquer') { <svg lucideSplit class="chip-ico"></svg> }
+          @case ('Dynamic Programming') { <svg lucideLayers class="chip-ico"></svg> }
+          @case ('Graph') { <svg lucideNetwork class="chip-ico"></svg> }
+          @case ('Greedy') { <svg lucideGem class="chip-ico"></svg> }
+          @case ('Hash Table') { <svg lucideHash class="chip-ico"></svg> }
+          @case ('Heap') { <svg lucideTriangle class="chip-ico"></svg> }
+          @case ('Linked List') { <svg lucideLink2 class="chip-ico"></svg> }
+          @case ('Math') { <svg lucidePi class="chip-ico"></svg> }
+          @case ('Prefix Sum') { <svg lucideFlag class="chip-ico"></svg> }
+          @case ('Recursion') { <svg lucideRepeat class="chip-ico"></svg> }
+          @case ('Shortest Path') { <svg lucideRoute class="chip-ico"></svg> }
+          @case ('Sliding Window') { <svg lucideColumns3 class="chip-ico"></svg> }
+          @case ('Sorting') { <svg lucideArrowUpDown class="chip-ico"></svg> }
+          @case ('Stack') { <svg lucideSquareStack class="chip-ico"></svg> }
+          @case ('String') { <svg lucideType class="chip-ico"></svg> }
+          @case ('Topological Sort') { <svg lucideGitBranch class="chip-ico"></svg> }
+          @case ('Tree') { <svg lucideTreePine class="chip-ico"></svg> }
+          @case ('Two Pointers') { <svg lucideArrowLeftRight class="chip-ico"></svg> }
+          @case ('Union Find') { <svg lucideMerge class="chip-ico"></svg> }
+        }
+        {{ tag }}
+      </button>
     }
   </div>
 
@@ -121,6 +171,7 @@
             <th>{{ lang.t('plThTitle') }}</th>
             <th class="th-acc center">{{ lang.t('plThAcceptance') }}</th>
             <th class="th-diff center">{{ lang.t('plThDifficulty') }}</th>
+            <th class="th-bookmark center">{{ lang.t('plThStatus') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -152,6 +203,11 @@
               <td class="td-acc center">{{ p.acceptance.toFixed(1) }}%</td>
               <td class="center">
                 <span class="diff" [class]="p.difficulty">{{ diffLabel(p.difficulty) }}</span>
+              </td>
+              <td class="center">
+                <button class="bookmark-btn" [class.active]="bookmarked().has(p.id)" (click)="toggleBookmark($event, p.id)" [attr.title]="lang.t('plBookmark')">
+                  <svg lucideBookmark></svg>
+                </button>
               </td>
             </tr>
           }

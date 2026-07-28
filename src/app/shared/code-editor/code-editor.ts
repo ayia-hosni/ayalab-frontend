@@ -2,6 +2,8 @@ import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, input, outp
 import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { tags as t } from '@lezer/highlight';
 import { basicSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
@@ -27,6 +29,29 @@ const editorTheme = EditorView.theme({
   '.cm-cursor': { borderLeftColor: '#CBD5E1' },
   '.cm-foldPlaceholder': { backgroundColor: '#2D3543', border: 'none', color: '#94A3B8' },
 }, { dark: true });
+
+// codemirror's built-in defaultHighlightStyle is tuned for light backgrounds
+// (e.g. navy #00f, dark purple #30a) which are nearly invisible on our dark
+// editor bg — define our own palette instead.
+const darkHighlightStyle = HighlightStyle.define([
+  { tag: t.keyword, color: '#C792EA' },
+  { tag: [t.name, t.deleted, t.character, t.propertyName, t.macroName], color: '#CBD5E1' },
+  { tag: [t.function(t.variableName), t.labelName], color: '#82AAFF' },
+  { tag: [t.color, t.constant(t.name), t.standard(t.name)], color: '#F78C6C' },
+  { tag: [t.definition(t.name), t.separator], color: '#CBD5E1' },
+  { tag: [t.typeName, t.className, t.number, t.changed, t.annotation, t.modifier, t.self, t.namespace], color: '#F78C6C' },
+  { tag: [t.operator, t.operatorKeyword, t.url, t.escape, t.regexp, t.link, t.special(t.string)], color: '#89DDFF' },
+  { tag: [t.meta, t.comment], color: '#697098', fontStyle: 'italic' },
+  { tag: t.strong, fontWeight: 'bold' },
+  { tag: t.emphasis, fontStyle: 'italic' },
+  { tag: t.strikethrough, textDecoration: 'line-through' },
+  { tag: t.link, color: '#697098', textDecoration: 'underline' },
+  { tag: t.heading, fontWeight: 'bold', color: '#F78C6C' },
+  { tag: [t.atom, t.bool, t.special(t.variableName)], color: '#F78C6C' },
+  { tag: [t.processingInstruction, t.string, t.inserted], color: '#C3E88D' },
+  { tag: t.invalid, color: '#FF5370' },
+  { tag: t.variableName, color: '#CBD5E1' },
+]);
 
 @Component({
   selector: 'app-code-editor',
@@ -81,6 +106,7 @@ export class CodeEditor implements AfterViewInit, OnDestroy {
         basicSetup,
         keymap.of([indentWithTab]),
         editorTheme,
+        syntaxHighlighting(darkHighlightStyle),
         this.languageConf.of(LANGUAGES[this.language()]()),
         this.readOnlyConf.of([EditorState.readOnly.of(this.readOnly()), EditorView.editable.of(!this.readOnly())]),
         EditorView.updateListener.of((update) => {
