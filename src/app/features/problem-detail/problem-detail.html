@@ -36,21 +36,21 @@
   <!-- ============ TAB 9: Move the Pointer ============ -->
   @if (activeTab() === 9 && p.hasVisualizer) {
   <div class="panel panel--sandbox">
-    <app-move-pointer [problemSlug]="p.slug"></app-move-pointer>
+    <app-move-pointer [config]="p.gameConfigs?.movePointer"></app-move-pointer>
   </div>
   }
 
   <!-- ============ TAB 8: Both Solutions (slides) ============ -->
   @if (activeTab() === 8 && p.hasVisualizer) {
   <div class="panel panel--sandbox">
-    <app-solution-slides [problemSlug]="p.slug"></app-solution-slides>
+    <app-solution-slides [config]="p.gameConfigs?.solutionSlides"></app-solution-slides>
   </div>
   }
 
   <!-- ============ TAB 2: Linked List Game ============ -->
   @if (activeTab() === 2 && p.hasVisualizer) {
   <div class="panel panel--sandbox">
-    <app-linked-list-game [problemSlug]="p.slug"></app-linked-list-game>
+    <app-linked-list-game [config]="p.gameConfigs?.traceGame"></app-linked-list-game>
   </div>
   }
 
@@ -61,9 +61,9 @@
       <div class="prose prose--inset" [class.rtl]="siteLang.isAr && p.descriptionAr" [innerHTML]="(siteLang.isAr && p.descriptionAr) ? p.descriptionAr : p.description"></div>
 
       <div class="lang-switch">
+        <button class="lang-btn" [class.active]="lang() === 'java'" (click)="showLang('java')">☕ Java</button>
         <button class="lang-btn" [class.active]="lang() === 'javascript'" (click)="showLang('javascript')">💛 JavaScript</button>
         <button class="lang-btn" [class.active]="lang() === 'python'" (click)="showLang('python')">🐍 Python</button>
-        <button class="lang-btn" [class.active]="lang() === 'java'" (click)="showLang('java')">☕ Java</button>
       </div>
 
       <div class="editor-head">

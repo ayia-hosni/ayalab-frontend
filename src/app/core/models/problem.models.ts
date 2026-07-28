@@ -13,12 +13,22 @@ export interface ProblemSummary {
   available: boolean;
 }
 
+/** Interactive game content per visualizer tab. Each value is a raw JSON string owned by
+ *  the matching frontend engine (chain-trace-engine / pointer-drag-engine / solution-slides'
+ *  chain-trace-engine or recursion-tree-engine); absent keys mean that tab has no game yet. */
+export interface GameConfigs {
+  traceGame?: string;
+  movePointer?: string;
+  solutionSlides?: string;
+}
+
 export interface ProblemDetail extends ProblemSummary {
   description: string | null;
   /** Arabic translation of `description`; null when not yet translated. */
   descriptionAr: string | null;
   /** Starter code per language, e.g. { javascript: '…', python: '…', java: '…' }. */
   starterCode: Record<string, string> | null;
+  gameConfigs: GameConfigs | null;
 }
 
 export interface CaseResult {

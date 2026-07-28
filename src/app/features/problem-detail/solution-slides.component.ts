@@ -2,19 +2,16 @@ import { Component, ElementRef, Input, ViewChild, AfterViewInit, OnDestroy, inje
 import { ActivatedRoute, Router } from '@angular/router';
 import { LanguageService } from '../../core/services/language.service';
 
-const MODULE_BY_SLUG: Record<string, () => Promise<{ default: any }>> = {
-  'reverse-linked-list': () => import('./solution-slides-react'),
-  'remove-linked-list-elements': () => import('./solution-slides-remove-elements-react'),
-  'palindrome-linked-list': () => import('./solution-slides-palindrome-react'),
-};
-
 @Component({
   selector: 'app-solution-slides',
   standalone: true,
   template: `<div #mount dir="ltr" style="width:100%;min-height:100vh;"></div>`,
 })
 export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
-  @Input() problemSlug = 'reverse-linked-list';
+  /** Raw JSON string from ProblemDetail.gameConfigs.solutionSlides. `kind: 'tree'` routes to
+   *  recursion-tree-engine.tsx; everything else (chain/array-shaped problems) uses
+   *  chain-trace-engine.tsx in 'slides' mode — see each engine's config shape comment. */
+  @Input() config: string | null | undefined;
   @ViewChild('mount') mountRef!: ElementRef<HTMLDivElement>;
   private root: any;
   private React: any;
@@ -31,7 +28,11 @@ export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
   }
 
   async ngAfterViewInit(): Promise<void> {
-    const loadModule = MODULE_BY_SLUG[this.problemSlug] ?? MODULE_BY_SLUG['reverse-linked-list'];
+    if (!this.config) return;
+    const parsedConfig = JSON.parse(this.config);
+    const loadModule = parsedConfig.kind === 'tree'
+      ? () => import('./recursion-tree-engine')
+      : () => import('./chain-trace-engine');
     const [{ default: React }, { default: ReactDOM }, { default: App }] = await Promise.all([
       import('react'),
       import('react-dom/client'),
@@ -44,6 +45,7 @@ export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
   }
 
   private renderApp(isAr: boolean): void {
+    const config = JSON.parse(this.config!);
     const initialTechnique = this.route.snapshot.queryParamMap.get('technique') === 'recursive' ? 'recursive' : 'iterative';
     const onTechniqueChange = (t: string) => {
       this.router.navigate([], {
@@ -53,7 +55,7 @@ export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
         replaceUrl: true,
       });
     };
-    this.root.render(this.React.createElement(this.App, { initialTechnique, onTechniqueChange, isAr }));
+    this.root.render(this.React.createElement(this.App, { config, initialTechnique, onTechniqueChange, isAr }));
   }
 
   ngOnDestroy(): void {

@@ -11,6 +11,28 @@ export function makeNodeLayout(spacing = 110, leftMargin = 40, boxHalfWidth = 26
   return { nodeX, nodeCx };
 }
 
+// Physical display order for a row of `n` chain nodes: follow `links` (0-based index ->
+// 0-based index | 'null') starting from each of `hints` in turn, then append anything left
+// over in original order. `links` may be null for array-mode data (no chain to follow).
+export function buildDisplayChain(links, hints, n) {
+  if (!links) return Array.from({ length: n }, (_, i) => i);
+  const visited = new Set();
+  const follow = (start) => {
+    const chain = [];
+    let node = start;
+    while (node !== null && node !== undefined && !visited.has(node)) {
+      visited.add(node); chain.push(node);
+      const nxt = links[node];
+      node = nxt === 'null' ? null : nxt;
+    }
+    return chain;
+  };
+  let combined = [];
+  (hints || []).forEach(h => { combined = combined.concat(follow(h)); });
+  for (let i = 0; i < n; i++) if (!combined.includes(i)) combined.push(i);
+  return combined;
+}
+
 // A single <marker> arrowhead definition, meant to sit inside an <svg><defs>.
 export function ArrowMarker({ id, color }) {
   return (
@@ -55,9 +77,9 @@ export function ScopeVariableBadge({ x, label, color, textColor, hasTarget, targ
       <rect x="0" y="20" width="56" height="22" rx="8" fill={color} />
       <text x="28" y="35" textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="13" fill={textColor} style={{ pointerEvents: 'none' }}>{label}</text>
       {draggable && (
-        <circle cx="28" cy="50" r="9" fill="#FECA57" stroke="#FFF" strokeWidth="2"
+        <circle cx="28" cy="50" r="9" fill="var(--medium)" stroke="var(--card)" strokeWidth="2"
           onPointerDown={onDragStart}
-          style={{ cursor: 'grab', touchAction: 'none', filter: 'drop-shadow(0 0 5px rgba(254,202,87,0.7))' }} />
+          style={{ cursor: 'grab', touchAction: 'none', filter: 'drop-shadow(0 0 5px color-mix(in srgb, var(--medium) 70%, transparent))' }} />
       )}
     </g>
   );
@@ -67,12 +89,12 @@ export function ScopeVariableBadge({ x, label, color, textColor, hasTarget, targ
 // linked-list-game and solution-slides node rows. Renders bare <rect>/<text> — the
 // caller keeps its own wrapping <g key transform> exactly as before, so sibling
 // elements (drag handles, drop-target overlays) are unaffected.
-export function NodeValueBox({ y, value, active, activeFill = '#FFF3CD', activeStroke = '#FECA57', onPointerUp, dropId }) {
+export function NodeValueBox({ y, value, active, activeFill = 'var(--medium-light)', activeStroke = 'var(--medium)', onPointerUp, dropId }) {
   return (
     <>
       <rect x="0" y={y} width="52" height="52" rx="18"
         onPointerUp={onPointerUp} data-drop-id={onPointerUp ? dropId : undefined}
-        fill={active ? activeFill : '#FFF'} stroke={active ? activeStroke : 'var(--line-heavy)'}
+        fill={active ? activeFill : 'var(--card)'} stroke={active ? activeStroke : 'var(--line-heavy)'}
         strokeWidth={active ? 4 : 3} style={onPointerUp ? { cursor: 'default' } : undefined} />
       <text x="26" y={y + 26} textAnchor="middle" dominantBaseline="central" fontWeight="900" fontSize="20" fill="var(--ink)" style={{ pointerEvents: 'none' }}>
         {value}
