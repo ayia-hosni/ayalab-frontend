@@ -10,6 +10,8 @@ import { LanguageService } from '../../core/services/language.service';
 export class LinkedListGameComponent implements AfterViewInit, OnDestroy {
   /** Raw JSON string from ProblemDetail.gameConfigs.traceGame — see chain-trace-engine.tsx. */
   @Input() config: string | null | undefined;
+  /** Fallback for problems with no config row: a hand-written component (see legacy-games.ts). Props: { isAr }. */
+  @Input() legacy: (() => Promise<{ default: any }>) | null | undefined;
   @ViewChild('mount') mountRef!: ElementRef<HTMLDivElement>;
   private root: any;
   private React: any;
@@ -26,11 +28,11 @@ export class LinkedListGameComponent implements AfterViewInit, OnDestroy {
   }
 
   async ngAfterViewInit(): Promise<void> {
-    if (!this.config) return;
+    if (!this.config && !this.legacy) return;
     const [{ default: React }, { default: ReactDOM }, { default: App }] = await Promise.all([
       import('react'),
       import('react-dom/client'),
-      import('./chain-trace-engine'),
+      this.config ? import('./chain-trace-engine') : this.legacy!(),
     ]);
     this.React = React;
     this.App = App;
@@ -39,7 +41,6 @@ export class LinkedListGameComponent implements AfterViewInit, OnDestroy {
   }
 
   private renderApp(isAr: boolean): void {
-    const config = JSON.parse(this.config!);
     const initialTechnique = this.route.snapshot.queryParamMap.get('technique') === 'recursive' ? 'recursive' : 'iterative';
     const onTechniqueChange = (t: string) => {
       this.router.navigate([], {
@@ -49,7 +50,11 @@ export class LinkedListGameComponent implements AfterViewInit, OnDestroy {
         replaceUrl: true,
       });
     };
-    this.root.render(this.React.createElement(this.App, { config, initialTechnique, onTechniqueChange, isAr }));
+    // Hand-written components take the same technique/language props as the generic engines, minus config.
+    const props = this.config
+      ? { config: JSON.parse(this.config), initialTechnique, onTechniqueChange, isAr }
+      : { initialTechnique, onTechniqueChange, isAr };
+    this.root.render(this.React.createElement(this.App, props));
   }
 
   ngOnDestroy(): void {

@@ -1,26 +1,30 @@
-import { Component, OnInit, HostListener, signal, computed, inject } from '@angular/core';
+import { Component, HostListener, signal, computed, inject } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { EMPTY, catchError, switchMap, tap } from 'rxjs';
 
 import { LessonsService } from '../../../core/services/lessons.service';
-import { LessonWithSlides } from '../../../core/models/lesson.models';
+import { LessonDetail } from '../../../core/models/lesson.models';
 import { LanguageService } from '../../../core/services/language.service';
+import { VisualRenderer } from '../../../shared/visual-renderer/visual-renderer';
 
 type CodeLang = 'cpp' | 'java';
 
 @Component({
   selector: 'app-lesson-viewer',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, VisualRenderer],
   templateUrl: './lesson-viewer.html',
   styleUrl: './lesson-viewer.css',
 })
-export class LessonViewer implements OnInit {
+export class LessonViewer {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private svc = inject(LessonsService);
   lang = inject(LanguageService);
 
-  lesson  = signal<LessonWithSlides | null>(null);
+  lesson  = signal<LessonDetail | null>(null);
   loading = signal(true);
   error   = signal<string | null>(null);
 
@@ -36,17 +40,32 @@ export class LessonViewer implements OnInit {
   isFirst       = computed(() => this.current() === 0);
   isLast        = computed(() => this.current() === this.totalInLesson() - 1);
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('lessonId'));
-    if (!Number.isFinite(id)) {
-      this.error.set(this.lang.t('lvNotFound'));
+  constructor() {
+    // Text is localized by the server: refetch when the language changes, keeping the current slide.
+    toObservable(this.lang.lang).pipe(
+      tap(() => { if (!this.lesson()) this.loading.set(true); }),
+      switchMap(lang => this.svc.get(this.route.snapshot.paramMap.get('slug') ?? '', lang).pipe(
+        catchError(err => {
+          this.error.set(this.lang.t(err?.status === 404 ? 'lvNotFound' : 'llCouldNotReach'));
+          this.loading.set(false);
+          return EMPTY;
+        }),
+      )),
+      takeUntilDestroyed(),
+    ).subscribe(l => {
+      this.lesson.set(l);
+      this.current.update(i => Math.min(i, Math.max(l.slides.length - 1, 0)));
+      this.error.set(null);
       this.loading.set(false);
-      return;
-    }
-    this.svc.get(id).subscribe({
-      next: l => { this.lesson.set(l); this.current.set(0); this.loading.set(false); },
-      error: () => { this.error.set(this.lang.t('llCouldNotReach')); this.loading.set(false); },
+      this.canonicalizeUrl(l.slug);
     });
+  }
+
+  /** Old links used the numeric id; swap it for the slug without adding a history entry. */
+  private canonicalizeUrl(slug: string): void {
+    if (this.route.snapshot.paramMap.get('slug') !== slug) {
+      void this.router.navigate(['/lessons', slug], { replaceUrl: true });
+    }
   }
 
   goTo(index: number): void {
@@ -65,12 +84,13 @@ export class LessonViewer implements OnInit {
   }
 
   slideTitle(i: number): string {
-    const s = this.slides()[i];
-    return this.lang.pick(s.title);
+    return this.slides()[i].title;
   }
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
     if (e.key === 'ArrowRight') this.next();
     if (e.key === 'ArrowLeft') this.back();
   }

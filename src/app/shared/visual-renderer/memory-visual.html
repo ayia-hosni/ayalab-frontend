@@ -1,0 +1,31 @@
+@for (panel of panels(); track $index) {
+  <div class="visual-box bg-gray-50 border border-gray-200 rounded-xl p-5 sm:p-8 mb-6 shadow-sm relative overflow-x-auto"
+       [class]="panel.caption ? 'pt-12 sm:pt-14' : ''" role="img" [attr.aria-label]="panel.ariaLabel">
+    @if (panel.caption) {
+      <div class="absolute top-2 left-3 bg-white border border-gray-200 px-3 py-1 rounded-md text-[11px] font-bold text-gray-500 shadow-sm">{{ panel.caption }}</div>
+    }
+
+    <div class="relative mx-auto" aria-hidden="true"
+         [style.width.px]="panel.layout.width" [style.height.px]="panel.layout.height">
+      <svg class="absolute inset-0" [attr.width]="panel.layout.width" [attr.height]="panel.layout.height">
+        @for (a of panel.arrows; track a.key) {
+          <path [attr.d]="a.d" fill="none" stroke-width="3" stroke-linecap="round" [class]="a.strokeClass" />
+          <polygon [attr.points]="a.head" [class]="a.fillClass" />
+        }
+      </svg>
+
+      @for (c of panel.cells; track c.id) {
+        <div class="absolute flex flex-col items-center" [style.left.px]="c.x" [style.top.px]="o.padding" [style.width.px]="o.cellWidth">
+          <div class="font-mono text-xs font-semibold text-gray-500 leading-none" [style.height.px]="o.addressHeight">{{ c.address }}</div>
+          <div class="w-full rounded-xl border-[3px] flex flex-col items-center justify-center node-3d"
+               [class]="c.boxClass + (c.highlighted ? ' ring-4 ring-amber-300' : '')" [style.height.px]="o.boxHeight">
+            @if (c.name) {
+              <span class="text-[11px] font-bold opacity-70 leading-none">{{ c.name }}</span>
+            }
+            <span class="font-mono font-bold text-base leading-tight" [class.opacity-40]="c.uninitialised">{{ c.value }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

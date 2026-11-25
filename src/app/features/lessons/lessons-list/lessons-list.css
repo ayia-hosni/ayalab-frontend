@@ -26,61 +26,90 @@
 }
 .lang-toggle button.active { background: var(--card); color: var(--secondary-shadow); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
 
-.section-block { margin-bottom: 8px; }
-.section-hdr {
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
-  gap: 10px; margin-bottom: 16px;
-}
-.section-title { font-size: 18px; font-weight: 700; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
-
-.category-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.cat-chip {
-  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-  padding: 7px 15px; border-radius: 100px;
-  border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
-  cursor: pointer; transition: all 0.15s;
-}
-.cat-chip:hover:not(.active) { color: var(--ink); background: var(--line); }
-.cat-chip.active { background: var(--secondary); color: var(--secondary-shadow); border-color: var(--secondary); box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.5); }
-
-.lessons-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
-  margin-bottom: 48px;
+/* Tree — a LinkedIn-Learning-style collapsible course outline: Section > Category > Lesson row. */
+.tree {
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  overflow: hidden; margin-bottom: 48px;
 }
 
-.lesson-card {
-  display: block; text-align: left;
-  background: var(--card); border: 1px solid var(--line); border-radius: 20px;
-  padding: 24px; box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05);
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-}
-.lesson-card:hover {
-  border-color: var(--line-heavy);
-  box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.12);
-  transform: translateY(-2px);
-}
+.branch + .branch, .section-branch + .section-branch { border-top: 1px solid var(--line); }
 
-.lesson-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-/* Deliberately neutral, not a purple-tinted box — every lesson had the exact
-   same colored wrapper regardless of content, which read as decorative
-   template filler rather than meaningful. The emoji itself carries the color. */
-.lesson-icon {
-  width: 48px; height: 48px; border-radius: 12px;
-  background: var(--surface-2); border: 1px solid var(--line);
-  display: flex; align-items: center; justify-content: center; font-size: 22px;
+.branch-hdr {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 16px 20px; background: transparent; border: none; cursor: pointer;
+  font-family: var(--sans); text-align: left; transition: background 0.15s;
 }
-.lesson-count {
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+.branch-hdr:hover { background: var(--surface-2); }
+.static-hdr { cursor: default; }
+.static-hdr:hover { background: transparent; }
+
+.chevron {
+  width: 16px; height: 16px; flex-shrink: 0; color: var(--ink-3);
+  transition: transform 0.15s;
+}
+.section-branch.expanded > .branch-hdr .chevron { transform: rotate(90deg); }
+.category-branch.expanded > .branch-hdr .chevron { transform: rotate(90deg); }
+
+.branch-title {
+  flex: 1; font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em;
+}
+.sub-title { font-size: 14px; font-weight: 600; }
+
+.branch-count {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
   background: #F1F5F9; color: var(--ink-2); padding: 4px 10px; border-radius: 100px;
-  white-space: nowrap;
+  white-space: nowrap; flex-shrink: 0;
 }
-.lesson-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-3); margin-bottom: 4px; }
-.lesson-title { font-size: 17px; font-weight: 700; color: var(--ink); margin: 0 0 8px; transition: color 0.15s; }
-.lesson-card:hover .lesson-title { color: var(--secondary-shadow); }
-.lesson-desc { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin: 0 0 16px; }
-.lesson-start { font-size: 13px; font-weight: 700; color: var(--secondary-shadow); }
+
+.branch-body { padding: 0 0 4px; }
+.sub-body { padding-left: 44px; }
+.rtl .sub-body { padding-left: 0; padding-right: 44px; }
+
+.category-branch { border-top: 1px solid var(--line); }
+.category-branch:first-child { border-top: none; }
+.category-branch .sub-hdr { padding-left: 44px; }
+.rtl .category-branch .sub-hdr { padding-left: 20px; padding-right: 44px; }
+
+.lesson-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 20px 12px 44px; text-decoration: none; transition: background 0.15s;
+}
+.rtl .lesson-row { padding: 12px 44px 12px 20px; }
+.sub-body .lesson-row { padding-left: 20px; }
+.rtl .sub-body .lesson-row { padding-left: 20px; padding-right: 20px; }
+.lesson-row:hover { background: var(--surface-2); }
+
+.lesson-icon {
+  width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  background: var(--surface-2); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.lesson-row:hover .lesson-icon { background: var(--card); }
+
+.lesson-num {
+  font-size: 12px; font-weight: 700; color: var(--ink-3); min-width: 16px; text-align: center; flex-shrink: 0;
+}
+
+.lesson-title {
+  flex: 1; font-size: 14px; font-weight: 600; color: var(--ink); transition: color 0.15s;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lesson-row:hover .lesson-title { color: var(--secondary-shadow); }
+
+.lesson-count {
+  font-size: 11px; font-weight: 600; color: var(--ink-3); white-space: nowrap; flex-shrink: 0;
+}
+
+.lesson-arrow {
+  font-size: 14px; font-weight: 700; color: var(--secondary-shadow);
+  opacity: 0; transform: translateX(-4px); transition: all 0.15s; flex-shrink: 0;
+}
+.rtl .lesson-arrow { transform: translateX(4px) scaleX(-1); }
+.lesson-row:hover .lesson-arrow { opacity: 1; transform: translateX(0); }
+.rtl .lesson-row:hover .lesson-arrow { transform: translateX(0) scaleX(-1); }
 
 .rtl { direction: rtl; text-align: right; font-family: 'Tajawal', sans-serif; }
+.rtl .branch-hdr { text-align: right; }
 
 .alert-error {
   background: var(--hard-light); border: 1px solid #FECDD3; border-radius: 12px;
@@ -89,8 +118,9 @@
 }
 .alert-error button { margin-left: auto; font-size: 12px; font-weight: 700; border: 1px solid var(--hard); border-radius: 8px; background: transparent; color: var(--hard-shadow); padding: 3px 12px; cursor: pointer; }
 
-.skeleton-card {
-  height: 180px; border-radius: 20px;
+.skeleton-tree { display: flex; flex-direction: column; gap: 1px; border-radius: 16px; overflow: hidden; margin-bottom: 48px; }
+.skeleton-branch {
+  height: 56px;
   background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
   background-size: 400% 100%;
   animation: shimmer 1.4s infinite;

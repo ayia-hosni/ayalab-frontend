@@ -54,10 +54,10 @@
             <tr>
               <td class="cell-id">{{ l.ordinal + 1 }}</td>
               <td class="cell-icon" [innerHTML]="l.icon"></td>
-              <td class="cell-title"><span class="title-text">{{ l.titleEn }}</span></td>
-              <td class="cell-title"><span class="title-text rtl">{{ l.titleAr }}</span></td>
+              <td class="cell-title"><span class="title-text">{{ l.translations.en?.title }}</span></td>
+              <td class="cell-title"><span class="title-text rtl">{{ l.translations.ar?.title }}</span></td>
               <td class="cell-title">
-                {{ l.sectionEn }}@if (l.categoryEn) { <span class="title-text" style="color:var(--ink-3)"> · {{ l.categoryEn }}</span> }
+                {{ sectionName(l) }}@if (categoryName(l)) { <span class="title-text" style="color:var(--ink-3)"> · {{ categoryName(l) }}</span> }@if (!l.published) { <span class="title-text" style="color:var(--ink-3)"> · draft</span> }
               </td>
               <td class="cell-slides">{{ l.slides.length }}</td>
               <td class="cell-actions">
@@ -120,23 +120,33 @@
 
         <div class="form-row two-col">
           <label class="form-field">
-            <span>Section (EN) *</span>
-            <input type="text" [value]="form().sectionEn" (input)="updateField('sectionEn', $any($event.target).value)" placeholder="e.g. Linked Lists" />
+            <span>Slug (URL) *</span>
+            <input type="text" [value]="form().slug" (input)="updateField('slug', $any($event.target).value)" placeholder="e.g. insert-first" />
           </label>
           <label class="form-field">
-            <span>Section (AR) *</span>
-            <input type="text" class="rtl-input" [value]="form().sectionAr" (input)="updateField('sectionAr', $any($event.target).value)" placeholder="مثال: القوائم المرتبطة" />
+            <span>Published</span>
+            <input type="checkbox" [checked]="form().published" (change)="updateField('published', $any($event.target).checked)" />
           </label>
         </div>
 
         <div class="form-row two-col">
           <label class="form-field">
-            <span>Category (EN) — optional</span>
-            <input type="text" [value]="form().categoryEn" (input)="updateField('categoryEn', $any($event.target).value)" placeholder="e.g. Insertion" />
+            <span>Section *</span>
+            <select (change)="setSection($any($event.target).value ? +$any($event.target).value : null)">
+              <option value="" [selected]="form().sectionId === null">— choose —</option>
+              @for (sec of taxonomy().sections; track sec.id) {
+                <option [value]="sec.id" [selected]="sec.id === form().sectionId">{{ sec.names.en }} / {{ sec.names.ar }}</option>
+              }
+            </select>
           </label>
           <label class="form-field">
-            <span>Category (AR) — optional</span>
-            <input type="text" class="rtl-input" [value]="form().categoryAr" (input)="updateField('categoryAr', $any($event.target).value)" placeholder="مثال: الإضافة" />
+            <span>Category — optional</span>
+            <select (change)="updateField('categoryId', $any($event.target).value ? +$any($event.target).value : null)">
+              <option value="" [selected]="form().categoryId === null">— none —</option>
+              @for (c of categoryOptions(); track c.id) {
+                <option [value]="c.id" [selected]="c.id === form().categoryId">{{ c.names.en }} / {{ c.names.ar }}</option>
+              }
+            </select>
           </label>
         </div>
 
@@ -207,9 +217,9 @@
 
             <div class="visual-mode-row">
               <span>Visual</span>
-              <button type="button" class="btn-mode-toggle" (click)="toggleVisualMode(idx)">
-                {{ s.visualMode === 'builder' ? '🖊 Switch to Raw HTML' : '🔧 Switch to Builder' }}
-              </button>
+              <button type="button" class="btn-mode-toggle" [class.active]="s.visualMode === 'builder'" (click)="setVisualMode(idx, 'builder')">🔧 Builder</button>
+              <button type="button" class="btn-mode-toggle" [class.active]="s.visualMode === 'raw'" (click)="setVisualMode(idx, 'raw')">🖊 Raw HTML</button>
+              <button type="button" class="btn-mode-toggle" [class.active]="s.visualMode === 'json'" (click)="setVisualMode(idx, 'json')">{{ '{ }' }} JSON</button>
             </div>
 
             @if (s.visualMode === 'builder') {
@@ -427,6 +437,16 @@
 
                 <div class="preview-box" [innerHTML]="previewFor(s)"></div>
               </div>
+            } @else if (s.visualMode === 'json') {
+              <label class="form-field">
+                <span>Visual spec (JSON: kind "list" or "tree")</span>
+                <textarea class="code-area" rows="12" spellcheck="false" [value]="s.specJson" (input)="updateSlide(idx, 'specJson', $any($event.target).value)"></textarea>
+              </label>
+              @if (parseJsonSpec(s); as spec) {
+                <div class="preview-box"><app-visual-renderer [spec]="spec" /></div>
+              } @else {
+                <p class="empty-hint">Not valid JSON yet — a preview appears once it parses and has a "kind".</p>
+              }
             } @else {
               <label class="form-field">
                 <span>Visual (raw HTML)</span>

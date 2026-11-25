@@ -12,6 +12,8 @@ export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
    *  recursion-tree-engine.tsx; everything else (chain/array-shaped problems) uses
    *  chain-trace-engine.tsx in 'slides' mode — see each engine's config shape comment. */
   @Input() config: string | null | undefined;
+  /** Fallback for problems with no config row: a hand-written component (see legacy-games.ts). Props: { isAr }. */
+  @Input() legacy: (() => Promise<{ default: any }>) | null | undefined;
   @ViewChild('mount') mountRef!: ElementRef<HTMLDivElement>;
   private root: any;
   private React: any;
@@ -28,11 +30,13 @@ export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
   }
 
   async ngAfterViewInit(): Promise<void> {
-    if (!this.config) return;
-    const parsedConfig = JSON.parse(this.config);
-    const loadModule = parsedConfig.kind === 'tree'
-      ? () => import('./recursion-tree-engine')
-      : () => import('./chain-trace-engine');
+    if (!this.config && !this.legacy) return;
+    const parsedConfig = this.config ? JSON.parse(this.config) : null;
+    const loadModule = !parsedConfig
+      ? this.legacy!
+      : parsedConfig.kind === 'tree'
+        ? () => import('./recursion-tree-engine')
+        : () => import('./chain-trace-engine');
     const [{ default: React }, { default: ReactDOM }, { default: App }] = await Promise.all([
       import('react'),
       import('react-dom/client'),
@@ -45,7 +49,6 @@ export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
   }
 
   private renderApp(isAr: boolean): void {
-    const config = JSON.parse(this.config!);
     const initialTechnique = this.route.snapshot.queryParamMap.get('technique') === 'recursive' ? 'recursive' : 'iterative';
     const onTechniqueChange = (t: string) => {
       this.router.navigate([], {
@@ -55,7 +58,11 @@ export class SolutionSlidesComponent implements AfterViewInit, OnDestroy {
         replaceUrl: true,
       });
     };
-    this.root.render(this.React.createElement(this.App, { config, initialTechnique, onTechniqueChange, isAr }));
+    // Hand-written components take the same technique/language props as the generic engines, minus config.
+    const props = this.config
+      ? { config: JSON.parse(this.config), initialTechnique, onTechniqueChange, isAr }
+      : { initialTechnique, onTechniqueChange, isAr };
+    this.root.render(this.React.createElement(this.App, props));
   }
 
   ngOnDestroy(): void {

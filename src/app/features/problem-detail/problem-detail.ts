@@ -10,6 +10,8 @@ import {
 import { LinkedListGameComponent } from './linked-list-game.component';
 import { SolutionSlidesComponent } from './solution-slides.component';
 import { MovePointerComponent } from './move-pointer.component';
+import { LEGACY_GAMES } from './legacy-games';
+import { formatJudgeValue } from '../../core/utils/judge-format';
 import { LanguageService } from '../../core/services/language.service';
 import { Topbar } from '../../shared/topbar/topbar';
 import { CodeEditor } from '../../shared/code-editor/code-editor';
@@ -32,6 +34,9 @@ export class ProblemDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   siteLang = inject(LanguageService);
+
+  readonly legacyGames = LEGACY_GAMES;
+  readonly fmt = formatJudgeValue;
 
   problem = signal<ProblemDetailModel | null>(null);
   loading = signal<boolean>(true);

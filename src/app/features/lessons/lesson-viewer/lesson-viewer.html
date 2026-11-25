@@ -15,7 +15,7 @@
     <a class="breadcrumb" routerLink="/lessons">
       <span class="breadcrumb-eyebrow">DSA</span>
       <span class="breadcrumb-sep">/</span>
-      <span class="breadcrumb-current">{{ lang.lang() === 'en' ? l.title.en : l.title.ar }}</span>
+      <span class="breadcrumb-current">{{ l.title }}</span>
     </a>
 
     <span class="spacer"></span>
@@ -49,11 +49,11 @@
       <div class="slide-viewport">
         <section class="slide-card">
           <div class="prose-text" [class.rtl]="lang.lang() === 'ar'">
-            <div class="slide-kicker" [innerHTML]="lang.lang() === 'en' ? slide().kicker.en : slide().kicker.ar"></div>
-            <h2 class="slide-title" [innerHTML]="lang.lang() === 'en' ? slide().title.en : slide().title.ar"></h2>
+            <div class="slide-kicker" [innerHTML]="slide().kicker"></div>
+            <h2 class="slide-title" [innerHTML]="slide().title"></h2>
           </div>
-          <div class="slide-visual" [innerHTML]="slide().visual"></div>
-          <div class="prose-text slide-body" [class.rtl]="lang.lang() === 'ar'" [innerHTML]="lang.lang() === 'en' ? slide().body.en : slide().body.ar"></div>
+          <div class="slide-visual"><app-visual-renderer [spec]="slide().visual" /></div>
+          <div class="prose-text slide-body" [class.rtl]="lang.lang() === 'ar'" [innerHTML]="slide().body"></div>
         </section>
       </div>
     </div>

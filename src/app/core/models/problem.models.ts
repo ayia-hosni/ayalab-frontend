@@ -1,3 +1,5 @@
+import type { JudgeValue } from '../utils/judge-format';
+
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type ProblemStatus = 'todo' | 'attempted' | 'solved';
 
@@ -33,9 +35,11 @@ export interface ProblemDetail extends ProblemSummary {
 
 export interface CaseResult {
   passed: boolean;
-  input: number[];
-  expected: number[];
-  actual: number[] | null;
+  /** A list, a [list, int] pair, or an int, depending on the problem. */
+  input: JudgeValue;
+  /** A list of integers, a boolean, or an int, depending on the problem. */
+  expected: JudgeValue;
+  actual: JudgeValue;
   error: string | null;
 }
 

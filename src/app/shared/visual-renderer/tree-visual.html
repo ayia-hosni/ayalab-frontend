@@ -1,0 +1,28 @@
+@for (panel of panels(); track $index) {
+  <div class="visual-box bg-gray-50 border border-gray-200 rounded-xl p-5 sm:p-8 mb-6 shadow-sm relative overflow-x-auto"
+       [class]="panel.caption ? 'pt-12 sm:pt-14' : ''" role="img" [attr.aria-label]="panel.ariaLabel">
+    @if (panel.caption) {
+      <div class="absolute top-2 left-3 bg-white border border-gray-200 px-3 py-1 rounded-md text-[10px] font-bold text-gray-500 uppercase tracking-wider shadow-sm">{{ panel.caption }}</div>
+    }
+
+    <div class="relative mx-auto" aria-hidden="true" [style.width.px]="panel.width" [style.height.px]="panel.height">
+      <svg class="absolute inset-0" [attr.width]="panel.width" [attr.height]="panel.height">
+        @for (e of panel.edges; track e.key) {
+          <line [attr.x1]="e.x1" [attr.y1]="e.y1" [attr.x2]="e.x2" [attr.y2]="e.y2"
+                stroke="#d1d5db" stroke-width="3" stroke-linecap="round" />
+        }
+      </svg>
+
+      @for (n of panel.nodes; track n.id) {
+        <div class="absolute -translate-x-1/2 -translate-y-1/2 w-14 h-14 text-lg rounded-2xl border-[3px] flex items-center justify-center font-bold node-3d"
+             [class]="n.boxClass + (n.highlighted ? ' ring-4 ring-amber-300' : '')"
+             [style.left.px]="n.x" [style.top.px]="n.y">
+          {{ n.label }}
+          @if (n.visit !== null) {
+            <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gray-900 text-white text-[11px] font-bold flex items-center justify-center">{{ n.visit }}</span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -2,7 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE } from './api.config';
-import { AdminLessonDetail, AdminLessonRequest } from '../models/lesson-admin.models';
+import {
+  AdminLessonDetail, AdminLessonRequest, AdminTaxonomy, TaxonomyRequest,
+} from '../models/lesson-admin.models';
 
 @Injectable({ providedIn: 'root' })
 export class AdminLessonService {
@@ -26,5 +28,17 @@ export class AdminLessonService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${API_BASE}/admin/lessons/${id}`);
+  }
+
+  taxonomy(): Observable<AdminTaxonomy> {
+    return this.http.get<AdminTaxonomy>(`${API_BASE}/admin/lessons/taxonomy`);
+  }
+
+  createSection(req: TaxonomyRequest): Observable<AdminTaxonomy> {
+    return this.http.post<AdminTaxonomy>(`${API_BASE}/admin/lessons/taxonomy/sections`, req);
+  }
+
+  createCategory(req: TaxonomyRequest): Observable<AdminTaxonomy> {
+    return this.http.post<AdminTaxonomy>(`${API_BASE}/admin/lessons/taxonomy/categories`, req);
   }
 }

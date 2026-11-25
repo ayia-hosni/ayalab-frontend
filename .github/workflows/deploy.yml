@@ -45,7 +45,7 @@ jobs:
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
             set -euo pipefail
-            cd /var/www/aya-lab/ayalab-frontend
+            cd /var/www/ayalab/ayalab-frontend
 
             git fetch origin main
             git reset --hard origin/main

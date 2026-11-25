@@ -16,7 +16,6 @@ const DICT = {
   // topbar
   navProblems:  { en: 'Problems',  ar: 'المسائل' },
   navLessons:   { en: 'Lessons',   ar: 'الدروس' },
-  navDashboard: { en: 'Dashboard', ar: 'لوحة التحكم' },
   navAdminLessons:  { en: 'Lesson Admin',  ar: 'إدارة الدروس' },
   navAdminProblems: { en: 'Problem Admin', ar: 'إدارة المسائل' },
   coffeeBtn: { en: '☕ Buy me a coffee', ar: '☕ اشتريلي قهوة' },

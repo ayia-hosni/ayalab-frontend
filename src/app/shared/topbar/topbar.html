@@ -11,7 +11,6 @@
     } @else if (extraNav() === 'problems') {
       <a class="nav-link" routerLink="/admin" routerLinkActive="active">{{ lang.t('navAdminProblems') }}</a>
     }
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">{{ lang.t('navDashboard') }}</a>
   </nav>
   <div class="theme-toggle">
     <button [class.active]="theme.theme() === 'light'" (click)="theme.set('light')" title="Light theme">☀️</button>

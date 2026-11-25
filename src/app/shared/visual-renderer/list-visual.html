@@ -1,0 +1,62 @@
+@for (panel of panels(); track $index) {
+  <div class="visual-box bg-gray-50 border border-gray-200 rounded-xl p-5 sm:p-8 mb-6 shadow-sm relative overflow-x-auto"
+       [class]="panel.caption ? 'pt-12 sm:pt-14' : ''" role="img" [attr.aria-label]="panel.ariaLabel">
+    @if (panel.caption) {
+      <div class="absolute top-2 left-3 bg-white border border-gray-200 px-3 py-1 rounded-md text-[10px] font-bold text-gray-500 uppercase tracking-wider shadow-sm">{{ panel.caption }}</div>
+    }
+
+    <div class="flex justify-center">
+      <div class="inline-flex flex-col min-w-max">
+        <div class="flex items-center gap-0 py-2" aria-hidden="true">
+          @if (variant() === 'doubly' && panel.nullEnd && panel.nodes.length) {
+            <ng-container *ngTemplateOutlet="nullCap" />
+            <div class="flex flex-col items-center"><div class="h-[26px]"></div><div class="w-8 sm:w-10 h-0 border-t-2 border-dashed border-gray-300 flex-shrink-0"></div></div>
+          }
+
+          @for (n of panel.nodes; track n.id; let last = $last) {
+            <div class="flex flex-col items-center">
+              <div class="h-[26px] flex items-end">
+                @if (n.pointer) {
+                  <div class="relative flex flex-col items-center animate-bounce-subtle">
+                    <div class="bg-gray-900 text-white font-bold text-[10px] px-2.5 py-1 rounded shadow-sm uppercase tracking-wider whitespace-nowrap">{{ n.pointer }}</div>
+                    <div class="w-0 h-0 border-x-[6px] border-x-transparent border-t-[7px] border-t-gray-900 mt-0.5"></div>
+                  </div>
+                }
+              </div>
+              <div class="w-14 h-14 text-lg rounded-2xl border-[3px] flex items-center justify-center font-bold node-3d flex-shrink-0"
+                   [class]="n.boxClass + (n.highlighted ? ' ring-4 ring-amber-300' : '')">{{ n.label }}</div>
+            </div>
+
+            @if (!last) {
+              <div class="flex flex-col items-center">
+                <div class="h-[26px]"></div>
+                <div class="w-8 sm:w-10 h-1 relative flex-shrink-0" [class]="n.lineClass">
+                  <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[7px]" [class]="n.arrowRight"></div>
+                  @if (variant() === 'doubly') {
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-r-[7px]" [class]="n.arrowLeft"></div>
+                  }
+                </div>
+              </div>
+            } @else if (panel.nullEnd) {
+              <div class="flex flex-col items-center"><div class="h-[26px]"></div><div class="w-8 sm:w-10 h-0 border-t-2 border-dashed border-gray-300 flex-shrink-0"></div></div>
+              <ng-container *ngTemplateOutlet="nullCap" />
+            }
+          }
+        </div>
+
+        @if (variant() === 'circular' && panel.nodes.length) {
+          <div class="relative mx-7 -mt-1 h-6 border-2 border-t-0 border-dashed border-gray-300 rounded-b-xl" aria-hidden="true">
+            <div class="absolute -left-[7px] -top-[3px] w-0 h-0 border-x-[6px] border-x-transparent border-b-[8px] border-b-gray-300"></div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<ng-template #nullCap>
+  <div class="flex flex-col items-center">
+    <div class="h-[26px]"></div>
+    <div class="w-9 h-9 text-xs rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 font-bold bg-white flex-shrink-0">∅</div>
+  </div>
+</ng-template>

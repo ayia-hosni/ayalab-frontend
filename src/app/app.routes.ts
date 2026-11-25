@@ -47,7 +47,7 @@ export const routes: Routes = [
       import('./features/lessons/lessons-list/lessons-list').then((m) => m.LessonsList),
   },
   {
-    path: 'lessons/:lessonId',
+    path: 'lessons/:slug',
     loadComponent: () =>
       import('./features/lessons/lesson-viewer/lesson-viewer').then((m) => m.LessonViewer),
   },

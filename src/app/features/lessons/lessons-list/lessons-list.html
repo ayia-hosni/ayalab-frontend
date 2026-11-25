@@ -14,66 +14,85 @@
   }
 
   @if (loading()) {
-    <div class="lessons-grid">
+    <div class="tree skeleton-tree">
       @for (i of [1,2,3]; track i) {
-        <div class="lesson-card skeleton-card"></div>
+        <div class="skeleton-branch"></div>
       }
     </div>
   } @else {
 
-    @for (section of sections(); track section.key) {
-      <div class="section-block">
-        <div class="section-hdr">
-          <h2 class="section-title" [class.rtl]="lang.isAr">{{ lang.pick(section.section) }}</h2>
-          @if (section.categories.length > 0) {
-            <div class="category-chips">
-              <button class="cat-chip" [class.active]="activeCategoryOf(section) === null" (click)="setCategory(section, null)">{{ lang.t('llAllCategories') }}</button>
-              @for (cat of section.categories; track cat.en) {
-                <button class="cat-chip" [class.active]="activeCategoryOf(section) === cat.en" (click)="setCategory(section, cat.en)">{{ lang.pick(cat) }}</button>
+    <div class="tree" [class.rtl]="lang.isAr">
+      @for (section of sections(); track section.key) {
+        <div class="branch section-branch" [class.expanded]="isSectionExpanded(section)">
+          <button class="branch-hdr" (click)="toggleSection(section)">
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="branch-title" [class.rtl]="lang.isAr">{{ section.section.name }}</span>
+            <span class="branch-count">{{ lessonCountLabel(section.lessons.length) }}</span>
+          </button>
+
+          @if (isSectionExpanded(section)) {
+            <div class="branch-body">
+              @for (l of section.uncategorized; track l.id) {
+                <a class="lesson-row" [routerLink]="['/lessons', l.slug]">
+                  <div class="lesson-icon" [innerHTML]="l.icon"></div>
+                  <span class="lesson-num">{{ lessonNumber(l) }}</span>
+                  <span class="lesson-title" [class.rtl]="lang.isAr">{{ l.title }}</span>
+                  <span class="lesson-count">{{ l.slideCount }} {{ lang.lang() === 'en' ? 'slides' : 'شريحة' }}</span>
+                  <span class="lesson-arrow">→</span>
+                </a>
+              }
+
+              @for (cg of section.categoryGroups; track cg.key) {
+                <div class="branch category-branch" [class.expanded]="isCategoryExpanded(cg)">
+                  <button class="branch-hdr sub-hdr" (click)="toggleCategory(cg)">
+                    <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="branch-title sub-title" [class.rtl]="lang.isAr">{{ cg.category.name }}</span>
+                    <span class="branch-count">{{ lessonCountLabel(cg.lessons.length) }}</span>
+                  </button>
+
+                  @if (isCategoryExpanded(cg)) {
+                    <div class="branch-body sub-body">
+                      @for (l of cg.lessons; track l.id) {
+                        <a class="lesson-row" [routerLink]="['/lessons', l.slug]">
+                          <div class="lesson-icon" [innerHTML]="l.icon"></div>
+                          <span class="lesson-num">{{ lessonNumber(l) }}</span>
+                          <span class="lesson-title" [class.rtl]="lang.isAr">{{ l.title }}</span>
+                          <span class="lesson-count">{{ l.slideCount }} {{ lang.lang() === 'en' ? 'slides' : 'شريحة' }}</span>
+                          <span class="lesson-arrow">→</span>
+                        </a>
+                      }
+                    </div>
+                  }
+                </div>
               }
             </div>
           }
         </div>
-        <div class="lessons-grid">
-          @for (l of visibleLessons(section); track l.id; let i = $index) {
-            <a class="lesson-card" [routerLink]="['/lessons', l.id]">
-              <div class="lesson-card-top">
-                <div class="lesson-icon" [innerHTML]="l.icon"></div>
-                <span class="lesson-count">{{ l.slideCount }} {{ lang.lang() === 'en' ? 'slides' : 'شريحة' }}</span>
-              </div>
-              <div class="lesson-num">{{ lang.lang() === 'en' ? 'Lesson ' + (i + 1) : 'الدرس ' + (i + 1) }}</div>
-              <h3 class="lesson-title" [class.rtl]="lang.isAr">{{ lang.pick(l.title) }}</h3>
-              <p class="lesson-desc" [class.rtl]="lang.isAr" [innerHTML]="lang.pick(l.description)"></p>
-              <span class="lesson-start">{{ lang.lang() === 'en' ? 'Start lesson →' : 'ابدأ الدرس ←' }}</span>
-            </a>
-          }
-        </div>
-      </div>
-    }
+      }
 
-    <!-- Cheat Sheet — its own section here, not lesson data from the API;
-         cards link out to the standalone animated cheat sheet pages. -->
-    <div class="section-block">
-      <div class="section-hdr">
-        <h2 class="section-title" [class.rtl]="lang.isAr">{{ lang.t('llCheatsheetSectionTitle') }}</h2>
-      </div>
-      <div class="lessons-grid">
-        <a class="lesson-card" routerLink="/cheatsheet/animate/php">
-          <div class="lesson-card-top">
+      <!-- Cheat Sheet — its own branch here, not lesson data from the API;
+           rows link out to the standalone animated cheat sheet pages. -->
+      <div class="branch section-branch expanded">
+        <div class="branch-hdr static-hdr">
+          <span class="branch-title" [class.rtl]="lang.isAr">{{ lang.t('llCheatsheetSectionTitle') }}</span>
+          <span class="branch-count">{{ lessonCountLabel(2) }}</span>
+        </div>
+        <div class="branch-body">
+          <a class="lesson-row" routerLink="/cheatsheet/animate/php">
             <div class="lesson-icon">🐘</div>
-          </div>
-          <h3 class="lesson-title" [class.rtl]="lang.isAr">PHP</h3>
-          <p class="lesson-desc" [class.rtl]="lang.isAr">{{ lang.t('llCheatsheetPhpDesc') }}</p>
-          <span class="lesson-start">{{ lang.t('llOpenCheatsheet') }}</span>
-        </a>
-        <a class="lesson-card" routerLink="/cheatsheet/animate/java">
-          <div class="lesson-card-top">
+            <span class="lesson-num">1</span>
+            <span class="lesson-title" [class.rtl]="lang.isAr">PHP</span>
+            <span class="lesson-count">{{ lang.t('llOpenCheatsheet') }}</span>
+            <span class="lesson-arrow">→</span>
+          </a>
+          <a class="lesson-row" routerLink="/cheatsheet/animate/java">
             <div class="lesson-icon">☕</div>
-          </div>
-          <h3 class="lesson-title" [class.rtl]="lang.isAr">Java</h3>
-          <p class="lesson-desc" [class.rtl]="lang.isAr">{{ lang.t('llCheatsheetJavaDesc') }}</p>
-          <span class="lesson-start">{{ lang.t('llOpenCheatsheet') }}</span>
-        </a>
+            <span class="lesson-num">2</span>
+            <span class="lesson-title" [class.rtl]="lang.isAr">Java</span>
+            <span class="lesson-count">{{ lang.t('llOpenCheatsheet') }}</span>
+            <span class="lesson-arrow">→</span>
+          </a>
+        </div>
       </div>
     </div>
   }

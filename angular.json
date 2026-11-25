@@ -55,6 +55,14 @@
             "port": 4200,
             "proxyConfig": "proxy.conf.json"
           }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "runner": "vitest",
+            "buildTarget": "pointer-lab-frontend:build:development"
+          }
         }
       }
     }
