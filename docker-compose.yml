@@ -5,6 +5,9 @@
 services:
   frontend:
     image: ayahosny/ayalab-frontend:latest
+
+    ports:
+      - "127.0.0.1:8082:80"
     environment:
       VIRTUAL_HOST: ayalab.co
       VIRTUAL_PORT: "80"
